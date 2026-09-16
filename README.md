@@ -23,8 +23,10 @@ work; an Android companion follows you into every other app on your phone.
 
 [All releases](https://github.com/Lizhiying1234/nyx-app/releases) · [Full release notes](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
 
-Two things are not in the download: an **OpenAI-compatible API key**, which analysis and practice
-require, and **dictionaries**, which are optional. See [Getting started](#getting-started).
+Two things are not in the download: an **API key** from an AI provider, which analysis and practice
+require, and **dictionaries**, which are optional. Any provider works — DeepSeek, OpenAI, Claude,
+Gemini, Kimi, GLM, Qwen, OpenRouter, or a local Ollama — and the protocol is detected from the key
+itself. See [Getting started](#getting-started).
 
 - **Windows** is portable — unzip, run `Nyx.exe`, nothing is installed and nothing is written to the
   registry. Do **not** unzip into `C:\Program Files`; that location is not writable by default and
@@ -33,6 +35,46 @@ require, and **dictionaries**, which are optional. See [Getting started](#gettin
 - **Android** is debug-signed and sideloaded. Upgrading later means uninstalling first, and
   **uninstalling an Android app deletes its local data** — export or sync your library before you
   uninstall anything.
+
+---
+
+## What it looks like
+
+Windows. The interface is in Chinese; the captions below say what each screen is doing.
+
+![Today](docs/screenshots/windows-home.png)
+
+*Today — what to practise, and how much. The number is a recommendation, not a cap. On the right:
+pick up where you left off, and a "hard zone" that collects items which keep failing.*
+
+![Analysis result](docs/screenshots/windows-analyze.png)
+
+*What comes back from an analysis: expressions ranked by the AI's own confidence, **each carrying the
+sentence it was taken from** (in italics). Nothing gets scheduled until you press the button at the
+bottom — looking the batch over is a deliberate step, and deleting nothing is a valid outcome.*
+
+![A Lecture](docs/screenshots/windows-lecture.png)
+
+*A Lecture is the workbench for one piece of material: the text, what was extracted from it, both
+practice tracks, and when it comes up next. New items always go through recognition first — asking
+someone to produce an expression they have never seen measures luck, not ability.*
+
+![Recognition drill](docs/screenshots/windows-reading.png)
+
+*A recognition drill: the source sentence with the expression removed, its meaning, and a note on
+register. You flip the card and grade yourself on four tiers.*
+
+![Production drill](docs/screenshots/windows-production.png)
+
+*A production drill — the reason the rest of it exists. The answer is graded on four tiers; this one
+lands on tier 2, "understandable but not idiomatic", and the grading points at exactly what is
+wrong: `on the flooding` should be `of the flooding`. Only the first attempt counts towards
+progress, so rewriting it teaches you something instead of inflating a number.*
+
+![Settings, AI](docs/screenshots/windows-settings.png)
+
+*Settings → AI. Paste a key from any provider; the protocol is worked out from the key itself. The
+page states plainly that the key stays on this machine, encrypted, and never takes part in sync.*
 
 ---
 
@@ -148,8 +190,9 @@ application.
 ### Windows
 
 1. Unzip anywhere except `C:\Program Files` — somewhere like `D:\Nyx` is fine. Run `Nyx.exe`.
-2. Settings → AI: paste your OpenAI-compatible API key, save, then **Test connection**. The key is
-   encrypted, stored on that machine only, never uploaded and never synced.
+2. Settings → AI: paste your API key, save, then **Test connection**. Any provider works and the
+   protocol is detected from the key. The key is encrypted, stored on that machine only, never
+   uploaded and never synced.
 3. Home → Start: paste an English text and run the analysis.
 4. Review what was extracted, then begin learning.
 5. Optional — dictionaries: put each dictionary in its own folder under `data/dicts/`, then

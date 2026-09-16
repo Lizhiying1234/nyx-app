@@ -20,14 +20,51 @@ Nyx 接收一段英文 —— 一篇文章、一个段落、一句你自己存�
 
 [全部版本](https://github.com/Lizhiying1234/nyx-app/releases) · [完整发布说明](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
 
-有两样东西不在包里：**OpenAI 兼容的 API key**（分析和练习需要它）、**词典**（可选）。
-见下面的[上手](#上手)。
+有两样东西不在包里：**AI 服务的 API key**（分析和练习需要它）、**词典**（可选）。
+哪一家都行 —— DeepSeek、OpenAI、Claude、Gemini、Kimi、智谱 GLM、通义千问、OpenRouter、本地 Ollama ——
+协议由 key 本身自动判断。见下面的[上手](#上手)。
 
 - **Windows** 是绿色便携的 —— 解压出来双击 `Nyx.exe` 就用，不安装，也不写注册表。
   **别**解压到 `C:\Program Files`，那个目录默认不可写，软件会打不开。因为这个构建没有代码签名，
   Windows 会弹 SmartScreen 警告。
 - **Android** 是调试签名、侧载安装的。将来升级必须先卸载，而
   **Android 卸载 App 会连同它的本地数据一起删掉** —— 卸载之前先导出或同步。
+
+---
+
+## 长什么样
+
+以下是 Windows 端。
+
+![Today](docs/screenshots/windows-home.png)
+
+*Today —— 今天练什么、练多少。那个数字是推荐，不是上限。右边两张卡：接着上次，以及「攻坚区」——
+反复练了还是过不去的条目会被收到那里。*
+
+![分析结果](docs/screenshots/windows-analyze.png)
+
+*一次分析拿回来的东西：AI 按自己的置信度排好，**每一条都带着它被取出来的那句原文**（斜体那行）。
+在你按下最下面那个按钮之前，什么都不会排进练习 —— 看一遍是刻意保留的一步，什么都不删也是一种结果。*
+
+![Lecture](docs/screenshots/windows-lecture.png)
+
+*Lecture 是一份材料的工作台：原文、从里面析出的知识点、认读与产出两条练习线、以及下次到期。
+新条目一律先走认读 —— 没见过就直接要求写出来，量的是运气，不是产出能力。*
+
+![认读练习](docs/screenshots/windows-reading.png)
+
+*认读练习：挖掉表达的原句、释义，外加一句语感提示。翻卡之后按四档自评。*
+
+![产出练习](docs/screenshots/windows-production.png)
+
+*产出练习 —— 其余一切存在的理由。作答按四档判分，这一份落在第 2 档「可懂但不地道」，
+并且直接指出错在哪：`on the flooding` 应该是 `of the flooding`。
+成绩只记第一次那回判定，所以改写是为了学会，不是为了把分数抬上去。*
+
+![设置 · AI](docs/screenshots/windows-settings.png)
+
+*设置 → AI。贴上任何一家的 key 都能接，协议由 key 自己判断。页面上明写着：
+key 只存在这台机器上，加密保存，不参与云同步。*
 
 ---
 
@@ -132,7 +169,7 @@ Nyx 从相反的假设出发：**一个表达是不是你的，唯一的证据�
 ### Windows
 
 1. 解压到 `C:\Program Files` 以外的任何地方 —— `D:\Nyx` 这类位置就行。双击 `Nyx.exe`。
-2. 设置 → AI：把 OpenAI 兼容的 API key 贴进去，保存，再点**测试连接**。
+2. 设置 → AI：把 API key 贴进去，保存，再点**测试连接**。哪一家都行，协议自动判断。
    key 加密保存，只存在这台机器上，不上传、不参与同步。
 3. 首页 → 开始：贴一段英文，跑分析。
 4. 看一遍析出的东西，然后开始学。
