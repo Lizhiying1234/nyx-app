@@ -1,164 +1,201 @@
 # Nyx
 
-A personal language-learning system, built for one user, running on two ends that share one source of truth.
+**Turn English you actually read into English you can actually produce.**
 
-- **`windows/`** — Desktop app (Electron, Svelte 5, TypeScript, better-sqlite3 in WAL mode).
-  Read material, pull out what is worth learning, generate exercises, practise, keep the record.
-- **`android/`** — Phone companion (Capacitor, Svelte 5, a native accessibility service).
-  Look up and capture words from inside any other app, analyse a single item, run exercises.
+Nyx takes a piece of English — an article, a paragraph, a sentence you saved — and pulls out the
+expressions worth learning, each one carrying the sentence it came from. It then drills you on them
+until you can produce them, not merely recognise them. A desktop app does the reading and the heavy
+work; an Android companion follows you into every other app on your phone.
+
+> 中文说明：[README.zh-CN.md](README.zh-CN.md)
+>
+> **The interface is in Chinese.** Nyx is a personal project, built for and used daily by its
+> author, published so that others can read the code and the design. This page and the source are
+> in English; the application is not.
+
+---
 
 ## Download — v0.1.0
 
 ### ⬇ [Windows — portable .zip, 146 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-windows-v0.1.0-portable.zip)
+
 ### ⬇ [Android — .apk, 72 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-android-v0.1.0-debug.apk)
 
-[All releases](https://github.com/Lizhiying1234/nyx-app/releases)　·　[Full release notes](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
+[All releases](https://github.com/Lizhiying1234/nyx-app/releases) · [Full release notes](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
 
-Both builds need two things you have to supply yourself: **MDX/MDD dictionary files** and an
-**OpenAI-compatible API key**. Without them the app starts and the interface works, but lookup and
-analysis do not.
+Two things are not in the download: an **OpenAI-compatible API key**, which analysis and practice
+require, and **dictionaries**, which are optional. See [Getting started](#getting-started).
 
-Two things to know before you install:
-
-- **Windows** is portable — unzip and run `Nyx.exe`, nothing is installed. Do **not** unzip into
-  `C:\Program Files` (not writable by default; the app will fail to start). Windows will show a
-  SmartScreen warning because this build is not code-signed.
-- **Android** is debug-signed and sideloaded. Upgrading to a later build means **uninstalling first**,
-  and **uninstalling an Android app deletes its local data** — for Nyx that is your learning database.
-  Back it up before you uninstall anything.
-
-## This is a snapshot
-
-This repository is **the current code as a single commit**. It carries no development history,
-no design documents, no issue log and no screenshots — those stay in the private repositories.
-
-## Layout
-
-```
-windows/            desktop source
-android/            phone source
-  nyx-core/         logic shared by both ends (src/core), database schema, AI prompts
-```
-
-In the real development repository `nyx-core/` is a git submodule pinned to a commit of the desktop
-repository — **the shared logic exists once, it is not copied into both ends.** To make this snapshot
-clonable on its own it has been materialised into a plain directory here, taken from desktop commit
-`35585f5`. So `windows/src/core/` and `android/nyx-core/src/core/` look duplicated here; upstream they
-are the same files.
-
-## A few design decisions
-
-- **SQLite is the only truth.** The UI holds no copy of the data and never touches the database or the
-  AI directly — everything goes through the main process.
-- **The database only grows.** Numbered migrations, a backup before every upgrade, a self-check after.
-  Nothing on a synced table is ever hard-deleted behind the user's back.
-- **Five kinds of generated exercise, and multiple choice is not one of them.** Recognising the right
-  option is not the same as being able to produce the phrase.
-- **Prompts are files, not code** (`prompts/*.md`) — editable in any text editor without a rebuild.
-- **All CSS lives in global stylesheets**; Svelte components carry no styles. No UI component library,
-  no Tailwind.
-
-## Running it
-
-```
-npm install
-npm run dev
-```
-
-You have to supply three things yourself, and none of them are in this repository:
-
-- **An AI endpoint and key** (OpenAI-compatible). Entered in the app's settings, stored locally only.
-- **Dictionaries** — the desktop app reads MDX/MDD dictionary files from `dicts/`.
-- **Sync** (optional) — WebDAV or Supabase Storage. Credentials also stay local.
-
-See `windows/使用说明.md` for the desktop app's own manual (Chinese).
-
-## Icons and splash art
-
-The **generated** icons and splash images are all here, so the apps build and run with nothing missing.
-The **source artwork** they were generated from is not included, so `scripts/gen-brand-icons.mjs` and
-`scripts/gen-splash-art.mjs` cannot run in this snapshot. That is deliberate, not a missing file.
-
-## License
-
-No licence is attached. All rights reserved — you are welcome to read it and learn from it,
-please do not reuse it without permission.
+- **Windows** is portable — unzip, run `Nyx.exe`, nothing is installed and nothing is written to the
+  registry. Do **not** unzip into `C:\Program Files`; that location is not writable by default and
+  the app will fail to start. Windows shows a SmartScreen warning because this build is not
+  code-signed.
+- **Android** is debug-signed and sideloaded. Upgrading later means uninstalling first, and
+  **uninstalling an Android app deletes its local data** — export or sync your library before you
+  uninstall anything.
 
 ---
 
-# Nyx（中文）
+## The problem it was built for
 
-一个自用的语言学习系统，两个端共用一份判据。
+Most vocabulary tools are built around recognition. You are shown a word and four options, you pick
+one, the tool records that you know it. But recognising a word in a list is not the same skill as
+reaching for it in the middle of your own sentence. It is common to have "learned" thousands of
+words this way and still write flat, cautious prose, because nothing along the way ever asked you to
+produce anything.
 
-- **`windows/`** —— 桌面端（Electron + Svelte 5 + TypeScript + better-sqlite3，WAL）。
-  理解材料、析出知识点、出题、练习、记录。
-- **`android/`** —— 手机端（Capacitor + Svelte 5 + 原生无障碍服务）。
-  在任何别的 App 里取词查词、单条解析、执行练习。
+Nyx starts from the opposite assumption: **the only evidence that an expression is yours is that you
+produced it.** Every design decision below follows from that one.
 
-## 下载 — v0.1.0
-
-### ⬇ [Windows —— 绿色便携 .zip，146 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-windows-v0.1.0-portable.zip)
-### ⬇ [Android —— .apk，72 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-android-v0.1.0-debug.apk)
-
-[全部版本](https://github.com/Lizhiying1234/nyx-app/releases)　·　[完整发布说明](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
-
-两个包都需要你自己准备两样东西：**MDX/MDD 词典文件** 和 **OpenAI 兼容的 API key**。
-这两样没有，软件能启动、界面能用，但查词和解析不能用。
-
-装之前要知道两件事：
-
-- **Windows** 是绿色便携的 —— 解压出来双击 `Nyx.exe` 就用，不安装。**别**解压到
-  `C:\Program Files`（默认不可写，软件会打不开）。因为这个构建没有代码签名，Windows 会弹 SmartScreen 警告。
-- **Android** 是调试签名、侧载安装的。将来升级到新版本**必须先卸载**，而
-  **Android 卸载 App 会连同它的本地数据一起删掉** —— 对 Nyx 来说就是你手机上那份学习数据库。
-  卸载任何东西之前先备份。
-
-## 这是一份快照
-
-本仓库是**当前代码的快照，只有一个提交**，不含开发历史、设计文档、问题清单和截图 —— 那些留在私有仓库里。
-
-## 目录
+## How it works
 
 ```
-windows/            桌面端源码
-android/            手机端源码
-  nyx-core/         两端共用的纯逻辑（src/core）、库结构（schema）、AI 提示词（prompts）
+   paste English text
+          |
+          v
+   AI analysis  ────────>  knowledge points, each carrying its source sentence,
+          |                split across two layers:
+          |                  [A] comprehension — you need to understand it
+          |                  [B] production    — you should be able to write it
+          v
+   practice ──────┬──────>  recognition drills   (does it register?)
+                  └──────>  production drills    (can you produce it?)
+                                   |
+                                   v
+                       four-tier scoring and diagnosis
+                                   |
+                                   v
+                        what to practise next, and when
 ```
 
-在真正的开发仓里 `nyx-core/` 是一个 git submodule，指向桌面端仓库并锁定 commit SHA ——
-**共用的逻辑只有一份，不是两端各抄一遍。** 为了让这份快照能独立 clone 下来构建，这里把它
-实体化成了普通目录，内容取自桌面端的 `35585f5`。所以 `windows/src/core/` 和
-`android/nyx-core/src/core/` 在这里看起来重复，在开发仓里它们是同一份文件。
+## What it does
 
-## 几条设计上的取舍
+### Reading and extraction
 
-- **SQLite 是唯一真相**：界面不持有数据副本，也不直接碰数据库和 AI，一律走主进程。
-- **数据库只增不删**：编号迁移、升级前备份、迁移后自检；同步表上不做用户看不见的硬删除。
-- **产出题型只有五种，里面没有选择题**：认得出正确选项，和能自己说出来，不是一回事。
-- **提示词是文件不是代码**（`prompts/*.md`）：记事本就能改，不用重新构建。
-- **全部 CSS 放全局样式表**，Svelte 组件里不写样式；不引 UI 组件库，不用 Tailwind。
+- Paste an article and get back knowledge points — expressions, patterns, collocations — **each one
+  carrying the original sentence it was taken from.** Nothing enters the library without a source.
+- Save sentences you collected yourself, and have them broken down into their parts.
+- Read an article alongside an AI tutor.
+- Ask for a full analysis of any single item: how it works, when it is used, what it is not.
 
-## 跑起来
+### Practice
+
+- **Recognition drills** and **production drills**, deliberately kept apart.
+- Production questions come in five forms, and **multiple choice is not one of them** — neither is
+  matching, nor gap-fill with a list of options to choose from. If the answer is somewhere on the
+  screen, the question is measuring the wrong thing.
+- Answers are graded on a **four-tier pragmatic scale**, and grading is required to be reproducible:
+  if the same answer scores differently tomorrow, progress is noise.
+- Diagnosis runs in two directions — down a single item over time, and across one round of practice.
+
+### Your library
+
+- Items are organised into Lectures and units. Nothing is discarded quietly.
+- An item you are finished with is made **silent** rather than deleted: it stops appearing, it does
+  not stop existing.
+- Deleted items wait in a recycle bin for ten days before they are really gone.
+- Local dictionaries are supported in two formats: **MDict** (`.mdx`, with `.mdd` resource files)
+  and **StarDict** (`.ifo`). Without any dictionary the app still works — examples are generated by
+  the AI and labelled as such.
+- Text to speech, either from a dictionary's own audio or from a system or cloud voice.
+
+### Your data
+
+- Everything lives in one SQLite database in `data/`, next to the executable. Copy that folder and
+  you have moved the entire installation to another machine.
+- The database is **append-only by design**: numbered migrations, an automatic backup on every
+  launch and again before every schema upgrade, ten backups kept, automatic rollback if an upgrade
+  fails.
+- Optional sync between the two ends over **WebDAV** or **Supabase Storage**. Sync credentials stay
+  on the device, and so does your API key — neither is ever uploaded.
+
+## Windows and Android are not the same application
+
+Both ends share one core — the same extraction rules, the same grading, the same database schema —
+but they are deliberately asymmetric.
+
+| | Windows | Android |
+|---|---|---|
+| Read and analyse long material | the main place you do it | not offered, by design |
+| Capture a sentence you liked | yes | yes |
+| Look words up **inside other apps** | — | yes; this is the point of it |
+| Practice, recognition and production | yes | yes |
+| Analyse a single item | yes | yes |
+| Edit an item's term and meaning | yes | yes |
+| Reports, statistics, scheduling | yes | not offered, by design |
+| Re-categorise or re-file items | yes | not offered, by design |
+
+The phone is meant for the minutes you have while queuing, not as a second desktop. Its distinctive
+feature is **Assist**: an accessibility service that lets you select text in any other application —
+a browser, a chat, a PDF reader — and look it up or save it into your library without leaving that
+application.
+
+## Design decisions you will notice
+
+- **Every knowledge point carries its source sentence.** An expression without the context it
+  appeared in is a flashcard, not a piece of language.
+- **The AI never translates whole sentences for you.** Explanations are in English wherever
+  possible; only grammar notes are written in Chinese.
+- **Prompts are files, not code.** Everything the AI does lives in `prompts/*.md`. Open one in a
+  text editor, change it, save it, and the next analysis uses your version. Delete it and the
+  built-in one takes over.
+- **Silence is not deletion, and deletion is not immediate.**
+- **The interface holds no copy of your data.** SQLite is the single source of truth; the UI never
+  touches the database or the AI directly.
+
+## Getting started
+
+### Windows
+
+1. Unzip anywhere except `C:\Program Files` — somewhere like `D:\Nyx` is fine. Run `Nyx.exe`.
+2. Settings → AI: paste your OpenAI-compatible API key, save, then **Test connection**. The key is
+   encrypted, stored on that machine only, never uploaded and never synced.
+3. Home → Start: paste an English text and run the analysis.
+4. Review what was extracted, then begin learning.
+5. Optional — dictionaries: put each dictionary in its own folder under `data/dicts/`, then
+   Settings → Dictionaries → Rescan.
+
+A Chinese manual, `使用说明.md`, ships inside the folder.
+
+### Android
+
+1. Sideload the APK; Android will ask you to allow installation from unknown sources.
+2. Settings → AI: enter your API key. Same rules — local only, never uploaded.
+3. To use **Assist**, grant the accessibility permission by hand in Android's system settings.
+   Nothing in the app will prompt you for it.
+4. Optional — configure sync so that the phone and the desktop share one library.
+
+Requires Android 6.0 or later.
+
+## Project status
+
+**v0.1.0.** The loop described above works end to end on both platforms. The parts that touch your
+data — migrations, backups, sync, deletion — are the parts that have been tested hardest, because
+they are the ones that can lose something. This is not a product: there is no support channel, no
+roadmap promises, and the interface is Chinese only.
+
+This repository is a **snapshot of the working code as a single commit**, published for reading. The
+development history, design documents and issue log are not part of it.
+
+## Building from source
 
 ```
 npm install
 npm run dev
 ```
 
-有三样东西要你自己准备，仓库里都没有：
+`windows/` and `android/` are separate projects; build each from its own directory.
 
-- **AI 接口与 key**（OpenAI 兼容）：在软件设置里填，只存在本地。
-- **词典**：桌面端读 `dicts/` 下的 MDX/MDD 词典文件。
-- **同步**（可选）：WebDAV 或 Supabase Storage，凭据同样只存在本地。
+In the private development repository the shared logic under `android/nyx-core/` is a git submodule
+pinned to a commit of the desktop repository, so the shared code exists exactly once. Here it is
+materialised into a plain directory so that this snapshot can be cloned and built on its own — which
+is why `windows/src/core/` and `android/nyx-core/src/core/` look duplicated in this repository.
 
-桌面端另见 `windows/使用说明.md`。
+Generated icons and splash images are included and both apps build with nothing missing, but the
+source artwork they were produced from is not published, so `scripts/gen-brand-icons.mjs` and
+`scripts/gen-splash-art.mjs` cannot run here. That is deliberate, not a missing file.
 
-## 图标与启动图
+## License
 
-图标和启动图的**成品**都在，构建和运行不缺东西；生成它们用的**原图不在**，所以
-`scripts/gen-brand-icons.mjs` 和 `scripts/gen-splash-art.mjs` 在这份快照里跑不起来。
-这是有意的，不是缺文件。
-
-## 许可
-
-未附许可证，保留一切权利。欢迎阅读和学习，未经许可请勿用于其他用途。
+No licence is attached; all rights reserved. You are welcome to read the code and learn from it.
+Please do not reuse it without permission.
