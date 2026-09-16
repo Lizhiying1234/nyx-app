@@ -1,0 +1,1676 @@
+/* ══════════════════════════════════════════════════════════════
+   Nyx Android · 布局层 —— **DS v5「夜光」的实现**（D-413 定版 · 2026-08-31）
+
+   语言三律（DS v5）：
+     ① 尺度对比 + 字距造层级（9 微标签 ↔ 40 大数 ↔ 16 衬线），**不靠堆字重**
+     ② 线与留白造结构：组无外框、发丝线只在需要扫读处
+     ③ ~~紫只做墨不做块~~ **已作废**（§〇③：那是助手自己发明的规则，
+        是「大面积黑色卡片 + 厚重按钮」的成因）→ **紫可以做块，但只做极淡的块**
+        （--soft / --soft-bd 控件面）
+
+   ★ D-227：样式全在这里，组件里一行都不写。
+   ★ 中文：默认 400 + .03em 字距，禁堆粗体（D-392）。
+   ★ 验收样 = 高保真 v4（artifact「Nyx 高保真」），逐屏对着看。
+   ══════════════════════════════════════════════════════════════ */
+
+/* ══ ★★ text-3 坐在哪个面上（U-015 · CL-Q2 / DS-Q23 定案）══════════
+   `--mute` = text-3，DS-Q23 把 AA 4.5 定成硬线之后它调深到 neutral-550。
+   算过的四个合格面：白 4.92 · neutral-50 4.76 · 页面底 neutral-100 4.60 · aqua-50 4.61。
+   **不合格的两个面**：--surface（neutral-200）4.35 · --soft（aqua-100）4.26。
+
+   ★ 做法不是逐条改颜色，是**让说明字跟着面走**：凡是把内容放到那两个面上的
+     容器，就地把 `--mute` 重定义成 text-2（4.63 / 4.54，两个都过线）。
+     一条规则管住整棵子树 —— 以后往 .sunkli 里加一行小字，它自动是对的。
+   ★ 为什么不直接把 --mute 全局调深：白面上的 text-3 是合格的，
+     全局改会把「正文 → 次级 → 说明」三档压成两档，平掉一整档层次。 */
+.sunkli, .li.silent, .toc.silent, .panel, .today, .assist, .pg .u{--mute:var(--color-text-2)}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--ui); font-size:var(--fs-ui); line-height:var(--lh);
+  letter-spacing:.01em;
+}
+
+/* ══ ★★★ 四个声部的归属（DS v5 §2.3）══════════════════════════
+   v4 的做法是**全局默认等宽**，于是项目名 · 导航 · 标题 · 正文 · 徽章
+   全落在同一族上 —— 那正是 v5 §2.1 点名的病灶 A。
+   v5 改成：**默认 = 界面之声**，凡是「机器知道的事」在下面统一指回等宽，
+   凡是「语言本身」各自指到衬线（散在下文，就近声明）。
+
+   ★ 中文不需要单独指定 family —— 思源黑体 Noto Sans SC 排在每一条字体栈的
+     纯拉丁兜底之后（D-342④），中文字符自然落到它上面。 */
+.m, .tag, .li small, .hero .sub, .vnum, .toc .ct, .toc .lead,
+.spark .n, .spark .wd, .mhead, .min, .selhead, .selbar .k, .empty .mline,
+.l1 .zh, .prog, .dtag, .drow .k{
+  font-family:var(--mono);
+}
+button{font:inherit; color:inherit; background:none; border:0; padding:0; text-align:left; cursor:pointer}
+
+/* ── 壳：100dvh + safe-area（DS §六：两个都要）───────────────── */
+.app{height:100vh; height:100dvh; display:flex; flex-direction:column;
+  /* ★ 顶部安全区 = 全局布局规则（质量审计根因 ③；DS §六「两个都要」补顶边）*/
+  padding-top:max(env(safe-area-inset-top), 10px)}
+.app-body{flex:1; overflow-y:auto; overflow-x:hidden}
+/* ★ 上边距从 .top 挪到 .view（第十九则指令）：四个 Tab 根页已经没有屏顶了，
+   留在 .top 上的上边距会跟着一起消失，内容直接贴上状态栏。
+   有屏顶的页面总距不变（12 + 0 == 0 + 12）。 */
+.view{padding:var(--s3) var(--s4) var(--s5); min-height:100%}
+
+/* Icon 钮（BUTTON_SYSTEM §四）：Android 40×40，**触达 44** —— 视觉 40，可点 44。
+   ★ 每一颗都必须带 aria-label：图标钮没有可读的文字，读屏器只会念「按钮」。 */
+.ibtn{
+  position:relative;
+  width:40px; height:40px; min-width:40px; display:inline-flex;
+  align-items:center; justify-content:center; color:var(--mute); border-radius:var(--r-ctl);
+}
+.ibtn::after{content:''; position:absolute; left:0; right:0; top:50%;
+  height:var(--touch); transform:translateY(-50%)}
+.ibtn:active{background:var(--chip)}
+.ibtn.sm{width:36px; height:36px; min-width:36px}
+.dots{color:var(--mute); font-size:17px; line-height:1}
+
+/* ── 分区标签：两声部（DS §2.3 / D-342③）────────────────────── */
+.lab{
+  font-family:var(--ui);
+  font-size:var(--lab-en); font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--mute); margin:var(--s5) 0 var(--s2);
+  display:flex; align-items:baseline; gap:var(--s2);
+}
+.lab .zh{font-size:var(--lab-zh); font-weight:400; letter-spacing:.1em; text-transform:none}
+.lab em{font-style:normal; color:var(--violet-2); font-size:11px}
+/* ★ 分区标签上的小星必须用 sprite，不许写 Unicode ✦ ——
+   那是第四份几何（另外三份见 Sprite.svelte 文件头）。11px 属 16px 档，只画核。 */
+.lab .labstar{color:var(--violet); align-self:center}
+.lab .rt{margin-left:auto; color:var(--violet-2); letter-spacing:.1em; font-weight:400}
+
+/* ── Settings 一级入口行（指令第十则 §六：大小层级要一眼可辨）──
+   一级 = mono 700 大写 + 中文小注 + ›，行高 64 —— 明显大过二级的 .li 行 */
+.l1{
+  display:flex; align-items:center; width:100%; min-height:64px; gap:var(--s3);
+  border-bottom:1px solid var(--line);
+}
+/* ★ P0「Settings 字体」（第十五则点名 · 第十六则给了答案）：
+   原本是 14px / 700 / .24em 全大写 —— 五行全屏大写在屏上很吵。
+   第三种方案的答案是 **sans 500，正常大小写** ——
+   「安静来自行高 + 留白，不靠把字放大加粗」。 */
+.l1 .en{font-family:var(--ui); font-weight:500; font-size:15px; letter-spacing:.004em; color:var(--ink)}
+.l1 .zh{font-size:var(--fs-micro-zh); letter-spacing:var(--ls-micro-zh); color:var(--mute); font-weight:400}
+.arr2{margin-left:auto; color:var(--mute); font-size:13px; flex:none}
+/* ★ §11.1 判据：**能点的一定有一个 violet 元素或一个 ›，不能点的两样都没有。**
+   树里的项目/单元行有展开 caret，讲次行原本两样都没有 —— 它却是能点进去的。 */
+.li .arr2{margin-left:8px}
+
+/* ── SavePicker 三段（I-093 Android 适配：横线+▾ · 行下内联下拉）── */
+.ppr{display:flex; align-items:center; gap:8px; margin-top:6px}
+.ppr .dlg-in{flex:1; margin:0}
+.ppcar{width:34px; min-width:34px; height:34px; color:var(--mute); font-size:12px}
+.ppcar:disabled{opacity:.35}
+.pplist{max-height:180px; overflow-y:auto; border-left:2px solid var(--line-2); margin:2px 0 4px; padding-left:8px}
+.ppo{display:block; width:100%; text-align:left; padding:9px 6px; font-size:13.5px; color:var(--ink-2); border-bottom:1px solid var(--line)}
+.ppo:last-child{border-bottom:none}
+.ppo.on,.ppo.new{color:var(--violet-2)}
+.ppo.dim{color:var(--mute); font-size:12px}
+
+/* ══ Lookup 统计面板（使用者第二轮 §七：位置靠下 + 「唯一功能是美观」）══
+   ★ 想法：横线格在 Atlas 是纯氛围，**在这里当刻度用** ——
+     每条线一个单位，柱子压在线上，一眼数得出今天比昨天多几格。
+     同一个图形语言，一处是气氛，一处是信息，装饰因此不只是装饰。
+   ★ 它没有变成分析：只有查了几次 · 收进几个 · 最常查哪个（D-362 数动作）。 */
+.spacer{height:30px}
+.lk-row{display:flex; align-items:center; gap:10px; width:100%; min-height:46px;
+  border-bottom:1px solid var(--line); border-radius:var(--r-press);
+  transition:background var(--m-press-out) var(--ease-out)}
+.lk-row:active{background:var(--chip); transition-duration:var(--m-press-in)}
+.lk-row .w{font-family:var(--serif); font-weight:400; font-size:15px; flex:1; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.lk-row .n{font-family:var(--mono); font-size:9px; font-weight:300; letter-spacing:.12em; color:var(--mute)}
+
+.panel{position:relative; padding-top:30px; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-card); padding:14px 15px 13px; margin-top:8px; overflow:hidden}
+/* ★ 面板不再有自己的小标题 —— 上面的分区标签「近七天」已经说了同一件事，
+   坐标 `LKP · W36` 负责身份。少一行字，密度反而更好。 */
+.chart{position:relative; height:74px; margin-top:11px; display:flex; align-items:flex-end}
+/* ★★ 修饰符不许用裸单类名 —— `.col.today` 曾经撞上 Atlas 的 `.today` 块，
+   真机上那一柱被套了个浅紫圆角卡片。本轮第三次同类事故（前两次是 `.ph` 和 `.real`）。
+   规矩：**修饰符要么带命名空间（.chart-cur），要么用只在本组件出现的词。** */
+/* ★ 横线刻度 —— 每一条线一个单位，柱子压在线上 */
+.chart .grid{position:absolute; inset:0 0 15px 0; pointer-events:none;
+  background-image:linear-gradient(rgba(56,168,180,.075) 1px, transparent 1px);
+  background-size:100% 13px}
+.chart .base{position:absolute; left:0; right:0; bottom:15px; height:1px; background:rgba(40,121,134,.28)}
+.chart .col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  height:100%; position:relative; z-index:1}
+.chart .bar{width:11px; background:rgba(56,168,180,.42); border-radius:1px 1px 0 0; position:relative}
+/* 柱顶那道线：柱子有了「读数」，不只是一块色 */
+.chart .bar::after{content:''; position:absolute; left:0; right:0; top:0; height:1.4px; background:var(--violet-2)}
+.chart .col.cur .bar{background:rgba(56,168,180,.62)}
+/* 零日画一道短横，不画一根很矮的柱子 —— 零就是零 */
+.chart .zero{width:11px; height:1.4px; background:rgba(40,121,134,.22)}
+.chart .wd{font-family:var(--mono); font-size:8px; font-weight:300; letter-spacing:.1em;
+  color:var(--faint); margin-top:5px; height:10px}   /* ★ 全仓唯一留在 faint 的一处：不用读的刻度 */
+.chart .col.cur .wd{color:var(--violet-2)}
+/* 「你在这儿」—— 柱子加深 + 星停在柱顶 + 星期字变紫，三条通道不靠颜色一条 */
+.chart .star{position:absolute; bottom:calc(15px + var(--h) + 4px);
+  width:7px; height:7px; color:var(--violet-2)}
+.sum{display:flex; align-items:baseline; gap:9px; margin-top:12px;
+  border-top:1px solid var(--line); padding-top:11px}
+.sum .v{font-family:var(--mono); font-weight:400; font-size:21px; letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums; color:var(--ink)}
+.sum .v .z{color:rgba(40,121,134,.28)}
+.sum .u{font-size:11.5px; color:var(--ink-2); letter-spacing:.04em}
+.sum .r{margin-left:auto; font-size:11px; letter-spacing:.06em; color:var(--mute)}
+/* ★ D-415②「坐标大写，名字照抄」：被查的词是真词，不是机器编的号 —— 不许 uppercase */
+.sum .r b{font-family:var(--serif); font-size:13px; color:var(--ink-2); font-weight:500; letter-spacing:0}
+
+.gap{margin-left:6px}
+
+/* ══ Nyx Toggle（DS v5 §16.2）══════════════════════════════════════
+   ★ 此前全应用**没有任何开关控件** —— 四处布尔设置都用一个写着「开/关」的
+     文字标签冒充（不是「还是默认 Switch」，是根本没有 Switch）。
+   ★ 滑块就是那颗星：OFF 空心核 / ON 实心核，**同一条路径**（§4.2）。
+   ★★ ON 的轨道**不用荧光**（2026-09-01 使用者裁定 A）：
+     DS §16.2 原设计是充 `--glow`，真机上它是 Settings 整屏唯一的饱和色，
+     而承载它的只是一个设置开关 —— **最不重要的东西占了最响的位置**
+     （与「0 条待做占最大版面」是同一个毛病）。改用 `--soft` 淡紫轨。
+   ★ ON/OFF 靠三条通道分，不靠一条颜色：
+     轨道底（chip→soft）· **星的空心/实心**（同一条路径 §4.2）· 位置与星色。
+   尺寸 46×26 · 滑块 18 · 热区 44 · 220ms（§16.2 定值不动）。 */
+/* ★★ OFF **不填色**（使用者 2026-09-09 第二次裁：「关闭比打开更有视觉印象，
+   这是不正确的 —— 关闭的时候框里面的颜色去掉」）。
+   先前 OFF 是 --chip（aqua-200）、ON 是 --soft（aqua-100）—— **关的那一档反而更深**，
+   我第一次只把边收轻（mute → line-2），不够：真正压住视线的是**填色**，不是边。
+   现在：关 = 空框（只有一圈结构线）· 开 = 淡水填色。**有颜色的那一头就是开着的那一头**。
+   ★ 轨的 ON 色仍按他 2026-09-01 那次裁定用 --soft，不许饱和色。 */
+.tg{
+  position:relative; width:46px; height:26px; border-radius:13px; flex:none;
+  background:transparent; border:1.4px solid var(--line-2);
+  transition:background var(--m-star-off) var(--ease-out), border-color var(--m-star-off);
+}
+.tg::after{ /* 热区补到 44 —— 视觉 26，可点 44 */
+  content:''; position:absolute; left:0; right:0; top:50%;
+  height:var(--touch); transform:translateY(-50%);
+}
+.tg[aria-checked='true']{background:var(--soft); border-color:var(--soft-bd)}
+/* ★ 旋钮底（使用者 2026-09-09 裁）：星不变，但底下垫一枚白圆片。
+   在这之前 ON 的样子是「一枚 12px 的星飘在一个淡色空药丸里」——
+   加深到 violet-2（4.36）之后**对比度过线了，可它仍然读不出是个开关**：
+   缺的不是深浅，是「有一个东西停在轨道的某一端」这个形。
+   ★ 轨色仍按 2026-09-01 那次裁定：ON 用 --soft，**不用饱和色**
+     （「最不重要的东西占了最响的位置」）。所以白圆片压在淡水轨上
+     只有 1.17，光靠填色读不出来 —— 给它一圈 --soft-bd 的发丝环，
+     两个轨（chip / soft）上都站得住。
+   ★ 三条通道一条没少：位置（左 / 右）· 星（空心 / 实心）· 轨（chip / soft），
+     旋钮底是**加上去的第四条**，不是替换掉哪一条。 */
+.tg .kn{
+  position:absolute; top:2px; left:2px; width:18px; height:18px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--mute);
+  background:var(--paper); border:1px solid var(--soft-bd); border-radius:50%;
+  box-sizing:border-box;
+  transition:left var(--m-star-off) var(--ease-out), color var(--m-star-off);
+}
+.tg[aria-checked='true'] .kn{left:24px; color:var(--violet-2)}
+/* ★ ON 的星用 violet-2 不是 violet：轨是 --soft（aqua-100），
+   aqua-500 压在上面只有 **2.45**，一枚 12px 的图形在那个对比度上基本消失
+   —— 真机上它读成「一个空的淡色药丸里飘着一点东西」。
+   aqua-700 压 aqua-100 是 4.36，过了图形件 3:1 那条线。
+   ★ 形没动：滑块仍然就是那颗星（OFF 空心核 / ON 实心核，DS §16.2），
+     动的只有深浅 —— 与使用者这一轮另外两处「深一档」是同一个判断。 */
+/* ★ 第三态「正在生效」（ST-Q6）——「开 / 关 / 正在切」三态里的那一个。
+   旋钮停在**半路**（46 的轨、18 的钮：2 与 24 的中点是 13）+ 呼吸，
+   一眼就是「它正在从这边走到那边」。**不转圈**（全应用不用 spinner）。
+   轨用 --chip：既不是关的灰、也不是开的水色，正好是「还没到」。
+   期间不可点：靠状态挡住第二下，而不是靠他手慢。 */
+.tg[aria-busy='true']{background:var(--chip); border-color:var(--soft-bd)}
+.tg[aria-busy='true'] .kn{left:13px; color:var(--violet-2);
+  animation:nyx-breathe 1.2s var(--ease-out) infinite}
+.tg:disabled{cursor:default}
+/* ★ --m-tap 接线（2026-09-01）：此前旋钮的按下缩放没有过渡，是硬跳。
+   §Motion「Tap 回应 · 只许改一个属性，不缩放不弹跳」—— 这里只动 transform。 */
+.tg .kn{transition:left var(--m-star-off) var(--ease-out), color var(--m-star-off),
+  transform var(--m-tap) var(--ease-out)}
+.tg:active .kn{transform:scale(.92)}
+
+/* ── 细 pill —— **归 Outline 小号**（BUTTON_SYSTEM §八.2）───────
+   ★ 它不再是 pill：五档里没有第六种形态，「胶囊」只是它当年的长相。
+     高 34（小号那一档）· 圆角 8 · 透明面 + 水色描边，与 .btn.sm.sec2 同一套配方。
+   ★ 热区仍然 44 —— 高度降回 34 之后靠 ::after 补，别让可点的带比规格窄
+     （那正是当年把 34 改成 42 要治的病，治法换成不动视觉高度的那一种）。 */
+.pill{
+  position:relative;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  min-height:var(--btn-h-sm); padding:4px var(--s3);
+  background:var(--btn-outline-bg); border:1px solid var(--btn-outline-border);
+  border-radius:var(--r-ctl-sm); font-size:11px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--btn-outline-text);
+}
+.pill::after{content:''; position:absolute; left:0; right:0; top:50%;
+  height:var(--touch); transform:translateY(-50%)}
+.pill:active{background:var(--btn-outline-pressed)}
+.pill.v{border-color:var(--violet); color:var(--violet-2)}
+.pill.w{border-color:var(--warn-bd); color:var(--warn)}
+
+/* ── 发丝组与行（§10.3：组无外框 · 行 56 · 无圆角）───────────── */
+.set{border-top:1px solid var(--line-2)}
+.li{
+  display:flex; align-items:center; gap:10px; width:100%;
+  min-height:var(--row-h); padding:var(--s2) 0;
+  border-bottom:1px solid var(--line); position:relative;
+}
+/* ── ★★ 三种行（DS §10.2c · 2026-09-01）───────────────────────
+   病：Settings → Data 一页七行，连接配置 / 当前状况 / 开关 / 动作四组东西
+   长得一模一样。这三条是 §〇「能点的和不能点的必须一眼分得出」的落地判据。 */
+
+/* ① 只读行：机器的事实。标签退到 --mute，值靠右，**按下去没有反应** */
+.li.ro > .g > .zh,.li.ro > .g > span:first-child{color:var(--mute); font-weight:400}
+
+/* ② 动作行：点了会发生事。标签是 --ink（不许再穿只读行的衣服），按下才有面 */
+.li.hit > .g > .zh:first-child{color:var(--ink)}
+.li.hit:active{background:var(--chip)}
+
+/* ③ 开关行 = .li + Toggle，行本身不是 button —— Toggle 就是它的脸，不另加样式 */
+
+/* ── ④ 键值行 `.kv`（B7 · 负向对照 I-176）─────────────────────
+   ★ 病是真机截出来的：ABOUT 那两行的值是一串不换行的等宽
+     （`core 1104bb5 · schema v36 · 指纹 cadb369e…`）。`.m` 上的
+     `white-space:nowrap` 让它一步不让，于是同时坏两头 ——
+       ① 值把自己顶出右缘，被切；
+       ② 标签列被挤到只剩一个字宽，「手机跑的判据是哪一版」竖排成 12 行。
+   ★ 三条**缺一条它就换个方式坏**（I-176 的判据，逐条落在下面）：
+       · 值可以换行           —— 去掉 nowrap
+       · 值按**字符**可断     —— 等宽串里没有空格可断，break-word 不够，要 anywhere
+       · 标签列有最小宽       —— 否则值一换行，标签又被挤回去
+   ★ 两边都可能是多行，所以顶对齐；行高按内容长，不再钉死在数据行那一档。 */
+/* ── ④ 键值行：判据在 `.li` 上，见下面 `.m` 之后那一段 ────────── */
+
+.li .g{flex:1; min-width:0}
+.li .hit{flex:1; min-width:0; display:flex; align-items:center; gap:10px; min-height:40px}
+.li small{
+  display:block; font-size:9.5px; letter-spacing:.06em; color:var(--mute);
+  margin-top:2px; line-height:1.5; font-weight:400;
+}
+.term{font-family:var(--serif); font-size:16px; line-height:1.45; font-weight:400}
+.zh{letter-spacing:.03em; font-weight:400}
+.m{font-size:var(--fs-meta); letter-spacing:.06em; color:var(--mute); white-space:nowrap; font-weight:400}
+
+/* ══ ★★ 键值行：值不许把标签挤没（负向对照 I-176）══════════════
+   ── 真机上量出来的机制（不是推的）────────────────────────────
+   行宽 328。`.g` 是 `flex:1 1 0%` —— **基准是 0**，所以它拿的是「剩下的」，
+   而 `.m` 的基准是 max-content（那串书名 271px）。271 < 328，于是
+   **压根没有收缩发生**：`.m` 原样占 271，`.g` 只分到 46.7px，
+   一个汉字宽 —— 「手机跑的判据是哪一版」于是竖排成一列。
+   所以治法不是「让值收缩」，是**给标签列一个真的下限**。
+
+   ── 三条缺一条它就换个方式坏 ──────────────────────────────
+     · 标签列有最小宽 9em  —— 治上面那条，最关键
+     · 值可换行            —— 去掉 `.m` 的 nowrap
+     · 值按**字符**可断    —— 等宽指纹串里没有空格可断，break-word 不够，要 anywhere
+
+   ★★ 这一段**必须写在 `.li .g` 与 `.m` 的基础规则之后**：`.li .g{min-width:9em}`
+      与 `.li .g{flex:1;min-width:0}` **特异性完全相同**，谁在后面谁赢。
+      我第一版写在前面，于是在浏览器里量到 `min-width: 0px` —— 规则在、没生效。
+   ★★ 判据落在 `.li` 上而不是某几行：我第一版只贴了 ABOUT 那两行，
+      结果同一个 bug 在设置 › 词典又坏了一次。凡「左标签 · 右事实」都算。 */
+.li .g{flex:1 1 auto; min-width:9em}
+.li .m{flex:0 1 auto; min-width:0; white-space:normal; overflow-wrap:anywhere}
+
+/* `.kv` 只剩「两边都可能多行」时那点排版：顶对齐 + 行高松一点。 */
+.li.kv{align-items:flex-start; padding-top:var(--s3); padding-bottom:var(--s3)}
+.li.kv .m{line-height:1.7; padding-top:1px}
+/* ★★ 元数据类里只要出现中文，就必须整行退回中文阶梯（D-415② / D-342③）。
+   真机抓到的：「这一条还没有完整解析 —— 回家由电脑补上。」里的破折号
+   由拉丁等宽渲染，在屏上看起来就是两个连字符 `--`。
+   中文句子的标点必须由中文字体画，而 10px 也低于中文下限 11.5px。 */
+.m.zh, .tag.zh, .li small.zh{
+  font-family:var(--ui); font-size:var(--fs-micro-zh);
+  letter-spacing:var(--ls-micro-zh); line-height:var(--lh-zh); white-space:normal;
+}
+.arr{color:var(--mute); font-size:10px; width:14px; text-align:center; flex:none;
+  transition:transform var(--m-std) var(--ease-out)}
+.open>.hit .arr,.arr.open{transform:rotate(90deg)}
+/* 层级=底色 + 缩进（v4 无导轨）*/
+/* ★ DS v5 §十五 清账 D2：右侧原本空 32px —— .li 是 width:100%，
+   负边距把盒子整体左移，右边就短了「页边距 + 负边距」两截。
+   width:auto 让它按可用宽度重算，两边才真的出血到屏幕边。 */
+/* ★★ 沉底行 = 整屏满幅（负边距把底色顶到屏幕两边）。
+   ★ 2026-09-01 真机修：这里原本写 `width:auto`，于是 `<button class="li sunkli">`
+     缩成了**文字宽**（`<button>` 即便 display:flex 也照样 shrink-to-fit），
+     底色从左边满出去、右边参差不齐 —— Settings→Dictionary 一整列楼梯状。
+     `<div class="li sunkli">` 看不出来，所以一直没被发现。
+     负边距要的是「比容器宽两个边距」，直接写出来。 */
+.sunkli{background:var(--surface); width:calc(100% + 2 * var(--s4));
+  margin:0 calc(-1 * var(--s4)); padding:var(--s2) var(--s4)}
+.p1{padding-left:var(--indent)}
+.p2{padding-left:calc(2 * var(--indent))}
+.sunkli.p1{padding-left:calc(var(--s4) + var(--indent))}
+/* 第二级缩进：面板里「一组配置」下面的那几行（AI 三槽） */
+.sunkli.p2{padding-left:calc(var(--s4) + var(--indent) * 2)}
+
+/* ── 徽章=纯文字（§10.4）────────────────────────────────────── */
+.tag{font-size:9px; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; font-weight:400}
+.t-v{color:var(--violet-2)} .t-c{color:var(--corp)} .t-w{color:var(--warn)} .t-m{color:var(--mute)}
+
+/* ── 进度（U-013 定案：**4px · 全圆角**，五档取 core 的 --progress-*）─────
+   五档 = primary（在做）· secondary（次一条线）· complete（做完）·
+   attention（该看一眼）· inactive（停着）。轨永远是 --progress-track。
+   ★ 高度与圆角都从 core 读（--progress-h / --progress-r），
+     两端同一份配方；这里只决定长度与摆法。 */
+.prog{width:44px; height:var(--progress-h); background:var(--progress-track); border-radius:var(--progress-r); flex:none; overflow:hidden}
+.prog i{display:block; height:100%; border-radius:var(--progress-r); background:var(--progress-primary)}
+.prog i.sec{background:var(--progress-secondary)}
+.prog i.done{background:var(--progress-complete)}
+.prog i.att{background:var(--progress-attention)}
+.prog i.off{background:var(--progress-inactive)}
+
+/* ══ Atlas（第三种方案定版 · 2026-09-01 按原型重排）══════════════
+   ★ 此前这里是「纯排版无盒子」的今日区 + 一列扁平 .li 树 ——
+     与使用者认可的原型**每一节的结构都不一样**。这一轮把版面搬过来。 */
+
+/* 页内小元数据行（讲次「34 条 · 12 到期」这类） */
+.num{font-family:var(--mono); font-size:9.5px; font-weight:300; color:var(--mute);
+  letter-spacing:.08em; font-variant-numeric:tabular-nums}
+.num.d{color:var(--violet-2)}
+
+/* 屏顶：衬线大标题（不是 mono 面包屑） */
+.top{display:flex; align-items:center; justify-content:space-between; padding:0 2px 2px; min-height:var(--touch)}
+.tt{font-family:var(--display); font-weight:400; font-size:var(--fs-title); letter-spacing:-.012em; color:var(--ink)}
+
+/* ══ 今日块（DS §17.3 · 2026-09-01 把漏掉的 HUD 层补回来）══════════
+   ★★★ 结构 · 颜色 · 比例 · 尺寸**一律不动** —— 使用者原话「我并没有想重新设计」。
+   之前它看起来像个大紫色 banner，根因不是设计错了，是 §17.3 白纸黑字写着的
+   四样 HUD **一样都没实现**：浅色网格 · 四角刻度 · 右上坐标 · 大数前导零。
+   Atlas 是密度梯度里最高的一档（████），这一层就是那个 ████。 */
+.today{
+  position:relative; overflow:hidden;
+  background:var(--soft); border:1px solid var(--soft-bd); border-radius:var(--r-card);
+  padding:16px 17px 15px; margin-top:12px;
+}
+/* ① 浅色网格 8px @ 5.5%（DS 原值；使用者第二轮选定 A 网格，横竖都有）
+   —— 第二眼才发现的那一层。第一眼就注意到就是太重了。 */
+.today::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:linear-gradient(rgba(56,168,180,.055) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(56,168,180,.055) 1px, transparent 1px);
+  background-size:8px 8px;
+}
+/* ② 四角 0.7px 刻度　③ 右上微型坐标
+   ★ 这两件**不绑在 .today 上** —— Lookup 的统计面板用的是同一套语言，
+     写两份就是同一件事两份判据。密度梯度靠**用几个角标**区分：
+     Atlas 四角（████），Lookup 两角（██）。 */
+.cn{position:absolute; width:7px; height:7px; border:.7px solid rgba(56,168,180,.42); pointer-events:none}
+.cn.a{left:7px; top:7px; border-right:0; border-bottom:0}
+.cn.b{right:7px; top:7px; border-left:0; border-bottom:0}
+.cn.c{left:7px; bottom:7px; border-right:0; border-top:0}
+.cn.d{right:7px; bottom:7px; border-left:0; border-top:0}
+.coord{position:absolute; right:16px; top:14px; font-family:var(--mono);
+  font-size:8px; font-weight:300; letter-spacing:.2em; text-transform:uppercase;
+  color:rgba(40,121,134,.5)}
+/* 内容要压在网格之上 */
+.today .k,.today .n,.today .w,.today .rest,.today .go{position:relative}
+.today .k{font-family:var(--ui); font-size:9.5px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--violet-2)}
+.today .n{display:flex; align-items:baseline; gap:9px; margin-top:8px}
+.today .n b{font-family:var(--mono); font-size:30px; font-weight:400; letter-spacing:-.035em;
+  color:var(--ink); font-variant-numeric:tabular-nums}
+/* ④ 大数前导零（N2 · §2.7）—— 零装饰、零成本，立刻有仪表感，
+   而且它说的是真话：这是一个定宽计数器。 */
+.today .n b .z{color:rgba(40,121,134,.28)}
+.today .n span{font-size:12.5px; color:var(--ink-2); letter-spacing:.05em}
+/* ★ 改每日目标的把手（B/SC-03 · F-011）—— **极轻**：它不是这一块的主角，
+   只是让那个数不再是个死数。视觉 11px，热区靠负边距补到 44 而不撑高这一行。
+   ★ 长按那个数仍然有效：把手是**多给一条路**，不是替换掉手势。 */
+.today .tgoal{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:var(--touch); height:var(--touch);
+  margin:calc(-1 * (var(--touch) - 16px) / 2) 0 calc(-1 * (var(--touch) - 16px) / 2) 2px;
+  color:var(--mute); flex:none; align-self:center;
+}
+.today .tgoal:active{color:var(--violet-2)}
+/* ★ --mute 压 --soft 只有 4.26 不合格（§1.3）—— 块内小字一律 --ink-2 */
+.today .w{font-size:11.5px; color:var(--ink-2); margin-top:5px; letter-spacing:.03em; line-height:var(--lh-zh)}
+.today .rest{font-family:var(--serif); font-size:16px; line-height:1.75; color:var(--ink-2); margin-top:8px; letter-spacing:.03em}
+.today .go{margin-top:13px}
+/* ★★ 这里原来有一条 `.today .go .btn{background:var(--paper); …}` ——
+   **真机第一张截图就抓到了**：TODAY 块里那颗按钮长成一个纯白空框，字没了。
+   病因是特异性：`.today .go .btn`（0,3,1）盖过 `.btn.pri`（0,2,0）的**面**，
+   却盖不住它的**字色** —— 于是白字落在白面上。
+   那条 override 是「按钮还是淡面 Secondary」年代给的补丁：块底是 --soft，
+   按钮也是 --soft，得换个面才看得出来。现在这颗是 Primary（实心水色 + 白字），
+   本来就跟块底分得开，补丁不但没用，还正好是 §六「不新增第六档」禁的那种东西。
+   删掉，让五档自己说话。 */
+
+/* ══ 按钮族 —— **全应用只有这一套**（DS v5 §16.1）══════════════════
+   ★★★ 2026-09-01 合并：此前 `.cta` 与 `.btn` 两套并存，Atlas 与 Lecture
+   **同时用着两套**，长相已经不一致 —— 同一件事两份判据，是这个仓库最贵的
+   事故形态。`.cta` 是「墨线 CTA」时代的名字，连同它的规则一起删掉，
+   12 处 call site 迁到 `.btn`。
+   （Kit 里的 `.btn.pri/.dk/.lg/.wide` 是 v4 死类名，**从来没有规则**，一并清。）
+
+   2026-09-07 使用者配色指令（U-012）五档：.btn = Secondary（淡水面 + teal 字）· .btn.pri = Primary（实心 aqua · 白字，一屏一个）·
+   .btn.sec2 = Outline（透明 · 描边）· .btn.dg = Destructive（Ghost + 粉字，**不填色不描边**）· .sm 小号。
+   ★ 尺寸 BTN-Q1 定案：手机 **常规 40 / 小号 34**，圆角 DS-Q4 定案 **控件 10 / 小号 8**。
+   ★ 十一态见 BUTTON_SYSTEM §三。这里能用 CSS 表达的是 default / focus / pressed /
+     active / disabled 五个；hover 触摸端不存在；selected 属 Segmented（.seg）；
+     **success / error 一律不落在按钮上**（BTN-Q2）—— 所以下面没有、也不许有
+     变绿或打勾的规则，结果由回执句给（Snackbar / inline）。 */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--s2);
+  height:var(--btn-h); padding:0 20px; border-radius:var(--r-ctl);
+  background:var(--btn-secondary-bg); border:1px solid var(--btn-secondary-border); color:var(--btn-secondary-text);
+  font-size:var(--fs-body-ui); letter-spacing:.05em;
+  transition:background var(--m-press-out) var(--ease-out);
+}
+/* pressed：进 90 出 160 —— **不对称才像手感**（BUTTON_SYSTEM §三）*/
+.btn:active{background:var(--btn-secondary-pressed); transition-duration:var(--m-press-in)}
+.btn.sm{height:var(--btn-h-sm); border-radius:var(--r-ctl-sm); padding:0 12px; font-size:13px}
+/* Primary：实心 aqua + 白字 —— 一屏只给一个（U-012）*/
+.btn.pri{background:var(--btn-primary-bg); border-color:var(--btn-primary-bg); color:var(--btn-primary-text)}
+.btn.pri:active{background:var(--btn-primary-pressed); border-color:var(--btn-primary-pressed)}
+/* Outline：透明 + 同一条描边 + **同一个尺寸** —— 并列时不制造主次错觉 */
+.btn.sec2{background:var(--btn-outline-bg); border-color:var(--btn-outline-border); color:var(--btn-outline-text)}
+.btn.sec2:active{background:var(--btn-outline-pressed)}
+/* Destructive = Ghost + danger 文字（BTN-Q3 定案「粉字不填色」；D-322 不羞辱）。
+   ★ 描边也去掉：留着边它仍然是一颗「看起来能按的实体」，
+     而危险动作要的是**在场但不抢眼**。点了先弹确认框（D-412）。 */
+.btn.dg{background:var(--btn-ghost-bg); border-color:transparent; color:var(--color-danger)}
+.btn.dg:active{background:var(--color-danger-subtle)}
+/* Ghost：取消 · 关闭 —— 次要到几乎不该被看见 */
+.btn.gh{background:var(--btn-ghost-bg); border-color:transparent; color:var(--btn-ghost-text)}
+.btn.gh:active{background:var(--btn-ghost-pressed)}
+/* active（这颗按钮代表的模式正开着）：面停在 pressed 档并**保持** + 1px 内描边。
+   与 pressed 的区别是「松手之后还在」。 */
+.btn.on{background:var(--btn-secondary-pressed); box-shadow:inset 0 0 0 1px var(--btn-secondary-border)}
+/* focus：键盘走到时才出现（鼠标/手指点击不出现）*/
+.btn:focus-visible{outline:2px solid var(--color-border-focus); outline-offset:2px}
+/* disabled：只降透明度，**不变色** —— 变色会让人以为它变成了另一种按钮 */
+.btn:disabled{opacity:.45}
+/* 布局修饰 */
+.btn.full{width:100%}
+.btn.center{margin-left:auto; margin-right:auto}
+/* ★ 按钮**按内容宽**，不通栏 —— 通栏那一版真机上又滑向「大块」。
+   真要通栏的场合显式加 .full。 */
+
+/* 分区标签右侧的动作（＋新建） */
+/* ★ 分区标签 —— 原型用的是 .sec，app 里一直只有 .lab；两者岗位相同
+   （SECTION，§2.5）。.lab 还有别的视图在用，不动，这里补齐 .sec。 */
+.sec{
+  display:flex; align-items:center; gap:10px; margin:20px 0 8px;
+  font-family:var(--ui); font-size:var(--lab-en); font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--mute);
+}
+.sec::after{content:""; flex:1; height:1px; background:var(--line)}
+.sec .zh{font-size:var(--lab-zh); font-weight:400; letter-spacing:.08em; text-transform:none}
+.sec .n{font-family:var(--mono); font-size:9px; font-weight:300; letter-spacing:.06em;
+  color:var(--mute); text-transform:none}
+
+/* 词条下的中文小注（原型的 .gloss）—— app 里此前没有这条规则，
+   所以「11 小时前收下」跟词条挤在同一行、还用了默认字号。 */
+.gloss{
+  display:block; margin-top:3px;
+  font-size:var(--fs-micro-zh); font-weight:400; color:var(--mute); letter-spacing:var(--ls-micro-zh);
+}
+
+/* ★ .sec 的发丝线是 ::after（flex:1 吃掉中间），所以右端动作必须 order:1
+   排到它后面 —— 否则「＋新建」会被挤在标签和线之间。 */
+.sec .rt{order:1; color:var(--violet-2); letter-spacing:.1em; font-weight:400; text-transform:none; flex:none}
+
+/* 项目卡：白卡头 + 浅底单元行 */
+.pg{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-card);
+  overflow:hidden; margin-top:9px}
+.pg .h{display:flex; align-items:center; gap:10px; padding:2px 6px 2px 14px;
+  background:var(--paper); min-height:54px}
+.pg .h .hit{flex:1; min-width:0; display:flex; align-items:center; gap:10px; min-height:50px}
+.pg .h .nm{font-family:var(--ui); font-weight:500; font-size:15px; flex:1; letter-spacing:.004em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.pg .u{display:flex; align-items:center; gap:10px; padding:2px 6px 2px 26px;
+  border-top:1px solid var(--line); min-height:48px}
+.pg .u .hit{flex:1; min-width:0; display:flex; align-items:center; gap:10px; min-height:44px}
+.pg .u .nm{font-family:var(--ui); font-weight:400; font-size:13.5px; color:var(--ink-2); flex:1;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.pg .u.lec{padding-left:40px}
+.pg .u.lec .nm{font-family:var(--serif); font-size:14.5px; color:var(--ink); font-weight:400}
+.pg .u .nm.dim{color:var(--mute); font-size:12px}
+.pg .num{font-family:var(--mono); font-size:9.5px; font-weight:300; color:var(--mute);
+  letter-spacing:.08em; font-variant-numeric:tabular-nums; flex:none}
+.pg .ic{color:var(--mute); display:flex; flex:none}
+/* ★ `.car2`（树上的展开记号）2026-09-09 随使用者裁定删了 —— 类名没有调用点了，
+   规则一起删，不留死样式。§17.1 第 06 条「折叠状态要看得见」在这一屏因此**不再成立**，
+   是明码的取舍（他提过后果之后仍要更干净的一屏），已记进交付。 */
+.pg .hit:active{background:var(--chip)}
+
+
+
+/* ══ 词条详情 / 讲次（第三种方案 · 2026-09-01 按原型重排）══════════
+   此前这两屏是 v4 的排法：屏顶 mono 面包屑、词条 .dterm、出处裸引文。
+   原型的做法是**引文块 = 浅紫底 + 左侧竖线**，比框一圈边更暖也更清楚。 */
+
+/* 屏顶次级面包屑（back 与 ⋮ 之间那一行坐标） */
+.dt{font-family:var(--mono); font-size:9px; font-weight:300; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--mute); flex:1; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* 词条头 */
+.word{font-family:var(--display); font-weight:400; font-size:var(--fs-word);
+  line-height:1.16; letter-spacing:-.015em; display:flex; align-items:center; gap:12px; margin-top:14px}
+.wm{display:flex; align-items:center; gap:9px; margin-top:7px}
+.def{font-family:var(--serif); font-weight:400; font-size:15.5px; line-height:1.68;
+  color:var(--ink-2); margin-top:12px}
+
+/* 圆钮（喇叭）：浅紫圆底，可供性明确但不重 */
+.rb{width:32px; height:32px; border-radius:var(--r-pill); background:var(--soft); color:var(--violet-2);
+  display:flex; align-items:center; justify-content:center; flex:none;
+  transition:background var(--m-press-out) var(--ease-out)}
+.rb:active{background:var(--soft-bd); transition-duration:var(--m-press-in)}
+.rb:active svg{transform:scale(.9)}
+.rb svg{transition:transform var(--m-press-in) var(--ease-out)}
+.rb.q{background:var(--chip); color:var(--mute)}
+
+/* ══ 出处引文块（§17.2 五处小巧思全部落在这里）══
+   一个想法出现三次，不是三样装饰：这段话是 Nyx 从外面捡回来的一块样本，
+   所以它该看起来像**被机器裁下来的**。 */
+.quo{
+  font-family:var(--serif); font-style:italic; font-weight:400; font-size:15px;
+  /* ★ 使用者 2026-09-08 裁「字深一档」：原来是 --violet-2（aqua-700），
+     压在暖底 warm-100 上只有 4.12，差一点到 AA 4.5 的硬线（DS-Q23）。
+     换成 teal-800 = 6.13，过线，而且还在同一族里、只深一档。
+     ★ 2026-09-08 总控按这条回报在 core 加了 --color-text-on-warm（值同为 teal-800），
+     改用它 —— 叫 warning 会让下一个人以为引文是个警告。 */
+  line-height:1.75; color:var(--color-text-on-warm);
+  background:var(--color-bg-warm); padding:12px 14px 12px 17px; margin-top:10px; position:relative;
+  /* ② 右下切角 11px：轮廓不对称了，它就不再是一个通用组件 */
+  border-radius:0 10px 0 0;
+  clip-path:polygon(0 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%);
+}
+/* ① 左侧实心条 → 刻度脊：顶端 16px 实心当头，其下 5/3 循环。
+   真机定的数 —— 先试 9/4 太散，在屏上读成一条虚线边框。 */
+.quo::before{
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(var(--violet), var(--violet)) 0 0/3px 16px no-repeat,
+             repeating-linear-gradient(rgba(56,168,180,.42) 0 5px, transparent 5px 8px);
+}
+/* ③ 目标词的荧光块 → 切角标签：同一刀的缩小回声 */
+.quo em{
+  background:var(--mark); color:var(--ink); font-style:italic; padding:0 3px; border-radius:0;
+  clip-path:polygon(0 0, calc(100% - var(--chamfer-inline)) 0, 100% var(--chamfer-inline),
+                    100% 100%, var(--chamfer-inline) 100%, 0 calc(100% - var(--chamfer-inline)));
+}
+/* ④ 菱形分隔 + ⑤ 字距 .26em。★ D-415②「坐标大写，名字照抄」：
+   出处是书名/讲次/App 的真名，**不许 uppercase**。 */
+.qs{font-family:var(--mono); font-size:9px; font-weight:300; letter-spacing:.26em;
+  color:var(--mute); margin-top:7px; font-variant-numeric:tabular-nums}
+.qs::before{content:''; display:inline-block; width:3.5px; height:3.5px; background:currentColor;
+  transform:rotate(45deg); margin-right:8px; vertical-align:2px}
+/* ★ 这里原来写着 `font-family:var(--zh)` —— `--zh` **从来没有被定义过**，
+   于是那条声明在计算值阶段就无效、退回继承，一直什么都没做（三处，本轮一并删）。
+   D-342④ 本来也说中文不需要自己的字族令牌：CJK 排在每条栈的纯拉丁兜底之后。 */
+.qs .zh{font-size:var(--fs-micro-zh); letter-spacing:var(--ls-micro-zh)}
+
+/* 解析块：白面 + 发丝边，一个小标签 + 一段中文 */
+.ib{border:1px solid var(--line); border-radius:var(--r-card); padding:11px 13px;
+  margin-top:9px; background:var(--paper)}
+.ib .l{font-family:var(--ui); font-size:9px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--mute)}
+.ib .v{font-size:12.5px; line-height:var(--lh-zh); color:var(--ink-2); margin-top:4px; letter-spacing:.03em}
+
+/* 文字动作（＋添加表达 / 中文释义）—— §十一「文字动作」档 */
+.txt{display:inline-flex; align-items:center; gap:5px; color:var(--violet-2);
+  font-size:13.5px; letter-spacing:.04em; min-height:var(--touch)}
+
+/* 浅底徽章（真实语料 / 攻坚 / 词典）—— 纯文字徽章的浅底版 */
+.bg{font-family:var(--ui); font-size:9.5px; font-weight:500; letter-spacing:.03em;
+  padding:2px 8px; border-radius:6px; flex:none; white-space:nowrap}
+.bg.real{background:var(--color-success-subtle); color:var(--corp)}
+.bg.dict{background:var(--soft); color:var(--violet-2)}
+.bg.hard{background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-bd)}
+
+/* ── Vault ──────────────────────────────────────────────────── */
+/* ★ 大数与屏顶标题之间要留白 —— 贴太近会读成一个块 */
+.vnum{font-weight:400; font-size:46px; line-height:1; letter-spacing:-.035em; margin-top:14px;
+  font-variant-numeric:tabular-nums}
+.vsub{font-size:12.5px; color:var(--mute); letter-spacing:.04em; margin-top:5px; font-weight:400}
+.uline{
+  display:flex; align-items:center; gap:var(--s2); width:100%;
+  border-bottom:1px solid var(--line-2); padding:10px 2px; color:var(--mute);
+  font-size:12.5px; letter-spacing:.03em;
+}
+.toc{display:flex; align-items:baseline; gap:10px; width:100%; min-height:52px; padding:var(--s2) 0;
+  border-bottom:1px solid var(--line)}
+.toc:last-child{border-bottom:none}
+.toc .nm{font-size:14px; font-weight:400; letter-spacing:.03em}
+/* ★ `.lead` 干着两件事：画点线 **和** 把右边那截顶到最右（flex:1）。
+   2026-09-09 使用者裁「只给有数的行画点线」—— 第一版我把没数的行整个 `.lead` 删了，
+   结果 `›` 当场贴到名字后面：**间距是它顺带撑的**，真机截图上一眼看见。
+   所以留着它撑间距，只把点线关掉。 */
+.toc .lead{flex:1; border-bottom:1.5px dotted var(--line-2); transform:translateY(-4px)}
+.toc .lead.nodots{border-bottom-color:transparent}
+.toc .ct{font-size:11px; letter-spacing:.06em; color:var(--mute); display:flex; gap:6px; align-items:baseline}
+.toc.dim .nm,.toc.dim .ct{color:var(--mute)}
+/* Assist 专区：全页唯一有底色的面 + 气泡尖角（D-391）*/
+.assist{
+  position:relative; background:var(--soft); border:1px solid var(--soft-bd); border-radius:var(--r-card);
+  padding:var(--s3) 14px 11px; margin-top:18px; width:100%;
+}
+/* ★ 尖角保留（使用者 2026-09-09 裁「尖角不去」）——
+   我提过它「不是气泡也不从任何东西里长出来」，他要它在。记录，不改。 */
+.assist::before{content:''; position:absolute; top:-5px; left:26px; width:10px; height:10px;
+  background:var(--soft); border-left:1px solid var(--soft-bd); border-top:1px solid var(--soft-bd); transform:rotate(45deg); border-radius:2px}
+.assist .hd{display:flex; align-items:baseline; gap:var(--s2)}
+.assist .prev{font-family:var(--serif); font-style:italic; font-size:15px; color:var(--ink-2); margin-top:6px}
+
+/* ── 空态（版 A 星座 · D-383）───────────────────────────────── */
+.empty{text-align:center; padding:var(--s7) var(--s4) var(--s6); position:relative}
+.empty .dust{height:44px; position:relative; margin-bottom:var(--s2)}
+/* ★★ 这里原来写的是 `fill:var(--violet-soft)` —— 那个令牌**从来没有被定义过**。
+   后果不是「颜色不对」而是「颜色没了」：无效的 var() 在计算值阶段被丢掉，
+   fill 退回它的初始值 **黑**，于是空态那三粒星一直是黑的，
+   而代码看起来在说「柔紫」。同一类事故本轮第二次（第一次是 `--zh`），
+   所以补了 `tests/tokens-live.test.ts` 把这一类挡在门外。
+   ★ DS-Q12 的配方是**用主色本身、靠透明度压到 30–45%** ——
+     直接填一个淡色会在不同底上厚薄不一，压透明度才做得到「第二眼才看见」。
+   ★ 核用 fill、四道芒用 stroke="currentColor"，所以两样由 color 一个源头驱动。 */
+.empty .dust svg{position:absolute; color:var(--color-primary); fill:currentColor}
+.empty .t{font-family:var(--serif); font-style:italic; font-size:21px}
+.empty .t.zh2{font-family:var(--ui); font-style:normal; font-size:15px; letter-spacing:.04em; font-weight:400}
+.empty .s{font-size:12.5px; color:var(--ink-2); margin-top:var(--s2); line-height:1.9; letter-spacing:.03em; font-weight:400}
+.empty .mline{font-size:var(--fs-meta); color:var(--mute); letter-spacing:.03em; margin-top:var(--s2)}
+
+/* ── 状态条（todo/告知 —— 2px warn 左线，D-379 P1 语气）──────── */
+.note{
+  border-left:2px solid var(--warn); padding:2px 0 2px 10px; margin:var(--s3) 0;
+  font-size:12.5px; color:var(--warn); letter-spacing:.02em; font-weight:400;
+}
+
+/* ── ⋮ 菜单（§10.8）— 类名沿 Menu.svelte ───────────────────── */
+.scrim{position:fixed; inset:0; background:var(--color-scrim-light); z-index:40}
+/* ── Dropdown：浮层家族第四型（DS §10.2b · 2026-09-01）─────────
+   ★ 与 Menu 的分界：改「这一屏在看什么」= Dropdown；对某个对象做事 = Menu。
+   ★ 捕获层**透明**：它不打断视线，只是换个值 —— 压暗是 Menu 的事。 */
+.dd-catch{position:fixed; inset:0; z-index:58; background:transparent; cursor:default}
+.dd{
+  position:fixed; z-index:59; max-width:calc(100vw - 32px); max-height:44vh; overflow-y:auto;
+  /* ★ 真机定的下限：触发控件（「来源」两个字）比内容还窄，跟着它走会挤成一条。
+     136 是「四个汉字 + 勾」不折行的宽度。 */
+  min-width:136px;
+  background:var(--paper); border:1px solid var(--line-2); border-radius:var(--r-card);
+  /* 极轻的影 —— 它贴着控件，不需要「浮起来」那么多。影只有一份：--e-menu。 */
+  box-shadow:var(--e-menu);
+  padding:4px 0;
+}
+/* ★ 38 → 44：DS §16.1「其余控件高度 44」。下拉里的每一条都是要按的。 */
+.dd .mi{min-height:44px; padding:0 14px; gap:10px}
+.dd .mhead{padding:7px 14px 5px}
+/* 触发控件在下拉开着时保持 on 态 —— 你得看得见是谁开的 */
+.fchip.open,.sortrow .m.open{color:var(--violet-2)}
+
+/* 浮层家族（D-393）：Dialog 居中 · ⋮ 菜单居中窄卡 · Sheet 贴底 */
+.menu{
+  position:fixed; left:50%; top:50%; transform:translate(-50%, -52%);
+  width:min(300px, calc(100vw - 56px));
+  background:var(--paper); border-radius:var(--r-card); box-shadow:var(--e-menu);
+  z-index:41; padding:6px 0; max-height:72dvh; overflow-y:auto;
+}
+.dialog{
+  position:fixed; left:50%; top:50%; transform:translate(-50%, -55%);
+  width:min(320px, calc(100vw - 48px));
+  background:var(--paper); border-radius:var(--r-card); box-shadow:var(--e-menu);
+  z-index:42; padding:18px 18px 14px;
+}
+.dlg-t{font-size:15px; font-weight:500; letter-spacing:.04em}
+.dlg-in{
+  width:100%; margin-top:14px; border:0; border-bottom:1px solid var(--line-2);
+  background:none; padding:8px 2px; font:inherit; font-size:15px;
+  letter-spacing:.02em; color:var(--ink); outline:none; border-radius:0;
+}
+.dlg-in:focus{border-bottom-color:var(--violet)}
+/* 多行值（AI Prompt 这类段落）：同一族底线式，只多了高度与换行 */
+.dlg-in.ta{resize:vertical; min-height:96px; line-height:1.7; font-size:13.5px}
+/* 一个弹窗里放好几个字段时给的小标题（T-5.14 的「修改」：词条 / 释义 / 中文释义）。
+   ★ 为什么不像 SavePicker 那样只靠 placeholder：那边三格是空的、按顺序填；
+     这边三格**都预先填好了值**，占位符根本不显示，三行长得一模一样。 */
+.dlg-lab{margin-top:14px; font-size:var(--fs-meta); letter-spacing:.1em; color:var(--mute)}
+/* ★ 内容区的高度上限是**全局**的（INTERACTION_RULES §一 末，总控 2026-09-08 裁）：
+   手机 60vh，头与动作栏钉住、只有这一块滚。
+   此前是查重那一屏自己加的 `.dlg-scroll`（46vh）—— 局部临时件，本轮删掉。
+   当时那条注释自己写着「给所有对话框设上限是 DS 的事，不该由一个功能顺手决定」，
+   现在 DS 定了，就收回来。 */
+.dlg-body{max-height:60vh; overflow-y:auto}
+.dlg-lab + .dlg-in{margin-top:2px}
+.dlg-acts{display:flex; justify-content:flex-end; gap:var(--s2); margin-top:18px}
+.mhead{padding:10px var(--s4) 6px; font-size:var(--fs-meta); letter-spacing:.1em;
+  color:var(--mute); border-bottom:1px solid var(--line); display:flex; gap:8px; align-items:center}
+.mi{display:flex; align-items:center; gap:10px; width:100%;
+  min-height:var(--touch); padding:6px var(--s4); font-size:13px; letter-spacing:.03em}
+.mi:active{background:var(--chip)}
+.mi.dg{color:var(--warn); border-top:1px solid var(--line); margin-top:4px}
+.mi.go{justify-content:space-between}
+.mi.back{color:var(--mute)}
+.msep{height:1px; background:var(--line); margin:4px 0}
+.mrow{display:flex; align-items:center; gap:10px}
+.min{margin-left:auto; font-size:var(--fs-meta); color:var(--mute)}
+.mempty,.mnote{padding:10px var(--s4); font-size:12px; color:var(--mute); letter-spacing:.03em; line-height:1.8}
+.mnote b{color:var(--ink-2); font-weight:500}
+/* ★ 删除确认的正文（D-412）—— **文案必须说真话**：它可以撤销，
+   就绝不许写「不可撤销」。这一条是使用者在第十二则里明确要的。 */
+.dlg-note{font-size:13px; line-height:1.9; color:var(--ink-2); letter-spacing:.03em; margin:12px 0 0}
+.dlg-note b{color:var(--ink); font-weight:500}
+.pdot{width:8px; height:8px; border-radius:99px; flex:none}
+
+/* ── 多选栏（§10.8 · G3）— 类名沿 SelBar.svelte ─────────────── */
+.selbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:30;
+  background:var(--paper); border-top:1px solid var(--line-2);
+  border-radius:var(--r-sheet) var(--r-sheet) 0 0; box-shadow:var(--e1);
+  padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom));
+}
+.selhead{display:flex; justify-content:space-between; align-items:baseline;
+  font-size:var(--fs-meta); letter-spacing:.08em; color:var(--mute); margin-bottom:var(--s2)}
+.sellink{color:var(--violet-2); letter-spacing:.08em}
+.selacts{display:flex; gap:var(--s2); flex-wrap:wrap}
+/* ★ 归 Outline 小号（BUTTON_SYSTEM §四「Toolbar」）：多选栏就是一条工具条。
+   32 → 34 高、胶囊 → 圆角 8、灰描边 → 水色描边，与 .pill 同一套配方。 */
+.act{
+  display:inline-flex; align-items:center; justify-content:center; min-height:var(--btn-h-sm);
+  padding:3px 12px; background:var(--btn-outline-bg);
+  border:1px solid var(--btn-outline-border); border-radius:var(--r-ctl-sm);
+  font-size:11.5px; letter-spacing:.08em; color:var(--btn-outline-text);
+}
+.act:active{background:var(--btn-outline-pressed)}
+/* 破坏性：Ghost + danger 字，不填色不描边（BTN-Q3，与 .btn.dg 同一条） */
+.act.dg{color:var(--color-danger); border-color:transparent; margin-left:auto}
+.act.dg:active{background:var(--color-danger-subtle)}
+.selbar .k{font-size:var(--fs-meta); color:var(--mute)}
+
+/* ── Tab 栏（§10.10：透明底 + 顶发丝线；四入口 D-391）────────── */
+.tabs{
+  display:flex; border-top:1px solid var(--line-2); background:var(--bg);
+  padding:var(--s2) 0 calc(var(--s2) + env(safe-area-inset-bottom));
+}
+.tab{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  color:var(--ink-2); min-height:var(--touch); justify-content:center}
+.tab span{font-size:8.5px; font-weight:700; letter-spacing:.22em; text-transform:uppercase}
+.tab.on{color:var(--violet-2)}
+/* ★ 选中态 = 细线图标 + 淡水色圆角方块（DS-Q17 定案）──────────
+   不换实心：一套图标只有一条轮廓，选中与否靠**它坐在什么上面**说。
+   方块同时是命中区的暗示 —— 参考图里那种做法。
+   ★ 三条通道仍然是三条，关掉颜色也读得懂：
+     ① 方块（有底 / 没底）② 图标与标签的颜色 ③ 标签字重 700 / 500。 */
+.tab .tabic{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:44px; height:26px; border-radius:var(--r-ctl-sm);
+  transition:background var(--m-std) var(--ease-out);
+}
+.tab.on .tabic{background:var(--color-primary-subtle)}
+
+/* ══ 微观细节（DS v5 §17.1）══════════════════════════════════════
+   使用者的验收线：**第二眼才发现。第一眼就注意到，说明太重了。** */
+
+/* 01 数字属于哪一边，形状就跟哪一边：语言里比例，元数据等宽对位 */
+.bval, .term, .dgloss, .rquote, .qline, .hrow .htxt, .hero .rest{
+  font-variant-numeric:proportional-nums;
+}
+.m, .tag, .toc .ct, .vnum, .hero .num, .hrow .hmeta, .min, .selbar .k{
+  font-variant-numeric:tabular-nums;
+}
+/* 03 右列计数对在**数位**上，不是对在右边缘上 */
+.li .m, .toc .ct{text-align:right}
+
+/* 04 + 11 行按下：进快出慢 + 有形状的浅底（不是一条通栏）
+   ★★ 圆角**只加在按下态**，不能加在静止态 —— 第一次写成无条件的，
+      真机上展开的子行（.sunkli 本来就有沉底）当场变成四个独立的圆角方块，
+      还从屏幕左边溢出去。按 §10.2 的验收判据数矩形边界 = 4，**违例**。
+      「只在按下那一瞬看得见」是这条细节的全部含义，静止时它不该存在。 */
+.li, .mi, .toc, .st, .l1{
+  transition:background var(--m-press-out) var(--ease-out);
+}
+/* ★ `.ro` 排除在外（DS §10.2c）：只读行**按下去没有反应** ——
+   这正是「能点的和不能点的一眼分得出」里「不能点」那一半的实现。 */
+.li:not(.ro):active, .toc:active, .l1:active{
+  background:var(--chip); transition-duration:var(--m-press-in);
+  border-radius:var(--r-press);
+  box-shadow:0 0 0 6px var(--chip);   /* ±6px 外扩 */
+}
+
+/* 05 喇叭按下：反馈发生在**钮**上，不在图标上 */
+.spk{transition:background var(--m-press-out) var(--ease-out)}
+.spk:active{background:var(--chip); transition-duration:var(--m-press-in)}
+.spk:active svg{transform:scale(.9)}
+.spk svg{transition:transform var(--m-press-in) var(--ease-out)}
+
+/* 07 DUE 前一个 4px 圆点 —— 紧迫性的第二条非颜色通道（D-341 四通道的延伸）*/
+.tag.t-w::before{
+  content:''; display:inline-block; width:4px; height:4px; border-radius:99px;
+  background:currentColor; margin-right:5px; vertical-align:1.5px;
+}
+/* 08 静默行整行沉到另一个面 —— 它退出了轮转就该退到另一个**层**；
+      层级用面表达，比用颜色深浅可靠 */
+.li.silent, .toc.silent{background:var(--surface)}
+.li.silent .term, .toc.silent .nm{color:var(--ink-2)}
+
+/* 09 Tab 选中：标签再加一档 = 方块之外的第二条非颜色通道
+   （图标不再换实心，见上面 DS-Q17 那一段）*/
+.tab span{font-weight:500}
+.tab.on span{font-weight:700}
+
+/* 10 长释义自动断词 —— 右缘参差是最容易被感觉到、最不容易被说出来的那种不精致 */
+.dgloss, .bval, .empty .s, .hero .rest{hyphens:auto; -webkit-hyphens:auto}
+
+/* ★ 未落地的一条（记账）：§17.1 第 02 条「中西混排自动 .16em 空隙」
+   纯 CSS 做不到（要按字符类型插空隙），得在渲染层加一个文本助手。
+   ★ 第 06 条「折叠箭头 180°」当前树用的是 caret 转 90°（那是对的形态），
+   等真出现「向下折叠」的箭头再补。 */
+
+/* ── Banner（常驻条 · B4 · NOTIFICATION_RULES §一）──────────────
+   浮层家族里唯一「不能手动关」的那一型：关了问题还在，那是把事实藏起来。
+   ★ **在流里，不是 fixed** —— 规矩写的是「内容区顶部，**不盖内容**」。
+   ★ 形态取暖底那一族（attention）：它是「该看一眼」，不是「错了」，
+     所以是描边 + 淡底 + 深字，不是一整条粉。
+   ★ 一句话 + 一颗按钮去修；没有「知道了」，因为知道了也没用。 */
+.banner{
+  display:flex; align-items:center; gap:var(--s3); flex-wrap:wrap;
+  margin:var(--s3) var(--s4) 0;
+  padding:11px 13px;
+  background:var(--warn-bg); border:1px solid var(--warn-bd);
+  border-radius:var(--r-card);
+}
+.banner .bn-t{flex:1; min-width:12em; font-size:12.5px; line-height:var(--lh-zh); color:var(--color-text)}
+
+/* ── 资源 · 启动页候选（Settings › Resources · 2026-09-09）─────────
+   ★ **一屏只放一张**（使用者 2026-09-09），左右滑着换 —— 两张并排时
+     两张卡的名字与按钮会在卡缝处连成一串读（真机上看出来的）。
+   ★ 预览模拟真启动页：素色底 + 中间一块画面，高 ≤60% · 宽 ≤88% ·
+     上移 3%（与 .splash / .splash-art 同一组数），**没有字**。
+     预览比真页面好看等于在骗他。
+   ★ 三件事分三个记号说，不合并：
+       滑到第几张 → 圆点          （只说位置）
+       这一张叫什么 → 名字         （只说身份）
+       在用的是不是它 → 徽章 / 按钮（只说状态）
+     一个记号表达两个意思，两个都读不准。 */
+.splashdeck{
+  display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
+  scrollbar-width:none; margin-top:var(--s2);
+}
+.splashdeck::-webkit-scrollbar{display:none}
+.splashslide{flex:0 0 100%; display:flex; justify-content:center; scroll-snap-align:center}
+/* 手机屏的比例（1080 × 2376），所以它一眼就是「一张启动页」而不是一张图片 */
+.splashprev{
+  width:64%; aspect-ratio:1080 / 2376;
+  border-radius:var(--r-card); overflow:hidden;
+  background:var(--color-bg); border:1px solid var(--line-2);
+  display:flex; align-items:center; justify-content:center;
+}
+/* 在用那一张：描边换主色 —— 第二条通道，关掉颜色还有下面那枚徽章 */
+.splashprev.on{border-color:var(--violet); border-width:1.5px}
+.splashart{max-height:60%; max-width:88%; object-fit:contain; transform:translateY(-3%)}
+/* 图标那一档的预览 —— 它不走插画那组数（高 ≤60% · 宽 ≤88% · 上移 3%），
+   而是照**真启动帧**的几何：画布 288px 压在 360dp 屏上 = 宽的 80%，正中不上移。
+   预览框代表一整块屏，所以同一个百分比直接用（这就是用百分比而不是 px 的原因）。 */
+.splashic{width:80%; object-fit:contain}
+
+.splashdots{display:flex; justify-content:center; gap:6px; margin-top:var(--s3)}
+.splashdot{
+  width:6px; height:6px; border-radius:var(--r-pill);
+  background:var(--color-border); transition:background var(--m-std) var(--ease-out);
+}
+.splashdot.on{background:var(--violet)}
+
+/* ── 配色模式（Settings › Resources › Colors · 2026-09-13）────────
+   ★ 模式条是**横着滚**的：模式会越建越多，竖着排会把下面的部件挤没。
+   ★ 「在用」用一个小圆点标在名字后面 —— 和「正在看哪一档」（选中态）
+     是两件事，两个记号分开（同启动页那一页的理路）。 */
+.cmodes{
+  display:flex; gap:var(--s2); overflow-x:auto; scrollbar-width:none;
+  padding:var(--s2) 0; margin-top:var(--s2);
+}
+.cmodes::-webkit-scrollbar{display:none}
+.cmode{
+  flex:none; display:inline-flex; align-items:center; gap:6px;
+  min-height:var(--btn-h-sm); padding:4px var(--s3);
+  background:var(--btn-outline-bg); border:1px solid var(--btn-outline-border);
+  border-radius:var(--r-pill); font-size:12.5px; color:var(--color-text-2);
+}
+.cmode.on{border-color:var(--violet); color:var(--violet-2); background:var(--soft)}
+.cmode.add{border-style:dashed; color:var(--mute)}
+/* 在用那一档的圆点 —— 第二条通道，关掉颜色也读得出 */
+.cdot{width:5px; height:5px; border-radius:var(--r-pill); background:var(--violet); flex:none}
+
+/* 组头右边那一排小色块：不展开也能看出这一组大概长什么样 */
+.cprev{display:flex; gap:3px; margin-left:auto; flex:none}
+.csw{
+  width:14px; height:14px; border-radius:4px; flex:none;
+  border:1px solid var(--line-2); box-sizing:border-box;
+}
+/* 逐项那一行的色块 —— **整行**可点（2026-09-13）：原来只有这个 30px 的小方块
+   能点，远低于 44 的触摸线，使用者点不中。现在它只是个指示物。 */
+.csw.big{width:34px; height:34px; border-radius:var(--r-ctl-sm)}
+.cpart{gap:var(--s2); text-align:left}
+
+/* ── 应用内拾色器（ColorPicker.svelte · 2026-09-13）──────────────
+   ★ 为什么不用 `<input type="color">`：真机上它弹的是 WebView 自带的那个
+     对话框 —— 八个纯红纯绿纯蓝的格子 + 一个被挤断行的「Cust om」。
+     能开，但配不出这套颜色。 */
+.cpick{display:flex; flex-direction:column; gap:var(--s3)}
+/* 大块预览：滑杆动一格就跟着变，不用眯着眼看 34px 的小方块 */
+.cpick-prev{
+  height:72px; border-radius:var(--r-card); border:1px solid var(--line-2);
+  display:flex; align-items:flex-end; justify-content:flex-end; padding:var(--s2);
+}
+.cpick-hex{
+  font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  background:var(--paper); color:var(--color-text-2);
+  padding:2px 6px; border-radius:var(--r-ctl-sm);
+}
+.cpick-row{display:flex; align-items:center; gap:var(--s3)}
+.cpick-row input[type='range']{flex:1; min-width:0; accent-color:var(--violet)}
+.cpick-n{width:2.6em; text-align:right; font-family:var(--mono); font-size:11px}
+/* 对比度读数：两个数各带一个标签。低于 4.5 的那个换成警告色 —— **只提醒不拦** */
+.cpick-cr{display:flex; align-items:baseline; gap:var(--s2); flex-wrap:wrap}
+.cpick-cr b{font-family:var(--mono); font-size:13px; color:var(--color-text)}
+.cpick-cr b.warn{color:var(--warn)}
+.cpart small{font-family:var(--mono); font-size:10px; letter-spacing:0}
+
+/* 名字与「启用」都**居中在图下方**（使用者 2026-09-09） */
+.splashnow{
+  display:flex; flex-direction:column; align-items:center; gap:var(--s2);
+  margin-top:var(--s2); min-height:76px;
+}
+.splashname{font-size:15px; letter-spacing:.03em}
+/* 动作行：主动作（启用 / 使用中）+ 改名。
+   ★ 改名用 .pill（Outline 小号），**不另造第六种按钮形态**
+     （BUTTON_SYSTEM 八.2：五档就是全部）。
+   ★ 内置那一档没有改名键 —— 不是置灰，是不出现：
+     点不动的键占着位置只会让人反复试（D-431 同一条理路）。 */
+.splashrow{display:flex; align-items:center; justify-content:center; gap:var(--s3)}
+
+/* ── 样式一览页的样块（Kit.svelte）──────────────────────────────
+   ★ D-227：那一页一行样式都不写。它唯一允许的内联是**现场读出来的值**
+     （`background:var(--bg)` 这种），尺寸这类固定值必须住在这里。 */
+.kswatch{width:26px; height:18px; flex:none; background:var(--soft); border:1px solid var(--soft-bd)}
+.kprog{width:64px}
+
+/* ── 启动页第二帧（B1 · DS §12.0b）───────────────────────────
+   底是 --color-bg **素色**：没有字、没有标语、没有水光 —— 中间就一块画面。
+   插画 高 ≤60% · 宽 ≤88%，居中并整块**上移 3%**：
+   视觉中心比几何中心高，不上移会看着往下坠。 */
+.splash{
+  position:fixed; inset:0; z-index:90;
+  background:var(--color-bg);
+  display:flex; align-items:center; justify-content:center;
+}
+.splash-art{
+  max-height:60%; max-width:88%; object-fit:contain;
+  transform:translateY(-3%);
+}
+/* 图标那一档（去瓷砖的水獭）—— 288px 是**系统 Splash 图标画布的同一组数**
+   （288dp），所以水獭的大小位置和 2026-09-09 改之前他看到的一样，
+   不会觉得图突然变小了。源图画布 432×432，主体占宽 48.6% / 占高 62.7%，正中。
+   ★ 不上移：插画那一档上移 3% 是因为满构图的视觉中心偏高；
+     一枚居中的图标没有那个问题，而且系统那一帧就是正中。
+   ★ max-width 兑子：窄屏上不让它顶满。 */
+.splash-ic{width:288px; max-width:80%; object-fit:contain}
+
+/* ── 首次引导（SC-25 · D-483 · 2026-09-15）───────────────────
+   四屏整屏左右滑。**层序压在启动页（90）下面**：启动页还在的时候它在底下等着，
+   收掉那一刻正好露出来 —— 顺序靠层序，不靠两个组件互相喊话（U-007 不动启动页）。
+   比 assist-wrap（60）高：引导盖着的时候不该有别的浮层插话。
+   底是 --color-bg 素色，和启动页同一块底：翻过去的时候底不跳。 */
+.onb{
+  position:fixed; inset:0; z-index:70;
+  background:var(--color-bg);
+  display:flex; flex-direction:column;
+}
+.onb-top{display:flex; justify-content:flex-end; padding:calc(env(safe-area-inset-top) + 8px) var(--s4) 0}
+/* 翻页用原生 scroll-snap：抛掷手感、回弹、无障碍焦点都是系统给的。
+   滚动条藏起来 —— 圆点已经在说位置了，两套指示器只会打架。 */
+.onb-rail{
+  flex:1; display:flex; overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; scrollbar-width:none;
+}
+.onb-rail::-webkit-scrollbar{display:none}
+/* ★★ scroll-snap-stop:always —— 2026-09-15 真机上抓到的：少了它，**一次快滑直接飞到末屏**
+   （第 2、3 屏根本没露过面）。mandatory 只保证「停下来时对齐某个吸附点」，
+   不保证「一次只过一个」—— 抛掷的动量照样能跨过中间几屏。always 是标准里
+   专门管这件事的那一条：每个吸附点都必须停。 */
+.onb-pg{
+  flex:0 0 100%; scroll-snap-align:center; scroll-snap-stop:always;
+  display:flex; flex-direction:column; justify-content:center; gap:var(--s4);
+  padding:0 var(--s5);
+}
+/* ── 形态「乙」：说话的兔子 + 漫画框（H-2）───────────────────
+   ★ 兔子是**说话的人**，不是装饰：框的尾巴朝上指着它。
+   ★ 同一张启动页那只（`SPLASH_ICON`），不另画；D-484 只放开首次引导这一处，
+     别的屏上不许出现它（D-340「不做吉祥物」没被推翻）。 */
+.onb-bun{
+  width:132px; height:132px; object-fit:contain;
+  align-self:center; margin-bottom:var(--s1);
+}
+/* 漫画框：和第二层那一族同一套度量（圆角 14 + 阴影 + 三角尾巴），
+   两层看起来是同一个人在说话 —— 这正是「一套视觉家族」的意思。 */
+.onb-blk{
+  position:relative;
+  background:var(--paper); border-radius:14px; box-shadow:var(--e2);
+  padding:16px 18px 14px;
+}
+.onb-tail{
+  position:absolute; top:-10px; left:50%; margin-left:-16px;
+  width:32px; height:10px; background:var(--paper);
+  clip-path:polygon(50% 0, 100% 100%, 0 100%);
+}
+/* TITLE（§2.5）：一行标题，中文只有 Noto Serif SC 一族，600 是它两档里的那一档 */
+.onb-t{font-size:22px; font-weight:600; line-height:1.4; letter-spacing:.02em; margin:0}
+/* 正文按 BODY-LANG 给：这几句要在一臂距离外读，界面正文那档（14）在整屏上偏小 */
+.onb-b{
+  font-size:var(--fs-body-lang); color:var(--ink-2);
+  line-height:1.85; letter-spacing:.03em; margin:var(--s3) 0 0;
+}
+.onb-foot{
+  display:flex; flex-direction:column; align-items:center; gap:var(--s4);
+  padding:0 var(--s5) calc(env(safe-area-inset-bottom) + var(--s6));
+}
+/* 圆点只报位置，点不动：没有紫、没有 caret，按 §11.1 一眼就看得出不是控件 */
+.onb-dots{display:flex; gap:var(--s2)}
+.onb-dot{
+  width:6px; height:6px; border-radius:50%; background:var(--line-2);
+  transition:background var(--m-std) var(--ease-out);
+}
+.onb-dot.on{background:var(--violet)}
+/* 这一格永远占着位：只在末屏放按钮的话，翻到末屏时圆点会被顶上去 */
+.onb-act{min-height:var(--btn-h); display:flex; align-items:center}
+
+/* ── 出题规则的选项行（D-482）────────────────────────────────
+   一行标签 + 一条 Segmented。为什么不塞进 44 的设置行右边：三段中文在
+   手机宽度上会把标签挤没（I-176 那条负向对照钉的就是这件事），所以上下摞。
+   变灰那一档用 .off：**不隐藏**，旁边给一句为什么（使用者要看得见它存在）。 */
+.qrow{margin:14px 0 0}
+.qrow .qlab{display:block; font-size:var(--fs-body-zh); color:var(--ink); letter-spacing:.03em}
+.qrow .qwhy{display:block; font-size:var(--fs-micro-zh); color:var(--mute); margin-top:3px; letter-spacing:.03em}
+.qrow .seg{margin-top:6px}
+.qrow.off{opacity:.45}
+.qrow.off .seg button{pointer-events:none}
+
+/* ══ 三层配置：牌面预览卡 · 题型单选行（D-486 · 2026-09-15）══════════
+   ★ 使用者第 5 条：牌面偏「视觉预览」、题型偏「选任务类型」、出题规则偏「条件配置」。
+     三层在屏上**必须长得不一样** —— 所以这里是**两种新形态**，
+     出题规则那一层保持「一行入口 → 弹窗」，一眼分得出不是同一种东西。
+   ★ D-227：样式只住这个文件。 */
+
+/* 牌面：小卡网格。认读多选、产出单选，**同一种形态**（两个模式结构对应，§一）*/
+.faces{display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); margin-top:var(--s2)}
+.facecard{display:block; width:100%; text-align:left; background:var(--paper);
+  border:1px solid var(--line-2); border-radius:var(--r-card);
+  padding:var(--s2) var(--s3) var(--s3); min-height:92px}
+.facecard:active{background:var(--btn-outline-pressed)}
+/* 选中 = 紫描边 + 紫名字。**不填充**（D-327 禁全 Card 化那一族的浓色块）*/
+.facecard.on{border-color:var(--violet)}
+.facecard.on .fname{color:var(--violet-2)}
+/* ★★ 多选那一面**再加一枚勾角标**（认读的牌面可多选，产出的是单选）。
+   两端在这一点上语义一致、度量各不同（D-474）：Windows 是「多选=勾选角标 /
+   单选=描边」，这里照同一条语义做手机的那份。
+   ☞ 只靠描边的话，**多选和单选长得一模一样** —— 他不点第二张就不知道能多选，
+     而屏幕上没有任何东西会告诉他。 */
+.facecard{position:relative}
+.facecard.multi.on::after{content:''; position:absolute; top:8px; right:8px;
+  width:13px; height:7px; border-left:1.5px solid var(--violet);
+  border-bottom:1.5px solid var(--violet); transform:rotate(-45deg)}
+.facecard.multi{padding-right:var(--s5)}
+/* 卡内那颗铺满的勾选键（外层是 div，因为自建那几张还要一颗「删掉」——按钮不能套按钮）*/
+.facecard .fhit{display:block; width:100%; text-align:left; background:none; border:0; padding:0}
+/* 自建牌面的「删掉」：小、靠右下、不抢勾选那一下 */
+.facecard .fdel{position:absolute; right:8px; bottom:6px; background:none; border:0;
+  font-size:var(--fs-micro-zh); color:var(--mute); padding:4px 2px; letter-spacing:.03em}
+.facecard .fdel:active{color:var(--warn)}
+.facecard:has(.fdel){padding-bottom:var(--s5)}
+/* 缩略的「真实卡面样子」—— 两三条横线，示意题面的排布，不是装饰 */
+.facecard .fprev{display:flex; flex-direction:column; gap:3px; margin:var(--s1) 0 var(--s2)}
+.facecard .fprev i{display:block; height:3px; border-radius:2px; background:var(--line-2)}
+.facecard.on .fprev i{background:var(--violet)}
+.facecard .fname{display:block; font-size:var(--fs-body-zh); color:var(--ink); letter-spacing:.03em}
+.facecard .fsays{display:block; font-size:var(--fs-micro-zh); color:var(--mute);
+  margin-top:3px; letter-spacing:.03em; line-height:1.45}
+
+/* 题型：一行一个任务类型（单选）。**行**不是卡 —— 它选的是「做什么」不是「长什么样」*/
+.picks{margin-top:var(--s2)}
+.pick{display:flex; align-items:flex-start; gap:var(--s3); width:100%; text-align:left;
+  padding:var(--s3) 0; border-bottom:1px solid var(--line)}
+.pick:last-child{border-bottom:none}
+.pick .pdot{flex:none; width:15px; height:15px; margin-top:2px; border-radius:50%;
+  border:1.5px solid var(--line-2); position:relative}
+.pick.on .pdot{border-color:var(--violet)}
+.pick.on .pdot::after{content:''; position:absolute; inset:3px; border-radius:50%;
+  background:var(--violet)}
+.pick .pname{display:block; font-size:var(--fs-body-zh); color:var(--ink); letter-spacing:.03em}
+.pick.on .pname{color:var(--violet-2)}
+.pick .psays{display:block; font-size:var(--fs-micro-zh); color:var(--mute);
+  margin-top:3px; letter-spacing:.03em; line-height:1.45}
+/* 模式标识：一屏一眼看清在配哪一个（使用者第 1 条）*/
+.mode{display:flex; align-items:baseline; gap:var(--s2); margin:var(--s5) 0 var(--s2)}
+.mode .mzh{font-size:var(--fs-body-zh); color:var(--ink); letter-spacing:.06em}
+.mode .men{font-family:var(--mono); font-size:9px; color:var(--mute); letter-spacing:.1em}
+.mode::after{content:''; flex:1; height:2px; background:var(--violet); opacity:.5}
+/* 段说明独占一行 —— **不塞进 `.sec`**：那是个 flex + `::after` 拉线的容器，
+   塞一句长话会把段名挤成竖排（真机第一张截图当场看见「牌 / 面」叠起来）。 */
+.seclead{margin:-2px 0 var(--s1); font-size:var(--fs-micro-zh); color:var(--mute);
+  letter-spacing:.03em; line-height:1.5}
+
+/* ══ 认读题型三档在卡屏上的那几件（D-486）══════════════════════
+   ★ `flip` 一件都不用 —— 它就是原来那个形态，**不为「有三档」而给它加装饰**。 */
+/* `write`「先写再翻」的输入框 */
+.wbox{display:block; width:100%; margin:var(--s3) 0 0; padding:10px var(--s3);
+  background:var(--paper); border:1px solid var(--line-2); border-radius:var(--r-card);
+  font-size:var(--fs-body-zh); color:var(--ink)}
+.wbox:focus{outline:none; border-color:var(--violet)}
+/* 翻开后的对照条：对上了描紫，没对上保持中性 —— **不报红**，
+   因为这一档不判分，红色会读成「你错了」而判分还在他手里 */
+.wcmp{display:flex; flex-direction:column; gap:3px; margin:var(--s3) 0 0;
+  padding:var(--s2) var(--s3); border-radius:var(--r-card);
+  border:1px solid var(--line-2); font-size:var(--fs-micro-zh); color:var(--mute)}
+.wcmp.ok{border-color:var(--violet)}
+.wcmp.ok span:last-child{color:var(--violet-2)}
+/* `timed` 的倒计时：数用等宽（机器知道的事），代价那句用中文 */
+.tleft{display:flex; align-items:baseline; gap:var(--s2); margin:var(--s3) 0 0;
+  font-size:var(--fs-micro-zh); color:var(--mute)}
+.tleft .tnum{font-family:var(--mono); font-size:20px; color:var(--ink); line-height:1}
+
+/* ══ 产出牌面三张在练习屏上的差别（D-486）══════════════════════ */
+/* `focus`：进题只留任务与输入框，答完再把其余推回来 */
+.pfocus .fadeaway{display:none}
+/* `split`：答完把他写的与参考答案并排。★ 这一轮是**零数据**的并排回看 —— 
+   不新增任何列，只是把已有的两段摆成两栏（`given` 列排下次装机批） */
+.psplit{display:grid; grid-template-columns:1fr 1fr; gap:var(--s3); align-items:start}
+/* ★★★ 断点 360 → **320**（真机改的，2026-09-15）。
+   他这台机器的 CSS 宽度**正好是 360**，`max-width:360px` 恰好命中 ——
+   于是「分栏」在他手机上**永远是上下堆叠**，而那一档的说明写着
+   「答完把你写的和参考答案**并排**放」。**屏上那句话成了假话，而没有任何东西会报错。**
+   真机上把两栏强开看过：360 宽下每栏 158px，那句英文五行一栏，
+   对照关系一眼看得出来 —— 读得了，所以让它真的并排。
+   320 留给更窄的机器（真到那个宽度，两栏确实不该硬撑）。 */
+@media (max-width:320px){.psplit{grid-template-columns:1fr}}
+
+/* ── 页面内功能引导（第二层 · 使用者 2026-09-15 第三条）────────
+   三样，度量按派单 G-1；**两端各自度量、语义相同**（D-474），不照抄电脑的像素。
+   层序 75：压在首次引导（70）与 assist-wrap（60）之上、启动页（90）之下 ——
+   引导指着某个东西说话的时候，不该有别的浮层插进来。 */
+.gd-wrap{position:fixed; inset:0; z-index:75}
+/* ★ 洞就是这块 div 自己：四周那一大圈遮罩是它的 box-shadow（9999px 铺满）。
+   比 SVG mask 少一层合成，而且它和目标读的是同一个 rect，不会错位。 */
+.gd-hole{
+  position:absolute; border-radius:14px;
+  border:1px solid var(--violet);
+  box-shadow:0 0 0 9999px var(--color-scrim);
+  pointer-events:none;
+}
+/* 连接线：**2px** 虚线，只走直角（G-1；2026-09-15 使用者裁 1px → 2px）。
+   ★ `pointer-events:none` 是为了让点击落回 `.gd-wrap` 被**吃掉**，
+     不是为了「点哪儿都算收掉」—— 点遮罩不再关（I-192 裁甲）。 */
+.gd-line{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+.gd-line path{fill:none; stroke:var(--violet); stroke-width:2; stroke-dasharray:4 4}
+/* 漫画框：通栏留边，圆角 14 + 阴影；尾巴 12×10 贴最近边 */
+.gd-box{
+  position:absolute; left:16px; right:16px;
+  background:var(--paper); border-radius:14px; box-shadow:var(--e2);
+  padding:14px 16px 10px;
+}
+.gd-says{
+  margin:0; font-size:var(--fs-body-zh); line-height:1.7;
+  letter-spacing:.03em; color:var(--ink);
+}
+.gd-act{display:flex; justify-content:flex-end; margin-top:8px}
+/* 尾巴：默认朝上（框在洞下面），框翻到上面时朝下 */
+.gd-tail{
+  position:absolute; top:-10px; width:32px; height:10px;
+  background:var(--paper);
+  clip-path:polygon(50% 0, 100% 100%, 0 100%);
+}
+.gd-box.up .gd-tail{top:auto; bottom:-10px; clip-path:polygon(0 0, 100% 0, 50% 100%)}
+
+/* ── 图标通用 ── */
+.ic{display:inline-block; vertical-align:middle; flex:none}
+.car{margin-left:auto}
+
+/* ── 读路径两屏（阶段 2）+ 语义工具类（D-227：样式只住这里）───── */
+.lab.tight{margin-top:var(--s1)}
+/* ★ `.cta`（墨线 CTA）的四条修饰规则 2026-09-08 删了。
+   BTN-Q7 定案写的是「保留成手机独有形态」，但源码里它 2026-09-01 就没了：
+   基础规则被删、12 处调用全迁到 `.btn`，**今天一个调用点都没有**，
+   只剩这四条修饰规则悬着，谁都改不动它们也看不见它们。
+   使用者 2026-09-08 裁：认账删掉，要不要重做另说（已回报总控改 BTN-Q7 的措辞）。 */
+/* 并列动作行：按钮按内容宽并排（原型形态），不是等分通栏 */
+.btnrow{display:flex; gap:10px; align-items:center; margin-top:15px; flex-wrap:wrap}
+.ic.v{color:var(--violet)} .ic.m{color:var(--mute)} .ic.c{color:var(--corp)} .ic.w{color:var(--warn)}
+.term.s15{font-size:15px} .term.s14{font-size:14px}
+.zh.s12{font-size:12.5px} .zh.s14{font-size:14px} .zh.dim{color:var(--ink-2)}
+.tag.gap{margin-left:6px}
+.m.blk{display:block; margin-top:var(--s3)}
+.uline.big{font-size:15px; margin-top:var(--s3)}
+.set.tight{border-top:1px solid var(--line)}
+/* ★ DS-Q12 定案的配额：**两级尺寸 12 / 7** · 透明度 30–45% · 一屏 ≤3 粒。
+   原来是 11 / 6 / 8 三个尺寸、且只有一粒压了透明度 —— 三个尺寸就不叫「两级」，
+   没压透明度的那两粒是第一眼就看见的，正好违反这条细节的全部用意。 */
+.empty .dust svg.d1{width:12px; left:36%; top:0; opacity:.42}
+.empty .dust svg.d2{width:7px; left:47%; top:24px; opacity:.30}
+.empty .dust svg.d3{width:7px; left:59%; top:9px; opacity:.38}
+/* 行下摘句（BUILD_PLAN 阶段 2 点名） */
+.qline{
+  display:block; font-family:var(--serif); font-size:12.5px; color:var(--mute);
+  margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  font-style:italic;
+}
+/* 详情页 */
+.dhead{display:flex; align-items:flex-start; gap:10px; margin-top:var(--s2)}
+.dterm{font-family:var(--display); font-weight:400; font-size:var(--fs-word); line-height:var(--lh-tight); flex:1}
+.dgloss{font-family:var(--serif); font-size:14.5px; color:var(--ink-2); margin-top:2px}
+.dtags{margin-top:6px; display:flex; gap:12px; align-items:baseline}
+.spk{width:26px; height:26px; min-width:26px; border-radius:var(--r-pill);
+  border:1px solid var(--violet); color:var(--violet);
+  display:inline-flex; align-items:center; justify-content:center}
+.spk.dim{border-color:var(--line-2); color:var(--mute)}
+/* 中文揭示件（D-389/D-392：点线下划 · 幽灵态） */
+.zh-reveal{
+  display:inline-flex; align-items:center; gap:6px; margin-top:7px;
+  font-size:10px; letter-spacing:.16em; color:var(--mute);
+  border-bottom:1.5px dotted var(--line-2); padding-bottom:2px;
+}
+.zh-full{display:block; font-size:13px; color:var(--ink-2); margin-top:6px; letter-spacing:.03em}
+/* 解析块（Detail 的正文一层 / REGISTER & NUANCE / CLOSE READING · D-468）*/
+/* ★ 展开/收起接线（2026-09-01）：此前是硬切。只淡入 + 轻微上移，
+   不做高度动画（高度动画在长列表上会掉帧，而且收起时必然卡一下）。 */
+@keyframes nyx-unfold{from{opacity:0; transform:translateY(-3px)} to{opacity:1; transform:none}}
+.bsec{padding:2px 0 var(--s1); animation:nyx-unfold var(--m-std) var(--ease-out) both}
+.bkey{font-size:var(--fs-meta); font-weight:700; letter-spacing:.18em; color:var(--mute); margin-top:var(--s3)}
+.bval{font-family:var(--serif); font-size:15px; line-height:1.62; margin-top:2px}
+/* 折叠头（Detail 的分组 · Settings 的分区，双向开关 D-393）*/
+.fold{display:flex; justify-content:space-between; align-items:baseline; width:100%;
+  padding:var(--s3) 0; border-bottom:1px solid var(--line)}
+.fold .m{letter-spacing:.1em}
+/* 判分点数（Practice 的成绩行；详情页历次作答 D-468 已删）
+   ★ U-013：点数是进度的另一种画法，配方走同一族 --progress-*，
+     不另立一套颜色 —— 「做了几档」在屏上任何地方都该是同一个色。 */
+.pips{display:inline-flex; gap:4px}
+.pip{width:6px; height:6px; border-radius:var(--progress-r); background:var(--progress-primary)}
+.pip.off{background:none; border:1px solid var(--progress-inactive)}
+/* 材料行（只读） */
+.matrow .g .zh{font-size:13px}
+/* 星角标：重复收集（描边+数）· 共识（实心） */
+.starn{display:inline-flex; align-items:center; gap:2px; color:var(--warn)}
+.starn svg{width:11px; height:11px}
+.starn b{font-size:9px; font-weight:400}
+
+.fold .lab{margin:0}
+.li.addrow .g{text-align:center}
+.mt3{margin-top:var(--s3)}
+.empty.tight{padding-top:var(--s6)}
+
+/* ── Vault 子页（①c~①f · D-391 · 值取自高保真 v4 定稿，DS v4.4 附则）── */
+.vhead{display:flex; align-items:baseline; gap:10px; margin-top:var(--s2)}
+.fchips{margin:12px 0 2px; display:flex; flex-wrap:wrap; row-gap:6px}
+.fchip{
+  font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-2); padding:2px 0 3px; margin-right:14px;
+  border-bottom:1px solid transparent; min-height:28px;
+}
+.fchip.on{color:var(--violet-2); border-bottom-color:var(--violet)}
+.sortrow{display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:1px solid var(--line-2); padding-bottom:8px}
+.sortrow .hits{color:var(--violet-2)}
+/* 全选行 —— 第二层的开关（D-391：全选=全选筛选结果，数字随身） */
+.allsel{
+  display:flex; align-items:center; gap:8px; width:100%; min-height:var(--touch);
+  font-family:var(--mono); font-size:12px; letter-spacing:.06em; color:var(--violet-2);
+}
+.allsel.off{color:var(--ink-2)}
+/* 选中标 —— ◆ 选中 / ◇ 未选（①d/①f 同一语言） */
+/* ★★ 多选记号 —— ⑪（2026-09-01 使用者：「太小、不明显」）
+
+   原来是 18px 槽里一枚 13px 的核，选中/未选只靠**实心 vs 空心 + 紫 vs 灰**。
+   两条通道都对，但在 13px 上两条都太弱：核本身在 24 网格里只占 47%，
+   13px 画出来实际墨迹只有 6px 见方。
+
+   ★ 使用者同时说了「**不要单纯粗暴放大**」，所以改的不只是尺寸：
+     ① 核 13 → 17px（槽 18 → 26），到能一眼分辨形状的档
+     ② 选中态**多一层 --soft 圆底** —— DS §1.2 的控件面，同 Toggle ON 的用法。
+        这是第三条通道：形（实心/空心）· 色（紫/灰）· **面（有底/没底）**，
+        关掉颜色仍然读得懂（D-341 非颜色通道优先，同判分那套）。
+     ③ 未选态保持**只有轮廓**，不给底 —— 一行里最多一个东西在发声。
+
+   ★ 点击区没动，也不需要动：整行本身就是那个 button（.li .hit，min-height 40，
+     外层 .li 还有 --row-h），触摸目标一直是一整行，不是那枚记号。 */
+.selmk{
+  flex:none; width:26px; height:26px; margin-left:-4px;
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--violet); border-radius:50%; background:var(--soft);
+}
+.selmk.off{color:var(--mute); background:none}
+/* 行内直给动作（D-379 H5：核心不藏 —— 静默库「恢复轮转」） */
+.rowact{
+  margin-left:auto; flex:none; display:inline-flex; align-items:center;
+  min-height:var(--touch); padding:0 4px;
+  font-size:var(--fs-meta); letter-spacing:.08em; color:var(--violet-2);
+}
+/* 多选栏里的墨线 CTA 与药丸排 */
+.pillrow{display:flex; gap:var(--s2); align-items:center; margin-top:8px}
+.pillrow .sp{flex:1}
+/* Snackbar（D-379 P1：零确认 + 撤销）—— 全部取自已冻令牌 */
+.snack{
+  position:fixed; left:12px; right:12px; bottom:calc(70px + env(safe-area-inset-bottom));
+  z-index:45; background:var(--paper); border:1px solid var(--line-2);
+  border-radius:var(--r-card); box-shadow:var(--e-menu);
+  padding:8px 14px; display:flex; align-items:center; gap:12px;
+  font-size:12.5px; letter-spacing:.03em; font-weight:400;
+}
+.snack .u{
+  margin-left:auto; flex:none; color:var(--violet-2); font-size:11.5px;
+  letter-spacing:.08em; min-height:32px; display:inline-flex; align-items:center; padding:0 6px;
+}
+.ink2{color:var(--ink-2)}
+
+/* ── 认读卡（④/④b · D-390 四逻辑 · 值取自高保真 v4 定稿）────── */
+/* ══ 练习卡本体（DS §10.2 两层 · 2026-09-01）════════════════════
+   病：卡不是一张卡 —— 内容直接躺在页面背景上，全挤在上三分之一，
+   下面三分之二整片空白。现在是**页面 --bg → 卡 --paper**，两层，往亮走。
+   ★ 用 flex 把卡顶到视觉重心，不是靠写死的 margin。 */
+/* ★ 练习屏的 .view 要是纵向 flex，.pstage 的 flex:1 才有意义 */
+.view.stage{display:flex; flex-direction:column}
+.pstage{flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0; padding:8px 0}
+/* ★ DS-Q5 定案「卡去掉阴影，只留 1px 发丝边」—— 页面里的内容不浮起来，
+   只有真正的浮层（菜单 / 对话框 / Sheet / 气泡 / Snackbar）才有影。 */
+.pcard{
+  background:var(--paper); border:1px solid var(--line-2); border-radius:var(--r-card);
+  padding:22px 18px;
+}
+/* 卡里的线索区：一条发丝线分开就够了，不另起一片 */
+.pcard .clues{border-top:1px solid var(--line); margin-top:14px; padding-top:12px}
+.pcard .clues .clue-v:last-child{margin-bottom:0}
+/* 卡下方的唯一动作，居中 */
+.pact{display:flex; justify-content:center; padding-top:16px}
+
+/* ── Loading 统一形态：卡的骨架先在，字自己呼吸 ──────────────
+   转圈说「等着」，骨架说**「东西会长在这里」**，而且它占的正是
+   内容将要占的位置 —— 出现的那一刻不跳版。 */
+.sk{height:11px; border-radius:3px; background:var(--chip); margin-bottom:9px}
+.sk.w90{width:90%} .sk.w70{width:70%} .sk.w45{width:45%}
+@keyframes nyx-breathe{0%,100%{opacity:1} 50%{opacity:.45}}
+
+/* ── ★ 200ms 之内什么都不显示（ST-Q2 · UI_STATE_MATRIX §2.2）──────
+   「闪一下的骨架比没有更糟」：内容 120ms 就到了，屏上却先抖一下灰条。
+   ★ 做法是**延迟出现，不是延迟挂载** —— 骨架照常在 DOM 里（位置一开始就占住，
+     好了就地填入、不跳版），只是头 200ms 完全透明。
+     这样每个调用点都不必各写一个计时器（那正是「同一件事 N 份判据」的来路）。
+   ★ `both` 让延迟期间就用 from 那一帧（opacity 0）；1ms 的时长 = 到点直接出现，
+     不做淡入 —— 淡入会把「它其实等了 200ms」这件事演出来，那不是我们要说的话。 */
+@keyframes nyx-sk-reveal{from{opacity:0} to{opacity:1}}
+.sk, .lk-skel{animation:nyx-sk-reveal 1ms linear 200ms both}
+.breathe{animation:nyx-sk-reveal 1ms linear 200ms both,
+  nyx-breathe 1.6s var(--ease-out) 200ms infinite}
+.loadline{font-size:12px; color:var(--mute);
+  margin-top:14px; text-align:center; line-height:1.7}
+
+.rquote{font-family:var(--serif); font-size:18px; line-height:1.68}
+.rquote .blank{border-bottom:1.5px solid var(--line-2); padding:0 24px}
+.rquote .mk{background:linear-gradient(transparent 58%, var(--mark) 58%)}
+.rquote.small{font-size:13.5px; color:var(--mute)}
+.clue-k{font-size:var(--fs-meta); letter-spacing:.18em; color:var(--mute); text-transform:uppercase}
+.clue-v{font-family:var(--serif); font-size:14.5px; color:var(--ink-2); line-height:1.6; margin:1px 0 10px}
+.clue-v.nu{font-style:italic}
+/* I-083 · 认读正面的中文揭示件带**代价**（warn 变体 —— 点开当场封顶） */
+.zh-reveal.warn{color:var(--warn); border-bottom-color:var(--warn-bd)}
+/* 判分 2×2 印刷表格（§五 · D-136 每格带自己的下次天数） */
+/* ★ 纸面印刷件 → 圆角 0（DS-Q4）：这是一张印在纸上的判分表，不是一个浮层。 */
+.gtab{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line-2);
+  border-radius:var(--r-paper); overflow:hidden; margin-top:14px}
+.gtab>button{
+  padding:12px 8px 10px; text-align:center; background:none;
+  border-right:1px solid var(--line-2); border-bottom:1px solid var(--line-2); border-radius:0;
+  min-height:var(--touch);
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+}
+/* ★★ 判分记号进四格（D-341 · 2026-09-01）：四条非颜色通道里的「形」
+   此前**只在结果页出现，选的时候看不到** —— 按下去那一刻只剩三条。
+   记号本身早就画好了（nyx-grade-ok / near / again），这里是把它们
+   放到该被看见的那一刻。★ 关掉颜色四格仍然读得懂。 */
+/* ★ 真机定的数（2026-09-01）：先试 17px —— **虚线读成一撮点，不是形状**
+   （D-357 同一条教训：小尺寸上细虚线必糊）。22px 才读得出「虚线的星」。 */
+.gtab .gm{width:22px; height:22px; display:block}
+.gtab>button:nth-child(1) .gm{color:var(--warn)}   /* 忘了 —— 赭石不用正红（D-322） */
+.gtab>button:nth-child(2) .gm{color:var(--mute)}   /* 想了一下 */
+.gtab>button:nth-child(3) .gm,.gtab>button:nth-child(4) .gm{color:var(--violet)}
+.gtab>button:nth-child(2n){border-right:none}
+.gtab>button:nth-child(n+3){border-bottom:none}
+.gtab>button:active{background:var(--chip)}
+.gtab b{font-size:13px; font-weight:500; letter-spacing:.02em}
+.gtab .d{font-family:var(--mono); font-size:9px; letter-spacing:.18em; color:var(--mute)}
+/* I-083 · 看过中文：高档降灰 + 天数改按封顶档显示（按钮上写的必须是真会发生的数） */
+.gtab>button.capped b{color:var(--mute)}
+.gtab>button.capped .gm{opacity:.4}
+/* ★ 喇叭独占一行（2026-09-01）：此前它跟在词条最后一个词旁边，
+   词条一换行就看着像词的一部分。 */
+.rterm{font-family:var(--serif); font-weight:500; font-size:21px; line-height:1.3; text-align:center}
+.rspk{display:flex; justify-content:center; margin-top:11px}
+.rcenter{text-align:center}
+
+
+/* ── 产出题（⑤/⑥/⑦ · 值取自高保真 v4 定稿）───────────────── */
+.pquote{font-family:var(--serif); font-size:15.5px; line-height:1.65; padding:0 0 14px}
+.paper-ta{
+  width:100%; border:0; outline:none; resize:vertical; border-radius:0;
+  /* ★ 横格底色跟着卡走（--paper），不是页面底（--bg）—— 进卡之后两者不同，
+     写成 --bg 会在白卡上留下一层脏。 */
+  background:repeating-linear-gradient(var(--paper), var(--paper) 27px, var(--line) 27px, var(--line) 28px);
+  min-height:114px; font-family:var(--serif); font-size:16px; line-height:28px;
+  color:var(--ink); padding:0 2px;
+}
+.prow{display:flex; justify-content:space-between; align-items:stretch; margin-top:14px; gap:10px}
+/* ★★ 提示按钮 —— ⑧（2026-09-01 使用者：「目前点不开」）
+
+   根因是**触摸目标只有 32px**，低于 --touch 的 44px。
+   在 .prow 那条 flex 行里它还被右边的「提交」挤着，实际可按的带更窄 ——
+   手指按在文字上，落点常常在 32px 带之外，于是「点了没反应」。
+
+   ★ 三处一起改，缺一条都还是难按：
+     ① min-height 32 → var(--touch)，热区补满
+     ② 文字 10px 太小（D-364 的下限是拉丁 9px，但这是**可点的东西**，
+        不是元数据）→ 11.5px，与元数据行内中文同档（D-415②）
+     ③ align-items 从 center 改成 stretch 让它在行内真的占满高 ——
+        否则 min-height 只撑起自己，外面那条 flex 行仍按内容高对齐
+
+   ★ 视觉重量不动：仍然是 --mute + 一条点线下划线，不抢「提交」的层级。
+     D-138 要的是「代价写在脸上」，不是「让人找不到」。 */
+.hintbtn{
+  font-size:11.5px; letter-spacing:.10em; color:var(--mute);
+  border-bottom:1px dotted var(--line-2);
+  display:inline-flex; align-items:center;
+  padding:0 2px; min-height:var(--touch);
+}
+/* 判分（§五 · §4.5：空心与实心同一条路径 stroke 9；答错赭石不羞辱 D-322） */
+.verdict{text-align:center; padding:20px 0 8px}
+.verdict .vzh{font-size:16px; font-weight:600; letter-spacing:.03em; margin-top:8px}
+.verdict .vzh.w{color:var(--warn)}
+.verdict .vwhy{font-size:12.5px; color:var(--ink-2); margin-top:4px; letter-spacing:.02em; line-height:1.7}
+/* ★ 第十一则指令（星遮字根因）：.vstar 曾是 inline span —— width/height 不生效，
+   占位高≈0，44px 的 absolute 星向下溢出盖住判词与评语。display:block 占实高，
+   内容流把文字推开 —— 所有长短文本一并修好，不是给某一条评论挪坐标。 */
+/* ★ --m-grade 接线（2026-09-01）：DS §五「方向即语义」此前一次都没发生过。
+   会了 = 向上收拢（升起来一点，停住）· 再想想 = 向下轻推（沉一下，不弹回）。
+   ★ 只动 transform + opacity，不动布局；两条时长都是 --m-grade。 */
+@keyframes nyx-grade-up{from{opacity:0; transform:translateY(7px) scale(.92)}
+  to{opacity:1; transform:none}}
+@keyframes nyx-grade-down{from{opacity:0; transform:translateY(-5px)}
+  60%{opacity:1; transform:translateY(2.5px)} to{transform:none}}
+.vstar{display:block; position:relative; width:44px; height:44px; margin:0 auto;
+  animation:nyx-grade-up var(--m-grade) var(--ease-out) both}
+.vstar.again{animation-name:nyx-grade-down}
+.vstar svg{position:absolute; inset:0}
+.yours{border-top:1px solid var(--line); padding-top:12px; margin-top:12px}
+.yours .txt{font-family:var(--serif); font-size:15px; line-height:1.7}
+.wavy{text-decoration:underline wavy var(--warn) 1.5px; text-underline-offset:3.5px}
+.annot{font-size:12.5px; color:var(--ink-2); margin-top:5px; letter-spacing:.02em; line-height:1.7}
+
+/* ── 拖动排序（D-361）：抬行 · 墨线落点 · 非同组压暗（拖时就看得出来）── */
+.li.draglift{background:var(--paper); box-shadow:var(--e1); position:relative; z-index:5}
+.li.dragdim{opacity:.38}
+.li.dropb::before, .li.dropa::after{
+  content:''; position:absolute; left:var(--s4); right:var(--s4); height:2px;
+  background:var(--violet); border-radius:2px;
+}
+.li.dropb::before{top:-1px}
+.li.dropa::after{bottom:-1px}
+.li.dropb, .li.dropa{position:relative}
+
+/* ── Assist 浮层（⑪/⑫ · D-343 白气泡=全应用唯一明显投影 §九）──── */
+.assist-wrap{position:fixed; inset:0; z-index:60; display:flex; flex-direction:column; justify-content:flex-end}
+.bubble{
+  position:relative; background:var(--paper); border-radius:var(--r-card); padding:14px 16px;
+  margin:0 14px 12px; box-shadow:var(--e2);
+}
+.bubble::after{
+  content:''; position:absolute; bottom:-6px; left:40px; width:13px; height:13px;
+  background:var(--paper); transform:rotate(45deg); border-radius:2px;
+}
+.bubble .bt{display:flex; align-items:baseline; gap:8px}
+.bubble .bterm{font-family:var(--serif); font-weight:500; font-size:19px; overflow-wrap:anywhere}
+.bubble .bstat{font-size:var(--fs-meta); letter-spacing:.06em; color:var(--mute); margin:2px 0 6px}
+.bubble .bgloss{font-family:var(--serif); font-size:14px; color:var(--ink-2); line-height:1.6}
+.bubble .brow{display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:14px}
+/* ⑫ 已收下确认条（sheet 语汇 §10.8） */
+.asheet{
+  background:var(--paper); border-top:1px solid var(--line-2);
+  border-radius:var(--r-sheet) var(--r-sheet) 0 0; box-shadow:var(--e1);
+  padding:12px var(--s4) calc(14px + env(safe-area-inset-bottom));
+}
+.asheet .handle{width:28px; height:3px; border-radius:99px; background:var(--line-2); margin:0 auto 12px}
+.asheet .hd{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:500}
+.seg{display:inline-flex; border-bottom:1px solid var(--line-2); font-size:10px;
+  letter-spacing:.14em; text-transform:uppercase; font-family:var(--mono)}
+.seg button{padding:6px 10px; color:var(--mute); min-height:32px}
+.seg button.sel{color:var(--violet-2); box-shadow:inset 0 -2px 0 var(--violet)}
+
+/* ── 动效尊重 reduced-motion（§八）── */
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; animation:none !important}
+}
+
+/* ── Assist 通道③ 小条（打开时接剪贴板 —— 不抢屏，点了才开浮层）── */
+.clipchip{
+  position:fixed; top:calc(env(safe-area-inset-top) + 8px); left:12px; right:12px; z-index:55;
+  display:flex; align-items:center; gap:8px; min-height:40px;
+  background:var(--paper); border:1px solid var(--line-2); border-radius:var(--r-card);
+  box-shadow:var(--e-menu); padding:6px 12px; font-size:12.5px;
+}
+.clipchip .ct{font-family:var(--serif); font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; text-align:left}
+.clipchip .m{flex:none; color:var(--violet-2)}
+.clipchip .x{flex:none; color:var(--mute); padding:4px 2px 4px 8px}
+
+/* ── 减少动态效果：系统开了就全部关掉（无障碍基本盘）────────── */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; scroll-behavior:auto !important;
+  }
+}
+
+/* ══ Lookup（⑥ 模式开关 + ⑫ 界面整理 · 2026-09-01）══════════════
+   ⑫ 审出来的都在这里收口 —— 原来这一屏有 13 处内联 style，
+   内联比「组件里写样式」更糟：它连「在哪能改」都说不出来（D-227）。 */
+
+/* 模式开关：顶部、明显。用已有的 .seg，不新造控件 */
+.lk-mode{display:flex; justify-content:center; margin:var(--s2) 0 var(--s3)}
+
+/* ── 搜索框：随内容长高（T-5.8）────────────────────────────────
+   原来是单行 input：长句一超宽就横向滚，看得见的永远只有一小段 ——
+   而查的东西越长，越需要看清自己输了什么。
+
+   ★ 高度不靠 JS 量。这层是 grid，textarea 与 ::after 叠在**同一个格子**里：
+     ::after 用 `attr(data-v)` 把同一段文字、同样的字体与宽度隐形地画一遍，
+     行高由它撑起来。于是「长高」是浏览器排版算出来的 ——
+     没有测量、没有内联 style、没有先矮一帧再跳高。
+   ★ 两个盒子的**字体 / 内边距 / 换行规则必须逐字相同**，否则影子比真身高一行
+     或矮一行，框就会抖。所以它们写在同一条选择器里，不许分开改。
+
+   ★★ 四行封顶的上限**必须落在两个格子成员上，不能只落在容器上** ——
+      这一条是浏览器里量出来的，不是推的（2026-09-05 主控实测，375×812 视口）：
+
+        第一版把 `max-height` 写在 `.lk-q` 上。结果六行文字时 ——
+          框（.lk-q）被卡在 107px ✓，**但 textarea 自己长到 129px**，
+          底边压出框外 22px、盖到下面那条操作行上，
+          而且 `scrollHeight == clientHeight` —— **压根没有内部滚动**。
+
+        为什么：grid 成员的高度由**行轨道**决定，轨道按内容撑；
+        容器的 `max-height` 只裁容器自己那个盒子，管不到成员。
+        容器又没有 `overflow:hidden`（也不该有 —— 那样只是把字切掉），
+        于是多出来的两行直接溢出。「封顶」变成了「框看起来封了顶」。
+
+      所以上限落在 textarea 与影子**各自**身上：影子不再长高 → 轨道停住 →
+      框跟着停住；textarea 到顶之后由 `overflow-y:auto` 真的滚起来。
+
+   ★★ 两个成员必须**同为 border-box**。`max-height` 在 content-box 下不含
+      内边距与底线，影子会比真身整整高 17px（= 上下 8+8 内边距 + 1px 底线），
+      框比 textarea 高一截 —— 实测过这一版：框 124 / textarea 107。
+      写死 box-sizing 之后三档都对上：短词 39 · 两行 62 · 六行 107（框与
+      textarea 同高、gap 0、scrollHeight 129 > clientHeight 106 = 真的在滚）。 */
+.lk-q{
+  display:grid; margin-top:14px;
+  font-size:15px; line-height:1.5;
+}
+.lk-q > .dlg-in,
+.lk-q::after{
+  grid-area:1 / 1 / 2 / 2;
+  box-sizing:border-box;               /* ★ 与下面那行 max-height 是一对，见上 */
+  max-height:calc(4 * 1.5em + 17px);   /* 四行 + 上下内边距 16 + 底线 1 */
+  margin:0; padding:8px 2px;
+  font:inherit; letter-spacing:.02em;
+  border:0; border-bottom:1px solid var(--line-2);
+  white-space:pre-wrap; overflow-wrap:break-word;
+}
+.lk-q::after{content:attr(data-v) ' '; visibility:hidden}
+.lk-q > .dlg-in{resize:none; overflow-y:auto}
+
+/* 书行：降级成一条 meta 小行（词典内容才是主角）。
+   ★ 高度补到 --touch —— 它是可点的（点开换书），原来 36px 低于规格。 */
+.lk-book{min-height:var(--touch); border-bottom:none}
+
+/* 词条框：词典自己的 HTML 住在里面，我们只给一个安静的边 */
+.lk-entry{
+  border:1px solid var(--line); border-radius:var(--r-card);   /* 卡档 14（DS-Q4）*/
+  overflow:hidden; margin-top:var(--s2); background:var(--paper);
+}
+/* ★ ⑫：高度跟内容走（iframe 内部报上来，见 Lookup.svelte）。
+   量不到就退回 62vh —— 退化成「和以前一样」，不是退化成 0。 */
+.lk-entry iframe{
+  width:100%; border:none; background:var(--paper); display:block;
+  height:var(--entry-h, 62vh);
+  transition:height var(--m-std) var(--ease-out);  /* 状态切换那一档 —— 可逆 */
+}
+
+/* 两条操作行：原来 40 / 44 混着，且靠内联写死 */
+.lk-act{min-height:var(--touch); border-bottom:none}
+.lk-into{min-height:var(--touch)}
+.lk-save{color:var(--violet-2)}
+
+/* ── AI 搜索结果：**我们的排版**（D-401 模型管内容、UI 管呈现）──
+   与词典那一侧的区别是刻意的：词典进 iframe 用它自己的样子，
+   AI 用 Nyx 的分节 + 语言之声。一眼看得出这两块不是一回事。 */
+.lk-ai{margin-top:var(--s2)}
+.lk-ai .lk-p{
+  margin:var(--s2) 0 var(--s3); font-family:var(--serif);
+  font-size:14px; line-height:1.75; letter-spacing:.02em; color:var(--ink);
+}
+/* 等待：骨架 + 呼吸，不跳版（同判分/词典的 Loading 形态）
+   ★ 200ms 之内不显示那一条在上面统一给（.sk, .lk-skel），这里只叠呼吸。 */
+.lk-skel{
+  height:14px; border-radius:4px; background:var(--chip);
+  margin:var(--s2) 0;
+  animation:nyx-sk-reveal 1ms linear 200ms both,
+    nyx-breathe 1.4s ease-in-out 200ms infinite;
+}
+.lk-skel.t{width:38%; height:11px}
+.lk-skel.s{width:64%}
+
+/* 认读卡 · AI 牌面的形式徽章（⑤）——「这句是机器编的」如实标一下 */
+.fform {
+  font-family: var(--mono);
+  /* D-415② · 元数据行内有中文（挖空/中译回想/场景补全）→ 走 11.5 那一档 */
+  font-size: var(--fs-micro-zh);
+  letter-spacing: var(--ls-micro-zh);
+  color: var(--mute);
+  margin-top: 10px;
+}

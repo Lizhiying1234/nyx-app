@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  自适应图标 · 2026-09-08（DS-Q19 / DS-Q27 定案 · U-007）
+
+  三层全是**使用者给的那张原图**派生出来的位图（nyx-core/assets/brand/android/，
+  由 DS 会话的 gen-brand-icons 出五档密度）：
+    foreground  主体抠出来、透明底。★ 不带原图那圈圆角瓷砖 ——
+                自适应图标会被启动器**再套一层遮罩**，圆角套圆角会在边上留一圈脏白。
+    background  纯色近白（从原图里量的，不是挑的）。使用者定：不换水色。
+    monochrome  单色层，Android 13+ 的主题图标，系统会整片染色。
+
+  ★ 此前这里是 drawable/ic_launcher_foreground.xml（app 内那颗衍射星的矢量）+
+    @color/nyx_paper。标志已定为水獭，那份矢量随之退役。
+  ★ 启动器那一层遮罩取消不了（自适应图标必被裁一次）——
+    所以主体是按 108 里居中 72dp 的安全区摆的，圆形遮罩裁不到它。
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    <monochrome android:drawable="@mipmap/ic_launcher_monochrome"/>
+</adaptive-icon>

@@ -1,0 +1,35 @@
+node_modules/
+out/
+dist/
+release/
+
+# 学习数据 —— 就在软件文件夹里（D-263 绿色便携），但不提交
+data/
+.demo/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+
+# 给其他 AI 工具的规则镜像，按使用者要求不入库
+AGENTS.md
+
+# 验收截图 —— 是给眼睛看的中间产物，不入库
+shots/
+
+# 截图脚本自己的数据目录 —— 用完就扔，不碰真实数据
+.shots-data/
+
+# 扫描器的产物：每次跑都会重生成，不进仓库
+click-sweep-report.md
+.shots-guides/
+.shots-onb/
+.shots-walk/
+.shots-dict/
+.shots-audit/

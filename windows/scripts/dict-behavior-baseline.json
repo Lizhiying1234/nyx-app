@@ -1,0 +1,1478 @@
+{
+  "says": "改造前的实录。D2 是行为等价重构 —— 这份文件对不上就是改坏了。",
+  "dir": "D:/Nyx/data/dicts",
+  "books": [
+    {
+      "file": "_._TLD.mdx",
+      "bookname": "_._TLD",
+      "wordCount": 0,
+      "enabled": 1,
+      "sortOrder": 14,
+      "missing": 0,
+      "problem": "这不是词典文件（文件太小或没有 MDict 头部），可以直接删掉。 头部声明 333319 字节，文"
+    },
+    {
+      "file": "21世纪大英汉词典.mdx",
+      "bookname": "21世纪大英汉词典",
+      "wordCount": 334621,
+      "enabled": 1,
+      "sortOrder": 1,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "21世纪英汉汉英双向词典.mdx",
+      "bookname": "21世纪英汉汉英双向词典",
+      "wordCount": 213587,
+      "enabled": 1,
+      "sortOrder": 2,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "朗文6英汉双解.mdx",
+      "bookname": "朗文6英汉双解",
+      "wordCount": 261689,
+      "enabled": 1,
+      "sortOrder": 15,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "朗文英文当代大词典（插图版)/[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】.mdx",
+      "bookname": "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】",
+      "wordCount": 47636,
+      "enabled": 1,
+      "sortOrder": 16,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "童哥说单词.mdx",
+      "bookname": "童哥说单词",
+      "wordCount": 25228,
+      "enabled": 1,
+      "sortOrder": 18,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "英语常用词疑难用法手册.mdx",
+      "bookname": "英语常用词疑难用法手册",
+      "wordCount": 1614,
+      "enabled": 1,
+      "sortOrder": 19,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "英语词根词缀词频.mdx",
+      "bookname": "英语词根词缀词频",
+      "wordCount": 6288,
+      "enabled": 1,
+      "sortOrder": 21,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "英语词根与单词的说文解字.mdx",
+      "bookname": "英语词根与单词的说文解字",
+      "wordCount": 6416,
+      "enabled": 1,
+      "sortOrder": 20,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "英语词源词典 .mdx",
+      "bookname": "英语词源词典 ",
+      "wordCount": 26557,
+      "enabled": 1,
+      "sortOrder": 22,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "正确运用词汇 USE THE RIGHT WORD.mdx",
+      "bookname": "正确运用词汇 USE THE RIGHT WORD",
+      "wordCount": 5440,
+      "enabled": 1,
+      "sortOrder": 17,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "Longman 5  English(全英)/Longman Dictionary of Common Errors.mdx",
+      "bookname": "Longman Dictionary of Common Errors",
+      "wordCount": 1277,
+      "enabled": 1,
+      "sortOrder": 3,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "Longman 5  English(全英)/Longman Dictionary of Contemporary English.mdx",
+      "bookname": "Longman Dictionary of Contemporary English",
+      "wordCount": 62963,
+      "enabled": 1,
+      "sortOrder": 4,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "Longman 5  English(全英)/Longman DOCE5 Extras.mdx",
+      "bookname": "Longman DOCE5 Extras",
+      "wordCount": 32359,
+      "enabled": 1,
+      "sortOrder": 5,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "Longman Collocations Dictionary and Thesaurus/LCDT.mdx",
+      "bookname": "LCDT",
+      "wordCount": 4239,
+      "enabled": 1,
+      "sortOrder": 6,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "Longman Phrasal Verbs Dictionary 2nd Edition/[英-英] Longman Phrasal Verbs Dictionary 2nd Edition.mdx",
+      "bookname": "[英-英] Longman Phrasal Verbs Dictionary 2nd Edition",
+      "wordCount": 5587,
+      "enabled": 1,
+      "sortOrder": 7,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "LongmanCollocationsDictionaryAndThesaurusEnEn.mdx",
+      "bookname": "LongmanCollocationsDictionaryAndThesaurusEnEn",
+      "wordCount": 4241,
+      "enabled": 1,
+      "sortOrder": 8,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "oald10-V1_4.mdx",
+      "bookname": "oald10-V1_4",
+      "wordCount": 283811,
+      "enabled": 1,
+      "sortOrder": 9,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "Synonym 辨析词典.mdx",
+      "bookname": "Synonym 辨析词典",
+      "wordCount": 118305,
+      "enabled": 1,
+      "sortOrder": 10,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "thes.mdx",
+      "bookname": "thes",
+      "wordCount": 246523,
+      "enabled": 1,
+      "sortOrder": 11,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "TLD.mdx",
+      "bookname": "TLD",
+      "wordCount": 4362467,
+      "enabled": 1,
+      "sortOrder": 12,
+      "missing": 0,
+      "problem": null
+    },
+    {
+      "file": "UrbanDictionary.mdx",
+      "bookname": "UrbanDictionary",
+      "wordCount": 1896333,
+      "enabled": 1,
+      "sortOrder": 13,
+      "missing": 0,
+      "problem": null
+    }
+  ],
+  "words": {
+    "children": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "children",
+          "text": "1279:64393ee5",
+          "textHead": "children ['tʃildrən] n. child的变形 child的复数 child [tʃaild] n. "
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "children",
+          "text": "58:6c59e3ef",
+          "textHead": "`1`chil.dren`3`(`tFIldrEn; 5tFildrEn)`5`<<名词>>`2`child 的复数"
+        },
+        {
+          "bookname": "Longman Dictionary of Common Errors",
+          "headword": "children",
+          "text": "201:94ba9459",
+          "textHead": "children ×: Some couples prefer NOT to make children. √: Som"
+        }
+      ],
+      "card": {
+        "word": "children",
+        "headword": "children",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Common Errors",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】",
+          "童哥说单词",
+          "英语词源词典 "
+        ],
+        "phonetic": "'tʃildrən",
+        "senses": [
+          {
+            "pos": "n.",
+            "gloss": "child的变形"
+          },
+          {
+            "pos": null,
+            "gloss": "child的复数"
+          },
+          {
+            "pos": null,
+            "gloss": "child"
+          }
+        ],
+        "raw": "1279:64393ee5",
+        "rawHead": "children ['tʃildrən] n. child的变形 child的复数 child [tʃaild] n. ",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "Longman Dictionary of Common Errors",
+          "text": "×: Some couples prefer NOT to make children."
+        },
+        {
+          "from": "Longman Dictionary of Common Errors",
+          "text": "√: Some couples prefer not to have children."
+        },
+        {
+          "from": "Longman Dictionary of Common Errors",
+          "text": "have children (NOT make ): 'We'd like to settle down and have children while we'"
+        }
+      ]
+    },
+    "crises": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "crises",
+          "text": "245:f3775308",
+          "textHead": "crises ['kraisi:z] n. crise的变形 crisis的变形 crise [kri:z] n. [法"
+        },
+        {
+          "bookname": "oald10-V1_4",
+          "headword": "crisis",
+          "text": "3570:ba4efd01",
+          "textHead": "crisis noun /ˈkraɪsɪs/ /ˈkraɪsɪs/ [countable, uncountable] ("
+        },
+        {
+          "bookname": "thes",
+          "headword": "crises",
+          "text": "2191:2ebc9f35",
+          "textHead": "crises nouncritical situation Synonyms for crises noun criti"
+        }
+      ],
+      "card": {
+        "word": "crises",
+        "headword": "crises",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解"
+        ],
+        "phonetic": "'kraisi:z",
+        "senses": [
+          {
+            "pos": "n.",
+            "gloss": "crise的变形"
+          },
+          {
+            "pos": null,
+            "gloss": "crisis的变形"
+          },
+          {
+            "pos": null,
+            "gloss": "crise"
+          }
+        ],
+        "raw": "245:f3775308",
+        "rawHead": "crises ['kraisi:z] n. crise的变形 crisis的变形 crise [kri:z] n. [法",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "oald10-V1_4",
+          "text": "The government is attempting to solve the debt crisis through spending cuts."
+        },
+        {
+          "from": "oald10-V1_4",
+          "text": "The government is facing a political crisis."
+        },
+        {
+          "from": "oald10-V1_4",
+          "text": "The business is still in crisis but it has survived the worst of the recession."
+        }
+      ]
+    },
+    "swayed": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "swayed",
+          "text": "59:4b202602",
+          "textHead": "swayed [sweid] adj. 【兽病理学】 =sway-backed 以上来源于：《21世纪大英汉词典》"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "swayed",
+          "text": "51:41db5cd2",
+          "textHead": "`1`swayed`3`(swed; sweid)`5`<<形容词>>`2`= sway-backed"
+        },
+        {
+          "bookname": "oald10-V1_4",
+          "headword": "sway",
+          "text": "2269:ca02a920",
+          "textHead": "sway verb /sweɪ/ /sweɪ/ Verb Forms present simple I / you / "
+        }
+      ],
+      "card": {
+        "word": "swayed",
+        "headword": "swayed",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解"
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": null,
+            "gloss": "[sweid]"
+          },
+          {
+            "pos": "adj.",
+            "gloss": "【兽病理学】 =sway-backed"
+          }
+        ],
+        "raw": "59:4b202602",
+        "rawHead": "swayed [sweid] adj. 【兽病理学】 =sway-backed 以上来源于：《21世纪大英汉词典》",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "oald10-V1_4",
+          "text": "The branches were swaying in the wind."
+        },
+        {
+          "from": "oald10-V1_4",
+          "text": "They danced rhythmically, swaying their hips to the music."
+        },
+        {
+          "from": "oald10-V1_4",
+          "text": "The curtains swayed gently in the breeze."
+        }
+      ]
+    },
+    "per cent": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "per cent",
+          "text": "45:d694f0f5",
+          "textHead": "per cent 每百；百分数(比)，百分之(几) 以上来源于：《21世纪大英汉词典》"
+        },
+        {
+          "bookname": "oald10-V1_4",
+          "headword": "per cent",
+          "text": "2560:db56425c",
+          "textHead": "per cent adjective, adverb OPAL WOPAL S /pə ˈsent/ /pər ˈsen"
+        },
+        {
+          "bookname": "TLD",
+          "headword": "per cent",
+          "text": "52:1f15767f",
+          "textHead": "per cent [pə: sent] adj.每一百中 n.百分之… [网络]百分数；百分率；百分比"
+        }
+      ],
+      "card": {
+        "word": "per cent",
+        "headword": "per cent",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "oald10-V1_4",
+          "TLD",
+          "朗文6英汉双解"
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": null,
+            "gloss": "每百；百分数(比)，百分之(几)"
+          }
+        ],
+        "raw": "45:d694f0f5",
+        "rawHead": "per cent 每百；百分数(比)，百分之(几) 以上来源于：《21世纪大英汉词典》",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "oald10-V1_4",
+          "text": "The company announced a 21 per cent increase in profits."
+        },
+        {
+          "from": "oald10-V1_4",
+          "text": "House prices dropped 8 per cent last year."
+        },
+        {
+          "from": "oald10-V1_4",
+          "text": "Dairy product prices jumped (= increased by)10.4 per cent in April."
+        }
+      ]
+    },
+    "bear the brunt of": {
+      "lookup": [
+        {
+          "bookname": "Synonym 辨析词典",
+          "headword": "bear the brunt of",
+          "text": "66:8deb693d",
+          "textHead": "syno bear the brunt of 首当其冲stand in the breach . stand in th"
+        },
+        {
+          "bookname": "thes",
+          "headword": "bear the brunt of",
+          "text": "413:6ee165d6",
+          "textHead": "bear the brunt of as inweather Synonyms for bear the brunt o"
+        },
+        {
+          "bookname": "TLD",
+          "headword": "bear the brunt of",
+          "text": "77:54524199",
+          "textHead": "bear the brunt of [bɛə ðə brʌnt ɔv] freq. 17 dict. 5 spoken "
+        }
+      ],
+      "card": {
+        "word": "bear the brunt of",
+        "headword": "brunt",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "Synonym 辨析词典",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】",
+          "正确运用词汇 USE THE RIGHT WORD",
+          "童哥说单词",
+          "英语词源词典 "
+        ],
+        "phonetic": "brʌnt",
+        "senses": [
+          {
+            "pos": "n.",
+            "gloss": "冲击，撞击"
+          },
+          {
+            "pos": null,
+            "gloss": "正面的冲击；主要的冲力，冲击力，主要的压力"
+          },
+          {
+            "pos": null,
+            "gloss": "最强烈部分，最沉重部分"
+          }
+        ],
+        "raw": "276:8b236709",
+        "rawHead": "brunt [brʌnt] n. 冲击，撞击 正面的冲击；主要的冲力，冲击力，主要的压力 最强烈部分，最沉重部分 [废语",
+        "fellBackFrom": null
+      },
+      "examples": []
+    },
+    "brunt": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "brunt",
+          "text": "276:8b236709",
+          "textHead": "brunt [brʌnt] n. 冲击，撞击 正面的冲击；主要的冲力，冲击力，主要的压力 最强烈部分，最沉重部分 [废语"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "brunt",
+          "text": "110:f9ea7af4",
+          "textHead": "`1`brunt`3`(brQnt; brQnt)`5`<<名词>>`2`[the ~] (攻击等的) 矛头,冲击或冲力"
+        },
+        {
+          "bookname": "Longman Dictionary of Contemporary English",
+          "headword": "brunt",
+          "text": "233:47bf2454",
+          "textHead": "brunt brunt /brʌnt/ noun bear/take/suffer etc the brunt of s"
+        }
+      ],
+      "card": {
+        "word": "brunt",
+        "headword": "brunt",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "Synonym 辨析词典",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】",
+          "正确运用词汇 USE THE RIGHT WORD",
+          "童哥说单词",
+          "英语词源词典 "
+        ],
+        "phonetic": "brʌnt",
+        "senses": [
+          {
+            "pos": "n.",
+            "gloss": "冲击，撞击"
+          },
+          {
+            "pos": null,
+            "gloss": "正面的冲击；主要的冲力，冲击力，主要的压力"
+          },
+          {
+            "pos": null,
+            "gloss": "最强烈部分，最沉重部分"
+          }
+        ],
+        "raw": "276:8b236709",
+        "rawHead": "brunt [brʌnt] n. 冲击，撞击 正面的冲击；主要的冲力，冲击力，主要的压力 最强烈部分，最沉重部分 [废语",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "The car took the full brunt of the explosion."
+        }
+      ]
+    },
+    "ASIO": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "ASIO",
+          "text": "86:249281c1",
+          "textHead": "ASIO abbr. Australian Security Intelligence Organization澳大利亚"
+        },
+        {
+          "bookname": "TLD",
+          "headword": "ASIO",
+          "text": "103:697adf47",
+          "textHead": "Asio abbr.澳大利亚安全情报组织（Australian Security Intelligence Organi"
+        },
+        {
+          "bookname": "UrbanDictionary",
+          "headword": "ASIO",
+          "text": "161:926a4b6e",
+          "textHead": "Asio 1Asion. A name you would call a close friend. Instead o"
+        }
+      ],
+      "card": {
+        "word": "ASIO",
+        "headword": "ASIO",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "TLD",
+          "UrbanDictionary"
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": "abbr.",
+            "gloss": "Australian Security Intelligence Organization澳大利亚安全情报组织"
+          }
+        ],
+        "raw": "86:249281c1",
+        "rawHead": "ASIO abbr. Australian Security Intelligence Organization澳大利亚",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "UrbanDictionary",
+          "text": "A name you would call a close friend. Instead of calling them thier name you jus"
+        }
+      ]
+    },
+    "marginalia": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "marginalia",
+          "text": "79:81229714",
+          "textHead": "marginalia [,mɑ:dʒi'neiliə] n. [复数] (书的)旁注，边注 次要的东西，次要项目 以上来"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "marginalia",
+          "text": "75:222574fa",
+          "textHead": "`1`mar.gi.na.li.a`3`(9mBrdVE`nelIE; 9mB:dVi5neiliE)`5`<<名词>>"
+        },
+        {
+          "bookname": "oald10-V1_4",
+          "headword": "marginalia",
+          "text": "330:6a56657",
+          "textHead": "marginalia noun /ˌmɑːdʒɪˈneɪliə/ /ˌmɑːrdʒɪˈneɪliə/ [plural] "
+        }
+      ],
+      "card": {
+        "word": "marginalia",
+        "headword": "marginalia",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "oald10-V1_4",
+          "Synonym 辨析词典",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "童哥说单词",
+          "英语词源词典 "
+        ],
+        "phonetic": ",mɑ:dʒi'neiliə",
+        "senses": [
+          {
+            "pos": "n.",
+            "gloss": "[复数]"
+          },
+          {
+            "pos": null,
+            "gloss": "(书的)旁注，边注"
+          },
+          {
+            "pos": null,
+            "gloss": "次要的东西，次要项目"
+          }
+        ],
+        "raw": "79:81229714",
+        "rawHead": "marginalia [,mɑ:dʒi'neiliə] n. [复数] (书的)旁注，边注 次要的东西，次要项目 以上来",
+        "fellBackFrom": null
+      },
+      "examples": []
+    },
+    "CD": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "CD",
+          "text": "429:16f1ca81",
+          "textHead": "CD abbr. carried down certificate deposit 定期存款 certificate o"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "CD",
+          "text": "25:88075455",
+          "textHead": "`1`Cd`2`((符号))‘化学’cadmium"
+        },
+        {
+          "bookname": "Longman Dictionary of Contemporary English",
+          "headword": "CD",
+          "text": "1141:4689ee0c",
+          "textHead": "CD CD S3 W3 /ˌsiː ˈdiː◂/ noun [countable] (compact disc) a s"
+        }
+      ],
+      "card": {
+        "word": "CD",
+        "headword": "CD",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "LCDT",
+          "LongmanCollocationsDictionaryAndThesaurusEnEn",
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】"
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": "abbr.",
+            "gloss": "carried down"
+          },
+          {
+            "pos": null,
+            "gloss": "certificate deposit 定期存款"
+          },
+          {
+            "pos": null,
+            "gloss": "certificate of deposit 存款单"
+          }
+        ],
+        "raw": "429:16f1ca81",
+        "rawHead": "CD abbr. carried down certificate deposit 定期存款 certificate o",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "Luke has a massive CD collection."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "She switched off the CD player."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "By 2002, CD burners were standard hardware for home computers."
+        }
+      ]
+    },
+    "cd": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "cd",
+          "text": "429:16f1ca81",
+          "textHead": "CD abbr. carried down certificate deposit 定期存款 certificate o"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "cd",
+          "text": "25:88075455",
+          "textHead": "`1`Cd`2`((符号))‘化学’cadmium"
+        },
+        {
+          "bookname": "Longman Dictionary of Contemporary English",
+          "headword": "cd",
+          "text": "1141:4689ee0c",
+          "textHead": "CD CD S3 W3 /ˌsiː ˈdiː◂/ noun [countable] (compact disc) a s"
+        }
+      ],
+      "card": {
+        "word": "cd",
+        "headword": "cd",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "LCDT",
+          "LongmanCollocationsDictionaryAndThesaurusEnEn",
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】"
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": "abbr.",
+            "gloss": "carried down"
+          },
+          {
+            "pos": null,
+            "gloss": "certificate deposit 定期存款"
+          },
+          {
+            "pos": null,
+            "gloss": "certificate of deposit 存款单"
+          }
+        ],
+        "raw": "429:16f1ca81",
+        "rawHead": "CD abbr. carried down certificate deposit 定期存款 certificate o",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "Luke has a massive CD collection."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "She switched off the CD player."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "By 2002, CD burners were standard hardware for home computers."
+        }
+      ]
+    },
+    "resilient": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "resilient",
+          "text": "119:f4526122",
+          "textHead": "resilient [ri'ziliənt; -jənt] adj. 有回弹力的；有弹性的；能迅速恢复原状的 迅速恢复活"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "resilient",
+          "text": "109:390aa16a",
+          "textHead": "`1`re.sil.ient`3`(rI`zIlIEnt; ri5ziliEnt)`5`<<形容词>>`2`1 弹 [跳"
+        },
+        {
+          "bookname": "Longman Dictionary of Contemporary English",
+          "headword": "resilient",
+          "text": "533:cf99154b",
+          "textHead": "resilient re‧sil‧i‧ent /rɪˈzɪliənt/ adjective Date: 1600-170"
+        }
+      ],
+      "card": {
+        "word": "resilient",
+        "headword": "resilient",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "Synonym 辨析词典",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】",
+          "正确运用词汇 USE THE RIGHT WORD",
+          "童哥说单词",
+          "英语词根词缀词频",
+          "英语词源词典 "
+        ],
+        "phonetic": "ri'ziliənt; -jənt",
+        "senses": [
+          {
+            "pos": "adj.",
+            "gloss": "有回弹力的；有弹性的；能迅速恢复原状的"
+          },
+          {
+            "pos": null,
+            "gloss": "迅速恢复活力的；迅速恢复精神的；心情愉快的；适应性强的"
+          },
+          {
+            "pos": null,
+            "gloss": "近义词:"
+          }
+        ],
+        "raw": "119:f4526122",
+        "rawHead": "resilient [ri'ziliənt; -jənt] adj. 有回弹力的；有弹性的；能迅速恢复原状的 迅速恢复活",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "Children are often very resilient."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "The company proved remarkably resilient during the recession."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "Any chemical treatment will leave hair less resilient than before."
+        }
+      ]
+    },
+    "ran": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "ran",
+          "text": "10434:c605c82a",
+          "textHead": "Ran [rɑ:n] 【北欧神话】兰(海上女神，海神艾吉尔Aegir之妻，以其网救溺水者) RAN abbr. Roya"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "ran",
+          "text": "39:98f13f40",
+          "textHead": "`1`ran`3`(rAn; rAn)`5`<<动词>>`2`run 的过去式"
+        },
+        {
+          "bookname": "Longman Dictionary of Contemporary English",
+          "headword": "ran",
+          "text": "35:bf76384b",
+          "textHead": "ran ran /ræn/ the past tense of run"
+        }
+      ],
+      "card": {
+        "word": "ran",
+        "headword": "ran",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "[英-英] ◆朗文英文当代大词典（插图版）（修订版）【DJL原创】【版本日期20080807】"
+        ],
+        "phonetic": "rɑ:n",
+        "senses": [
+          {
+            "pos": null,
+            "gloss": "【北欧神话】兰(海上女神，海神艾吉尔Aegir之妻，以其网救溺水者)"
+          },
+          {
+            "pos": "abbr.",
+            "gloss": "Royal Australian Navy 澳大利亚皇家海军"
+          },
+          {
+            "pos": null,
+            "gloss": "[ræn]"
+          }
+        ],
+        "raw": "10434:c605c82a",
+        "rawHead": "Ran [rɑ:n] 【北欧神话】兰(海上女神，海神艾吉尔Aegir之妻，以其网救溺水者) RAN abbr. Roya",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "21世纪大英汉词典",
+          "text": "The train ran past the signal."
+        },
+        {
+          "from": "21世纪大英汉词典",
+          "text": "He ran across to a neighbour's house to borrow some money."
+        },
+        {
+          "from": "21世纪大英汉词典",
+          "text": "He threw down his rifle and ran from the battlefield."
+        }
+      ]
+    },
+    "sway": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "sway",
+          "text": "1081:7022d21d",
+          "textHead": "SWAY (日本产)变色布(能随温度变化而变色) sway [swei] vi. 摇动，摆动 歪，倾斜，偏向一边： Th"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "sway",
+          "text": "828:8fc055a4",
+          "textHead": "`1`sway`3`(swe; swei)`5`<<及物动词>>`2`1 a. (前后、左右地) 摇动,摆动`11`~ "
+        },
+        {
+          "bookname": "Longman Dictionary of Contemporary English",
+          "headword": "sway",
+          "text": "2188:bdb24b50",
+          "textHead": "swayI sway1 /sweɪ/ verb Date: 1200-1300 Origin: Probably fro"
+        }
+      ],
+      "card": {
+        "word": "sway",
+        "headword": "sway",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "Synonym 辨析词典",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "正确运用词汇 USE THE RIGHT WORD",
+          "童哥说单词"
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": null,
+            "gloss": "(日本产)变色布(能随温度变化而变色)"
+          },
+          {
+            "pos": null,
+            "gloss": "[swei]"
+          },
+          {
+            "pos": "vi.",
+            "gloss": "摇动，摆动"
+          }
+        ],
+        "raw": "1081:7022d21d",
+        "rawHead": "SWAY (日本产)变色布(能随温度变化而变色) sway [swei] vi. 摇动，摆动 歪，倾斜，偏向一边： Th",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "The trees swayed gently in the breeze."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "Don’t allow yourself to be swayed by his promises."
+        },
+        {
+          "from": "Longman Dictionary of Contemporary English",
+          "text": "The branches swayed in the wind."
+        }
+      ]
+    },
+    "abandon": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "abandon",
+          "text": "808:b27130d1",
+          "textHead": "abandon [ə'bændən] vt. 放弃；弃绝；绝望；断念： He abandoned all hope. 他"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "abandon",
+          "text": "460:38ddbb9",
+          "textHead": "`1`a.ban.don`3`(E`bAndEn; E5bAndEn)`5`<<及物动词>>`2`1 放弃,遗弃,抛弃,"
+        },
+        {
+          "bookname": "Longman Dictionary of Common Errors",
+          "headword": "abandon",
+          "text": "1068:688c4620",
+          "textHead": "abandon verb 1 ×: Since capital punishment was abandoned, th"
+        }
+      ],
+      "card": {
+        "word": "abandon",
+        "headword": "abandon",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Common Errors",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "LCDT",
+          "[英-英] Longman Phrasal Verbs Dictionary 2nd Edition",
+          "LongmanCollocationsDictionaryAndThesaurusEnEn",
+          "oald10-V1_4",
+          "Synonym 辨析词典",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "正确运用词汇 USE THE RIGHT WORD",
+          "童哥说单词",
+          "英语词根词缀词频",
+          "英语词源词典 "
+        ],
+        "phonetic": "ə'bændən",
+        "senses": [
+          {
+            "pos": "vt.",
+            "gloss": "放弃；弃绝；绝望；断念："
+          },
+          {
+            "pos": null,
+            "gloss": "He abandoned all hope."
+          },
+          {
+            "pos": null,
+            "gloss": "他放弃一切希望。"
+          }
+        ],
+        "raw": "808:b27130d1",
+        "rawHead": "abandon [ə'bændən] vt. 放弃；弃绝；绝望；断念： He abandoned all hope. 他",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "21世纪大英汉词典",
+          "text": "That patient abandoned the attempt in despair."
+        },
+        {
+          "from": "21世纪大英汉词典",
+          "text": "The sailors abandoned the burning ship."
+        },
+        {
+          "from": "21世纪大英汉词典",
+          "text": "The man shamelessly abandoned his wife and child for another woman."
+        }
+      ]
+    },
+    "the": {
+      "lookup": [
+        {
+          "bookname": "21世纪大英汉词典",
+          "headword": "the",
+          "text": "4706:b9c99592",
+          "textHead": "the [辅音前读作 ðə; 元音前和j-; hi-; he-; hə-前常读作ði; 罕强'ði; ,ði; 强ði:"
+        },
+        {
+          "bookname": "21世纪英汉汉英双向词典",
+          "headword": "the",
+          "text": "6239:eb8caa3a",
+          "textHead": "`1`the`3`((轻读)TE; TE((在子音之前)), TI; Ti((在母音之前)); (重读)Ti; Ti:)"
+        },
+        {
+          "bookname": "Longman Dictionary of Common Errors",
+          "headword": "the",
+          "text": "4595:624d58fc",
+          "textHead": "the I adverb See WHERE 1 ⇨ where II determiner 1 ×: She is a"
+        }
+      ],
+      "card": {
+        "word": "the",
+        "headword": "the",
+        "book": "21世纪大英汉词典",
+        "others": [
+          "21世纪英汉汉英双向词典",
+          "Longman Dictionary of Common Errors",
+          "Longman Dictionary of Contemporary English",
+          "Longman DOCE5 Extras",
+          "oald10-V1_4",
+          "thes",
+          "TLD",
+          "UrbanDictionary",
+          "朗文6英汉双解",
+          "童哥说单词",
+          "英语常用词疑难用法手册",
+          "英语词源词典 "
+        ],
+        "phonetic": null,
+        "senses": [
+          {
+            "pos": null,
+            "gloss": "[辅音前读作 ðə; 元音前和j-; hi-; he-; hə-前常读作ði; 罕强'ði; ,ði; 强ði:; 在元音前有时用作弱式; 元音前弱 ði; 辅"
+          },
+          {
+            "pos": null,
+            "gloss": "definite article."
+          },
+          {
+            "pos": null,
+            "gloss": "[指已提过的人或物]："
+          }
+        ],
+        "raw": "4706:b9c99592",
+        "rawHead": "the [辅音前读作 ðə; 元音前和j-; hi-; he-; hə-前常读作ði; 罕强'ði; ,ði; 强ði:",
+        "fellBackFrom": null
+      },
+      "examples": [
+        {
+          "from": "21世纪大英汉词典",
+          "text": "I bought a car yesterday. The car is very expensive."
+        },
+        {
+          "from": "21世纪大英汉词典",
+          "text": "The book you gave me is now on the bookshelf."
+        },
+        {
+          "from": "21世纪大英汉词典",
+          "text": "I have returned the book."
+        }
+      ]
+    },
+    "zzzznotaword": {
+      "lookup": [],
+      "card": {
+        "word": "zzzznotaword",
+        "headword": "",
+        "book": "21世纪大英汉词典",
+        "others": [],
+        "phonetic": null,
+        "senses": [],
+        "raw": "0:811c9dc5",
+        "rawHead": "",
+        "fellBackFrom": null
+      },
+      "examples": []
+    }
+  },
+  "registry": {
+    "rows": 22,
+    "byStatus": [
+      [
+        "NOT_A_DICTIONARY",
+        1
+      ],
+      [
+        "READY",
+        21
+      ]
+    ],
+    "mddRegisteredAsBook": [],
+    "providers": 22,
+    "uids": 21,
+    "resourceFiles": 16,
+    "ldoce5Resources": [
+      "Longman Dictionary of Contemporary English (1).mdd·185710",
+      "Longman Dictionary of Contemporary English.mdd·185710"
+    ],
+    "media": {
+      "book": "LCDT",
+      "gotBytes": true,
+      "looksLikeMp3": true
+    }
+  },
+  "redirects": {
+    "oald10 · children": {
+      "headword": "child",
+      "redirectedFrom": [
+        "children"
+      ],
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "child noun /tʃaɪld/ /tʃaɪld/ (plural children /ˈtʃ"
+    },
+    "oald10 · crises": {
+      "headword": "crisis",
+      "redirectedFrom": [
+        "crises"
+      ],
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "crisis noun /ˈkraɪsɪs/ /ˈkraɪsɪs/ [countable, unco"
+    },
+    "oald10 · swayed": {
+      "headword": "sway",
+      "redirectedFrom": [
+        "swayed"
+      ],
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "sway verb /sweɪ/ /sweɪ/ Verb Forms present simple "
+    },
+    "oald10 · per cent": {
+      "headword": "per cent",
+      "redirectedFrom": null,
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "per cent adjective, adverb OPAL WOPAL S /pə ˈsent/"
+    },
+    "朗文6 · children": {
+      "headword": "children",
+      "redirectedFrom": null,
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "childrenchildren /ˈtʃɪldrən/ ThesaurusLongman Lang"
+    },
+    "朗文6 · crises": {
+      "headword": "crisis",
+      "redirectedFrom": [
+        "crises"
+      ],
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "crisiscrisis /ˈkraɪsɪs/ ●●○ S3 W3 noun (plural cri"
+    },
+    "朗文6 · swayed": {
+      "headword": "sway",
+      "redirectedFrom": [
+        "swayed"
+      ],
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "verb | noun swaysway1 /sweɪ/ ●●○ verb Word OriginW"
+    },
+    "朗文6 · per cent": {
+      "headword": "percent",
+      "redirectedFrom": [
+        "per cent"
+      ],
+      "showsLink": false,
+      "senses": 3,
+      "rawHead": "adjective, adverb | noun percentpercent1 (also per"
+    }
+  },
+  "rich": {
+    "oald10 · brunt": {
+      "headword": "brunt",
+      "caps": [
+        "text",
+        "html",
+        "phonetic",
+        "audio",
+        "example",
+        "translation",
+        "etymology"
+      ],
+      "phonetics": [
+        "uk♪",
+        "us♪"
+      ],
+      "senses": 1,
+      "withZh": 1,
+      "examples": 1,
+      "boxes": 1,
+      "crossRefs": 0,
+      "htmlBytes": 3253,
+      "dirty": false,
+      "refs": {
+        "audio": 4,
+        "image": 0
+      },
+      "styleRef": "oald10.css",
+      "fetched": {
+        "audio/uk": "够长 magic=fffb90",
+        "audio/us": "够长 magic=fffb90",
+        "audio/other": "够长 magic=fffb10"
+      }
+    },
+    "oald10 · sway": {
+      "headword": "sway",
+      "caps": [
+        "text",
+        "html",
+        "phonetic",
+        "audio",
+        "example",
+        "translation",
+        "crossReference",
+        "etymology"
+      ],
+      "phonetics": [
+        "uk♪",
+        "us♪",
+        "other♪",
+        "other♪"
+      ],
+      "senses": 4,
+      "withZh": 4,
+      "examples": 20,
+      "boxes": 11,
+      "crossRefs": 2,
+      "htmlBytes": 18748,
+      "dirty": false,
+      "refs": {
+        "audio": 22,
+        "image": 0
+      },
+      "styleRef": "oald10.css",
+      "fetched": {
+        "audio/uk": "够长 magic=fffb90",
+        "audio/us": "够长 magic=fffb90"
+      }
+    },
+    "oald10 · ostrich": {
+      "headword": "ostrich",
+      "caps": [
+        "text",
+        "html",
+        "phonetic",
+        "audio",
+        "translation",
+        "crossReference",
+        "etymology"
+      ],
+      "phonetics": [
+        "uk♪",
+        "us♪"
+      ],
+      "senses": 2,
+      "withZh": 2,
+      "examples": 0,
+      "boxes": 1,
+      "crossRefs": 1,
+      "htmlBytes": 2856,
+      "dirty": false,
+      "refs": {
+        "audio": 2,
+        "image": 0
+      },
+      "styleRef": "oald10.css",
+      "fetched": {
+        "audio/uk": "够长 magic=fffb90",
+        "audio/us": "够长 magic=fffb90"
+      }
+    },
+    "朗文6 · brunt": {
+      "headword": "brunt",
+      "caps": [
+        "text",
+        "html",
+        "phonetic",
+        "audio",
+        "example",
+        "translation"
+      ],
+      "phonetics": [
+        "uk♪"
+      ],
+      "senses": 1,
+      "withZh": 1,
+      "examples": 2,
+      "boxes": 0,
+      "crossRefs": 0,
+      "htmlBytes": 12735,
+      "dirty": false,
+      "refs": {
+        "audio": 4,
+        "image": 3
+      },
+      "styleRef": "ldoce6ec.css",
+      "fetched": {
+        "audio/uk": "够长 magic=fff340",
+        "audio/us": "够长 magic=fff338"
+      }
+    },
+    "Contemporary English · brunt": {
+      "headword": "brunt",
+      "caps": [
+        "text",
+        "html",
+        "phonetic",
+        "example"
+      ],
+      "phonetics": [
+        "uk(放不了)"
+      ],
+      "senses": 1,
+      "withZh": 0,
+      "examples": 2,
+      "boxes": 0,
+      "crossRefs": 0,
+      "htmlBytes": 1377,
+      "dirty": false,
+      "refs": {
+        "audio": 4,
+        "image": 3
+      },
+      "styleRef": null,
+      "fetched": {
+        "audio/uk(×)": "够长 magic=4f6767",
+        "audio/us(×)": "够长 magic=4f6767",
+        "audio/sentence(×)": "够长 magic=4f6767"
+      }
+    }
+  }
+}

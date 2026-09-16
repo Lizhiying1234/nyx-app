@@ -1,0 +1,689 @@
+/* Nyx 全局样式 · 从 docs/nyx-总原型-v2.html 原样搬入（D-214 样式零重写）。
+   此后**只增不改**：需要新样式时新增规则，不许修改已有的。
+   有意偏离写在 enhancements.css，必须用令牌、不用 !important。
+   全部 CSS 放这里，Svelte 组件里一行样式都不写（D-227）——
+   总原型有大量跨层级选择器（.lrow:hover .ck），放进组件作用域会静默失效。 */
+/* ═══════════ 设计令牌 · 机械提取自 nyx_prototype.html 第 8–17 行，另加本阶段新增 ═══════════ */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--color-bg);font-family:var(--font);color:var(--text);font-size:var(--fz-body-ui);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+button{font-family:inherit;cursor:pointer}
+/* ★ 原生控件（滑块 · 勾选框）自己带一套系统色 —— 设置 › 声音那条语速滑块是**全屏唯一一处
+   不属于这套配色的蓝**，它不来自任何一条 CSS，来自浏览器默认。`accent-color` 是唯一能改它的地方。 */
+input[type='range'],input[type='checkbox'],input[type='radio']{accent-color:var(--color-primary)}
+
+/* ═══════════ 窗口外壳 ═══════════ */
+.win{width:min(1400px,100vw);height:min(900px,100vh);background:var(--bg);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column}
+.titlebar{height:36px;background:var(--sidebar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;flex:none;-webkit-app-region:drag}
+.titlebar .nm{font-size:var(--fs-2);color:var(--text-3);font-weight:600;letter-spacing:.3px}
+.titlebar .wb{margin-left:auto;display:flex;gap:2px}
+.titlebar .wb i{width:30px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-3);font-style:normal;font-size:11px;border-radius:5px}
+.titlebar .wb i:hover{background:var(--hover)}
+.titlebar .wb i.cl:hover{background:var(--color-danger);color:var(--color-text-inverse)}
+/* position:relative 是 LT-B1 需要的：窄档铺开的侧栏是 absolute 盖在内容上的，
+   没有这一行它会相对视口定位，把标题栏一起盖住。 */
+.body{flex:1;display:flex;min-height:0;position:relative}
+
+/* ═══════════ 侧边栏 · D-009 / D-042 / D-109 ═══════════ */
+.side{width:250px;flex:none;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:10px 8px 8px}
+.side .scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.nv{display:flex;align-items:center;gap:9px;min-height:var(--row-side);font-size:var(--fz-body-ui);color:var(--text-2);padding:0 var(--sp-3);border-radius:var(--r-ctl-sm);cursor:pointer;user-select:none;white-space:nowrap}
+.nv:hover{background:var(--hover)}
+/* ★ DS-Q17 · 图标选中态「不换实心，把细线图标放进一个淡水色圆角方块里」——
+   它同时解决了「选中」和「命中区」两件事，所以整行不再铺底色。
+   ★ 方块**常驻**（平时透明）：选中才现身的话，行内元素宽度会在那一刻跳一下。 */
+.nv.on{background:none;color:var(--accent-2);font-weight:600}
+.nv .ic{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-ctl-sm);flex:none;font-size:var(--ic);color:var(--color-icon);opacity:.85}
+.nv.on .ic{background:var(--color-primary-subtle);color:var(--color-text-accent);opacity:1}
+.sep{height:1px;background:var(--border);margin:8px 6px}
+/* ══ 分区双语头 · DS §10.1 BilingualLabel（DS-Q11 定案：只给一级分区）══
+   ★ UX-Q2（2026-09-08）改过一次主副位：**英文在主位、中文在副位**
+     （名字定成英文之后，「我的项目 / All Projects」那种中文主的例子已作废）。
+   ★ 它**不可点**，所以长得就不可点：没有 hover 底色、没有 caret、没有图标位
+     （DS §7.1 S4「能点的和不能点的必须一眼分得出」）。I-173 改的就是这个。
+   ★ 中文副题 11.5px 是**下限**，再小真机上横画会糊（D-342③）；字距按 DS-Q3 的 .05em。 */
+.secthead{padding:10px 10px 4px;user-select:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.secthead .en{grid-column:1;font-size:var(--fz-body-ui);font-weight:600;color:var(--color-text);letter-spacing:.01em}
+.secthead .zh{grid-column:1;font-size:var(--fz-micro-zh);color:var(--color-text-3);letter-spacing:var(--ls-micro-zh);margin-top:1px}
+/* 尾槽：Projects 那颗 ＋ · Today 副列那一枚计数。跨两行、靠右、不参与被挤 */
+.secthead>.add,.secthead>.n{grid-column:2;grid-row:1 / span 2;justify-self:end}
+.cap{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--muted);padding:9px 10px 4px;text-transform:uppercase;display:flex;align-items:center}
+.cap .add{margin-left:auto;font-size:var(--ic);color:var(--color-icon-muted);cursor:pointer;letter-spacing:0}
+.cap .add:hover{color:var(--accent-2)}
+.grp{overflow:hidden;max-height:0;transition:max-height .2s ease}
+.grp.show{max-height:520px}
+.sb{display:flex;align-items:center;gap:8px;min-height:var(--row-data);font-size:var(--fs-2);color:var(--text-2);padding:0 var(--sp-2) 0 32px;border-radius:var(--r-ctl-sm);cursor:pointer;white-space:nowrap}
+.sb:hover{background:var(--hover)}
+.sb.on{background:var(--active);color:var(--accent-2);font-weight:600}
+.sb .d{width:5px;height:5px;border-radius:50%;background:var(--faint);flex:none}
+.sb .due{margin-left:auto;font-size:9.5px;background:var(--color-attention-subtle);color:var(--color-attention);border:1px solid var(--color-attention-border);padding:0 5px;border-radius:5px}
+.sb .n{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.sb2{padding-left:48px}
+.pin{color:var(--accent);font-size:9px;margin-left:4px}
+
+/* ═══════════ 主区 ═══════════ */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.view{display:none;flex:1;overflow-y:auto;padding:var(--pad-work) var(--pad-work) 48px}
+.view.on{display:block}
+.vh{display:flex;align-items:center;gap:13px;margin-bottom:20px}
+.vh h1{margin:0;font-size:var(--fs-7);font-weight:700;letter-spacing:-.35px}
+.vh .c{font-family:var(--mono);font-size:var(--fs-2);color:var(--text-3)}
+.vh .sp{flex:1}
+.bk{font-size:var(--fz-body-ui);color:var(--text-3);cursor:pointer;margin-bottom:12px;display:inline-block}
+.bk:hover{color:var(--accent-2)}
+
+/* 通用件 */
+/* == 按钮五档 · BUTTON_SYSTEM 一 · U-012（2026-09-08 UI-Win 第一轮）=========
+   .btn       = Outline    透明面 + 描边（工具条 · 行内 · 一组并列）
+   .btn.pri   = Primary    实心水色 + 白字（一屏唯一的主动作）
+   .btn.sec   = Secondary  淡水面（并列的第二选择）
+   .btn.ghost = Ghost      无面无边（取消 · 关闭）
+   .btn.dgr   = 危险       Ghost + 粉字**不填色**（D-322 不羞辱 · BTN-Q3）
+   高 36 / 小号 28（--btn-h / --btn-h-sm，使用者若想改 32 只动那一处）· 圆角 10 · 图标在左间距 6 */
+.btn{height:var(--btn-h);padding:0 var(--btn-pad);font-size:var(--fz-body-ui);border-radius:var(--r-ctl);border:1px solid var(--btn-outline-border);background:var(--btn-outline-bg);color:var(--btn-outline-text);display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:1;white-space:nowrap}
+.btn:hover{background:var(--btn-outline-hover)}
+/* ★★ 2026-09-01 · Primary 按 v5 §16.1 改成「淡紫面 + 紫墨」，不再是整块饱和紫。
+   §16.1 原文：--soft 面 + --soft-bd 1px 描边 + --accent-2 紫墨字。
+   同时 §1.3 给紫的分工是：**--accent 给线与图形，--accent-2 给压在浅紫面上的字** ——
+   拿 --accent 去填一整块面，本来就不在它的岗位上。
+
+   ★★ 但要记住 D-413 的另一句边界（使用者原话）：
+   **「不要通过：把按钮变得几乎看不见 来解决」**。
+   所以这里不是「去掉存在感」：面仍然是全屏最亮的那一档浅紫，
+   加 1px 描边 + 600 字重 + 紫墨 —— 与周围的 Secondary（白面）拉得开。
+   ★ 这一条**必须上眼看**。真觉得桌面端需要实心紫，改回来只要一行。
+
+   ★ 还没做的那一半：v5 §16.1 写着 Primary「**一屏至多一个**」，
+   而 Windows 这边 .btn.pri 有 23 处、十个组件都在用 —— 那是配给问题，
+   要一屏一屏看，记在 PLAN 里。 */
+.btn.pri{background:var(--btn-primary-bg);border-color:transparent;color:var(--btn-primary-text);font-weight:600}
+.btn.pri:hover{background:var(--btn-primary-hover)}
+.btn.sec{background:var(--btn-secondary-bg);border-color:var(--btn-secondary-border);color:var(--btn-secondary-text)}
+.btn.sec:hover{background:var(--btn-secondary-hover)}
+.btn.ghost{background:var(--btn-ghost-bg);border-color:transparent;color:var(--btn-ghost-text)}
+.btn.ghost:hover{background:var(--btn-ghost-hover)}
+.btn.dgr{background:transparent;border-color:transparent;color:var(--color-danger)}
+.btn.dgr:hover{background:var(--color-danger-subtle)}
+/* ★★ 2026-09-01 · 从整块深色改成 v5 Primary（§16.1）。
+   这不是顺手改样式 —— 是**换令牌换出来的直接矛盾**：
+   同一轮引进的 v5 §1.4 明写 --deep 的配给是
+   「面积上限 = 内容宽 × 56px；**不许四边完整封闭；不许做容器**」，
+   而一个按钮正好就是四边封闭的容器。
+   D-413 使用者亲口点名过的 P0 四项里，「**厚重按钮**」就是其中一条。
+   v5 的 Primary = --active(soft) 面 + --chip-bd(soft-bd) 描边 + --accent-2 紫墨字。
+   ★ --text-3 不许压在 soft 上（4.26 < AA）—— 按钮内小字一律 --accent-2。 */
+/* ★★ C-1（2026-09-03 UI 审计）· `.btn.dk` 已撤 —— 它和 `.btn.pri` 是
+   **两个名字、一套样式**：底色 / 边框 / 字色 / 字重 / hover / :active 全都一模一样。
+   于是「按钮有层级」是假的：没人分得清该用哪个，全库 11 处随手挑一个用。
+   一个样子只留一个名字。11 处已全部换成 `.pri`（测试没有一处靠 `.dk` 选元素，逐处查过）。 */
+.btn.sm{height:var(--btn-h-sm);padding:0 var(--btn-pad-sm);font-size:var(--fs-2);border-radius:var(--r-ctl-sm)}
+/* active = **这颗按钮代表的模式正开着**（松手之后还在 —— 与 pressed 的区别就在这儿）。
+   `.btn.on` 在设置危险区那一排一直有人用，而样式表里从来没有它：形态是空的。 */
+.btn.on{background:var(--color-surface-selected);color:var(--color-text-accent);border-color:transparent;box-shadow:inset 0 0 0 1px var(--color-border-strong);font-weight:600}
+/* ══ 图标钮 · BUTTON_SYSTEM 四（Windows 28x28 · 图标 18 · 必须有 aria-label，桌面另给 title）══
+   ★ 侧栏那两枚（⋮ / caret）**没有**收进来：把它们撑到 28 会让侧栏行从 29 长到 40，
+     那是版面，归 LAYOUT_TEMPLATES 那一批（B11 / 侧栏那一片），本轮不动。 */
+.dt3,.xbtn,.mdel,.fdel,.qtm-x,.dcw-x,.fbar .x,.ftag .x{width:var(--icon-btn);height:var(--icon-btn);display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-ctl-sm);flex:none}
+.dt3:hover,.xbtn:hover,.mdel:hover,.fdel:hover,.qtm-x:hover,.dcw-x:hover{background:var(--btn-outline-hover)}
+/* DS-Q5 定案：**卡去影**（使用者 09-03 原话「不要把整个 UI 做成 Card」「不要重阴影」）。
+   卡靠 1px 发丝边与底色就分得开；影只留给真的浮起来的东西（浮层 · 菜单 · 打断层）。 */
+.card{background:var(--color-surface);border:1px solid var(--color-border-subtle);border-radius:var(--r-card)}
+.tg{font-size:var(--fs-1);background:var(--chip);border:1px solid var(--chip-bd);color:var(--text-2);padding:1px 8px;border-radius:6px;white-space:nowrap}
+.tg.a{background:var(--accent-soft);border-color:var(--color-border-strong);color:var(--accent-2);font-weight:600}
+.sec{font-size:var(--fs-1);font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:24px 0 11px;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.sec .en{font-family:var(--font)}
+
+/* ═══════════ 首页 ═══════════ */
+.stat{font-size:var(--fs-2);color:var(--text-3);display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-bottom:15px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.stat b{color:var(--text-2);font-family:var(--mono);font-size:var(--fz-body-ui)}
+.hero{background:linear-gradient(112deg,var(--color-primary-soft),var(--color-bg-elevated) 62%,var(--color-surface));border:1px solid var(--accent-soft);border-radius:var(--r-lg);padding:22px 24px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-46px;top:-46px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,var(--color-primary-subtle),transparent 68%)}
+.hero h2{margin:0 0 4px;font-size:var(--fs-7);font-weight:700;letter-spacing:-.3px}
+.hero .mt{font-size:var(--fz-body-ui);color:var(--text-2);margin-bottom:14px}
+.hero .mt code{font-family:var(--mono);font-size:var(--fs-2);background:var(--color-surface);border:1px solid var(--chip-bd);padding:1px 6px;border-radius:5px}
+/* == 进度 · U-013 定案：高 4px · 全圆角 · 五档令牌（轨 / 填 / 完成 / 欠账 / 停着）==
+   渐变去掉：使用者 09-03 明令「不要厚重渐变」，而且渐变让「填到哪」读不准。 */
+.prog{height:var(--progress-h);background:var(--progress-track);border-radius:var(--progress-r);overflow:hidden;max-width:320px;margin-bottom:15px}
+.prog i{display:block;height:100%;background:var(--progress-primary);border-radius:var(--progress-r)}
+.prog i.done{background:var(--progress-complete)}
+.prog i.att{background:var(--progress-attention)}
+.prog i.off{background:var(--progress-inactive)}
+.hrow{display:flex;gap:8px;position:relative;z-index:1;flex-wrap:wrap}
+.blk{padding:18px 20px}
+.blk h3{margin:0 0 2px;font-size:var(--fs-4);font-weight:700;display:flex;align-items:center;gap:8px}
+.blk .s2{font-size:var(--fs-2);color:var(--text-3);margin-bottom:13px}
+.qty{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.qty input{width:62px;font-family:var(--mono);font-size:var(--fs-6);font-weight:700;color:var(--accent-2);border:1px solid var(--chip-bd);border-radius:var(--r-ctl);padding:5px 8px;text-align:center;background:var(--color-surface)}
+/* BUTTON_SYSTEM 8.1：`.st` 步进 减／加 归 **Icon 钮**（Outline 小号正方形 28x28）*/
+.qty .st{border:1px solid var(--btn-outline-border);background:var(--btn-outline-bg);width:var(--icon-btn);height:var(--icon-btn);border-radius:var(--r-ctl-sm);color:var(--color-icon);font-size:var(--ic-btn);line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.qty .st:hover{background:var(--btn-outline-hover);color:var(--color-icon-active)}
+.qty .u{font-size:var(--fs-2);color:var(--text-3)}
+/* ★ H-7 / D-6（2026-09-03）· 攻坚区那块原来也写死十六进制，
+   于是它是全屏唯一一块「不属于这套配色」的米黄。改走警示令牌。 */
+/* ★★ DS 9.1「**粉不铺块**」（粉是 3–5% 的配额，只给特殊 / 重要 / 情绪）——
+   这一块原来是 warn-soft 满幅填色，而换体系后 warn-soft 就是 pink-50：
+   **一整张粉色卡**，正好踩在使用者明令不要的那一条上。
+   现在只留：粉描边一条 + 计数那一枚粉徽章。少一块粉，信息一分没少。 */
+/* ★ 2026-09-09（SC-23 / SC-02）· `.hard` 原来在这里铺一层白面 + 粉描边，
+   于是攻坚区那一块在米色页底上就是一张卡 —— 而副列已经按 S1 去掉了卡片外框，
+   两块一框一不框，看着像两种东西。它今天**只有 Today 副列一处用**，
+   样子整个交给 `.tside .tblk.hard`（hover 才上底色）。 */
+.hard h3 .n{font-family:var(--mono);background:var(--warn-soft);color:var(--amber);border:1px solid var(--warn-bd);font-size:var(--fs-1);padding:1px 7px;border-radius:var(--r-pill)}
+.hit{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--color-border-subtle);font-size:var(--fz-body-ui)}
+.hit:last-child{border-bottom:0}
+.hit .t{font-family:var(--serif);font-weight:600;flex:1}
+.hit .w{font-size:var(--fs-1);color:var(--text-3)}
+.rbar{margin-top:15px;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 18px;display:flex;align-items:center;gap:15px;background:linear-gradient(100deg,var(--color-bg-elevated),var(--color-surface));cursor:pointer}
+.rbar:hover{border-color:var(--color-border-strong)}
+.rbar .tt{font-size:var(--fs-4);font-weight:700}
+.rbar .ss{font-size:var(--fs-2);color:var(--text-3)}
+
+/* ═══════════ 讲次工作台 ═══════════ */
+.lh{display:flex;align-items:center;gap:12px;margin:10px 0 18px}
+.lnum{width:36px;height:36px;border-radius:var(--r-md);background:var(--accent-soft);color:var(--accent-2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:var(--fz-body-ui);flex:none}
+.lname{font-size:var(--fs-7);font-weight:700;letter-spacing:-.3px;flex:1}
+/* BUTTON_SYSTEM 8.1：`.pill` 归 **Outline 小号**，圆角 999 改 8（U-012 判掉了 full pill）*/
+.pill{height:var(--btn-h-sm);display:inline-flex;align-items:center;font-size:var(--fs-2);border:1px solid var(--btn-outline-border);background:var(--btn-outline-bg);border-radius:var(--r-ctl-sm);padding:0 var(--btn-pad-sm);color:var(--btn-outline-text);white-space:nowrap}
+.pill:hover{background:var(--btn-outline-hover)}
+.matbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;border:1px solid var(--line);border-radius:var(--r-md);padding:11px 14px;margin-bottom:14px}
+.mchip{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border:1px solid var(--chip-bd);border-radius:var(--r-ctl-sm);padding:4px 9px;font-size:var(--fs-2);color:var(--text-2)}
+.mchip .x{color:var(--color-icon-muted);cursor:pointer}.mchip .x:hover{color:var(--red)}
+.mleft{font-size:var(--fs-1);color:var(--text-3);margin-left:auto}
+.drop{border:2px dashed var(--color-border-strong);border-radius:var(--r-card);background:linear-gradient(170deg,var(--color-bg-elevated),var(--color-surface));padding:44px 28px;text-align:center}
+.drop:hover{border-color:var(--accent);background:var(--color-primary-soft)}
+.drop .i{font-size:28px;color:var(--accent);opacity:.5}
+.drop h3{margin:12px 0 5px;font-size:var(--fs-5);font-weight:700}
+.drop p{margin:0 0 17px;font-size:var(--fz-body-ui);color:var(--text-3)}
+.drop .bs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.drop .me{margin-top:16px;font-size:var(--fs-1);color:var(--muted);display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:3px}
+/* 筛选标签一排 —— 与 `.pill` 同一种东西：Outline 小号，圆角 8（DS-Q4 判掉 full pill）*/
+.tabs button{height:var(--btn-h-sm);border:1px solid var(--btn-outline-border);background:var(--btn-outline-bg);font-size:var(--fs-2);color:var(--btn-outline-text);padding:0 var(--btn-pad-sm);border-radius:var(--r-ctl-sm)}
+.tabs button.on{background:var(--btn-secondary-bg);border-color:var(--btn-secondary-border);color:var(--btn-secondary-text);font-weight:600}
+.tabs button .n{font-family:var(--mono);font-size:10px;opacity:.65;margin-left:4px}
+.hint{font-size:var(--fs-1);color:var(--text-3);margin:9px 0 2px}
+.lrow{display:grid;grid-template-columns:24px 20px 1fr 1.1fr 74px var(--icon-btn);gap:9px;align-items:center;padding:5px;border-bottom:1px solid var(--line);font-size:var(--fz-body-ui);cursor:pointer;min-height:var(--row-list)}
+.lrow:hover{background:var(--hover)}
+.lrow:hover .ck{opacity:1}
+.lrow.sel{background:var(--accent-soft)}
+.lrow.sel .ck{opacity:1;background:var(--accent);border-color:var(--accent)}
+/* ★ SC-06（2026-09-09）· 勾选框**常驻**，只是淡。原来是 opacity:0、hover 才出 ——
+   和侧栏那个 ⋯ 一模一样的毛病：**看不见的入口等于没有入口**。
+   （旧注释写「悬停时显现（占位常驻，不跳动）」—— 位置是不跳，但他得先猜到那里有东西。） */
+.ck{width:14px;height:14px;border:1.5px solid var(--chip-bd);border-radius:4px;opacity:.45;background:var(--color-surface);position:relative;display:flex;align-items:center;justify-content:center;color:transparent}
+/* DS-Q18 定案：勾不再用字符（每个字体里长得都不一样，与图标家族不是一家），
+   改用 `core/icons.ts` 的 `check` —— 几何两端唯一一份（D-410）。这里只管颜色。 */
+.lrow.sel .ck{color:var(--color-text-inverse)}
+.lt{font-family:var(--serif);font-size:var(--fs-4);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg{color:var(--text-3);font-size:var(--fs-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ln{font-size:10.5px;padding:1px 7px;border-radius:5px;text-align:center;white-space:nowrap}
+/* ★★★ 两条线两个颜色（2026-09-03）·「紫色太单调」的正解
+   ────────────────────────────────────────────────────────────
+   在这之前：主动＝紫，被动＝**灰**。也就是说**认读线根本没有颜色** ——
+   它只是「不是紫的那个」。而这个软件的全部理由恰恰是
+   「读得懂但写不出」（D-096）：**两条线是并列的主角，不是主角和背景。**
+
+   紫 = 产出线（主动词汇）    青 = 认读线（被动词汇）
+
+   ★ 这不是为了好看加颜色 —— 第二个色相**挣到了一份工作**：
+     扫一眼列表就知道这一条走的是哪条线，不用去读那两个字。 */
+.ln.a{background:var(--accent-soft);color:var(--accent-2);font-weight:600}
+.ln.p{background:var(--cyan-soft);color:var(--cyan);font-weight:600}
+.dt3{color:var(--color-icon-muted);text-align:center}
+.dt3:hover{color:var(--accent-2)}
+.quo{font-family:var(--serif);font-size:var(--fz-body-ui);color:var(--text-3);font-style:italic;padding:1px 5px 7px 33px;border-bottom:1px solid var(--line)}
+.task{border:1px solid var(--color-border-strong);background:var(--color-surface);border-radius:var(--r-card);padding:12px 14px;margin-top:11px}
+.task .th{font-size:10px;font-weight:700;letter-spacing:.9px;color:var(--accent-2);text-transform:uppercase;margin-bottom:6px;display:flex;gap:7px;align-items:center}
+.task .th .st{margin-left:auto;font-size:10px;background:var(--chip);color:var(--text-3);padding:1px 7px;border-radius:5px;letter-spacing:0;text-transform:none;font-weight:400}
+.task .tb{font-family:var(--serif);font-size:var(--fs-4);line-height:1.7}
+.task .tb a{color:var(--accent-2);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.tl{position:relative;padding-left:19px}
+.tl::before{content:"";position:absolute;left:5px;top:7px;bottom:7px;width:1px;background:var(--line)}
+
+/* ═══════════ 词条详情 ═══════════ */
+/* T-4.22 · 右栏整栏取消后这里只剩一栏：正文占满整页宽（原来是 1fr 350px + 窄屏折行） */
+.cols{display:grid;grid-template-columns:1fr;gap:0;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+/* ★★ D-2（2026-09-03 UI 审计）· 左右两栏原来「几乎没有边界」——
+   右栏底色写死成 `#fcfbff`，和左栏的白只差 **ΔL* 1.21**（判据要 ≥1.5，实测不过关），
+   于是唯一的分隔就是一条最淡的发丝线 `--line`。
+
+   ★ v5 的面阶梯里本来就有对的那一档：`--sidebar-bg`（「**安静区块 · 侧栏**」）——
+     右栏正是这种东西。换过去 ΔL* 变成 **2.57**，两栏这才真的分得开。
+   ★ 分隔线也从发丝线 `--line` 换成结构线 `--border` ——
+     它分的是两个区域，不是两行。 */
+/* T-4.22 · 右边没有栏了，那条分隔线跟着走（.R 整条规则删） */
+.L{padding:var(--pad-work) var(--pad-work) 32px}
+/* ══ 展示之声落地 · v5 §2.5（2026-09-01）═══════════════════════════
+   v5 把 ≥24px 的**词与大标题**交给 Instrument Serif（展示之声），
+   Literata 管的是「一切语言材料」里**读的那部分**（例句 · 原文 · 释义）。
+   换字体那一轮只把族接上了，这一层没铺 —— --display 当时零引用。
+
+   ★★ 字重必须是 400。Instrument Serif **只有 400 一个字重**。
+      ★ 实测更正（我先写成「会得到合成的假粗体」，量完发现不是）：
+        浏览器**没有合成**，它只是**默默用 400 那个 face** ——
+        同一串字在 400/500/600/700 下宽度都是 236.4，一模一样。
+        所以写 600 不是「变丑」，是「**写了等于没写**」：
+        CSS 说的和屏幕上发生的不是一回事，而且看不出来。写 400 是让它说实话。
+      ★ 量法：先 document.fonts.load 把每个字重真的加载出来，再量同一串字的宽度。
+        不 load 就量，量到的是兜底字体（我第一次就量错了）。
+   ★ ≥24px 才给它：这是 v5 定的门槛，23px 那一档（.vh h1 / .lh .lname）
+      仍归界面之声与语言之声，不要顺手一起改。
+   ★ 数字不在此列 —— 机器知道的事用等宽（.bigl .n / .mc .v / .sstat .n 不动）。 */
+.term{font-family:var(--display);font-size:var(--fs-8);font-weight:400;letter-spacing:-.5px;line-height:1.15;cursor:pointer}
+.term:hover{color:var(--accent-2)}
+.gl{font-size:var(--fs-4);color:var(--text-2);margin:2px 0 11px}
+/* CL-Q3 定案：**语言材料坐在暖底上** —— 把「你的语言材料」和「系统界面」一眼分开。
+   DS 3.2：**圆角属浮层 · 直角属纸面**，引文块是纸面，半径 0。
+   墨用 --color-text：aqua-700 压在暖底上只有 4.12，不过 AA（U-015 硬线）。 */
+.qb{font-family:var(--serif);font-size:var(--fz-body-lang);line-height:1.7;font-style:italic;color:var(--color-text);background:var(--color-bg-warm);border-left:3px solid var(--accent);border-radius:var(--r-paper);padding:10px 14px;cursor:pointer}
+.qs{font-size:var(--fs-1);color:var(--muted);margin-top:5px;display:flex;gap:9px}
+.qs .m{color:var(--accent-2);cursor:pointer}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.g2{grid-template-columns:1fr}}
+.ib{border:1px solid var(--line);border-radius:var(--r-card);padding:11px 13px;background:var(--color-surface)}
+.ib .l{font-size:9.5px;font-weight:700;letter-spacing:.7px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.ib .v{font-size:var(--fz-body-ui);line-height:1.6;color:var(--text-2)}
+.ib .v b{color:var(--text)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chips .c{font-family:var(--serif);font-size:var(--fz-body-ui);background:var(--chip);border:1px solid var(--chip-bd);padding:2px 9px;border-radius:var(--r-sm);color:var(--text-2)}
+.warn{border:1px solid var(--warn-bd);background:var(--warn-soft);border-radius:var(--r-md);padding:11px 14px;font-size:var(--fz-body-ui);line-height:1.7;color:var(--amber)}
+.warn b{color:var(--text);font-family:var(--serif)}
+.ex{margin-bottom:8px}
+.ex .s{font-family:var(--serif);font-size:var(--fs-4);line-height:1.65;cursor:pointer}
+.ex .s:hover{color:var(--accent-2)}
+.ex .f{font-size:10px;margin-top:2px;display:inline-block;padding:1px 7px;border-radius:5px}
+.f.real{background:var(--color-success-subtle);color:var(--color-success)}.f.dict{background:var(--accent-soft);color:var(--accent-2)}.f.ai{background:var(--chip);color:var(--text-3)}
+.nu{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.nr{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:var(--fz-body-ui);align-items:baseline}
+.nr:last-child{border-bottom:0}.nr:hover{background:var(--hover)}
+.nr .w{font-family:var(--serif);font-size:var(--fs-4);font-weight:600;width:128px;flex:none}
+.nr .w.me{color:var(--accent-2)}
+.nr .d{color:var(--text-2);line-height:1.6;flex:1}
+.nr .st{font-family:var(--mono);font-size:10px;color:var(--muted);align-self:center}
+/* T-4.22 · .rs（栏标题）与 .sml（层 / 状态 / 间隔那一行）只有取消掉的那一栏用过，一起删 */
+.evo{position:relative;padding-left:19px}
+.evo::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.ev{position:relative;padding:8px 0}
+.ev::before{content:"";position:absolute;left:-18px;top:15px;width:8px;height:8px;border-radius:50%;border:2px solid var(--color-surface)}
+.ev.a1::before{background:var(--g1);box-shadow:0 0 0 1.5px var(--g1)}
+.ev.a2::before{background:var(--g2);box-shadow:0 0 0 1.5px var(--g2)}
+.ev.a3::before{background:var(--g3);box-shadow:0 0 0 1.5px var(--g3)}
+.ev .m{font-size:10px;font-family:var(--mono);color:var(--muted);display:flex;gap:7px;align-items:center}
+.ev .gr{font-family:var(--font);font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px}
+/* ★ 判分四档 · D-341：语义优先走非颜色通道（形 / 文案 / 方向 / 点数），
+   颜色只是第五条。这里**只把写死值归到令牌，语义一个字不动**。 */
+.gr.a1{background:var(--warn-soft);color:var(--red)}.gr.a2{background:var(--warn-soft);color:var(--amber)}.gr.a3{background:var(--color-success-subtle);color:var(--color-success)}
+.ev .s{font-family:var(--serif);font-size:var(--fz-body-ui);line-height:1.55;margin-top:3px}
+/* 「错」走 danger 那一族（粉）·「半对」走 warning 那一族（暖底 + teal 墨）。
+   CL-Q1 把「错」与「警」的**墨**合成了一档（都是粉），两处高亮靠各自的**面**仍分得开。 */
+.ev .s .x{background:var(--color-danger-subtle);border-bottom:2px solid var(--color-danger);padding:0 2px;border-radius:3px 3px 0 0}
+.ev .s .y{background:var(--color-warning-subtle);border-bottom:2px solid var(--color-warning);padding:0 2px;border-radius:3px 3px 0 0}
+.fold{font-size:var(--fs-2);color:var(--text-3);cursor:pointer;padding:6px 0 0 1px}
+.fold:hover{color:var(--accent-2)}
+/* ★★ D-6（2026-09-03）· 这一块原来写死五个十六进制值，**不在令牌体系里** ——
+   所以它在页面上像一块外来的米黄。现在走 `--warn-soft` / `--warn-bd` / `--amber`
+   （新加的警示面，见 tokens.css）。颜色几乎没变，**但它从此属于这套配色**。 */
+.diag{border:1px solid var(--warn-bd);background:var(--warn-soft);border-radius:var(--r-md);padding:12px 14px;margin-top:13px}
+.diag .h{font-size:9.5px;font-weight:700;letter-spacing:.9px;color:var(--amber);text-transform:uppercase;margin-bottom:6px}
+.diag p{margin:0;font-size:var(--fs-2);line-height:1.75;color:var(--amber)}
+.diag p b{color:var(--text);font-family:var(--serif)}
+
+/* ═══════════ 矩阵 ═══════════ */
+.mxw{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.mx{display:grid;grid-template-columns:66px repeat(4,1fr);gap:3px;max-width:520px;flex:1;min-width:380px}
+.mx .h,.mx .rh{color:var(--muted);font-size:10.5px;display:flex;align-items:center;justify-content:center}
+.mx .rh{justify-content:flex-end;padding-right:8px}
+.mx .c{border-radius:var(--r-ctl);height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:var(--fs-4);cursor:pointer;border:1.5px solid transparent}
+.mx .c:hover{border-color:var(--accent)}
+.q0{background:var(--sidebar-bg);color:var(--faint);font-weight:400}
+/* CL-Q7 定案：图表走**同一条水色阶梯四档**。墨全部用 --color-text（压在四档上
+   10.34 / 9.41 / 7.72），最深那一档换成 --color-primary-pressed 配白字（5.04）——
+   chart-4（aqua-600）配白字只有 3.67，不过 AA 硬线（DS-Q23）。 */
+.q1{background:var(--chart-1);color:var(--color-text)}.q2{background:var(--chart-2);color:var(--color-text)}
+.q3{background:var(--chart-3);color:var(--color-text)}.q4{background:var(--color-primary-pressed);color:var(--color-text-inverse)}
+.zone{border-color:var(--color-attention)!important}
+.mxs{flex:1;min-width:200px;font-size:var(--fs-2);color:var(--text-3);line-height:1.8}
+.mxs .zl{display:flex;align-items:center;gap:8px;font-size:var(--fz-body-ui);color:var(--text-2);margin-bottom:12px}
+.mxs .zl i{width:13px;height:13px;border-radius:4px;border:1.5px solid var(--color-attention);display:block;flex:none}
+/* == 多选条 · 深面三处之一（DS 7.2 · CL-Q6）=========================
+   深面**只做窄带不做容器**：高 = 一个导航行，不许四边完整封闭成一块区域。
+   面与面上的字全部走 --color-deep / --color-on-deep*，不再写死白与半透白。 */
+.selbar{background:var(--color-deep);border-radius:var(--r-ctl);padding:0 15px;min-height:var(--row-nav);display:flex;align-items:center;gap:11px;color:var(--color-on-deep);font-size:var(--fz-body-ui);margin:16px 0}
+.selbar .n{font-family:var(--mono);font-weight:700}
+.selbar .sp{flex:1}
+.selbar button{height:var(--btn-h-sm);border:1px solid var(--color-on-deep-3);background:transparent;color:var(--color-on-deep);font-size:var(--fs-2);border-radius:var(--r-ctl-sm);padding:0 var(--btn-pad-sm)}
+.selbar button:hover{border-color:var(--color-on-deep-accent);color:var(--color-on-deep-accent)}
+.selbar .go{background:var(--color-on-deep);color:var(--color-deep);border-color:var(--color-on-deep);font-weight:600}
+.fbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.ftag{font-size:var(--fs-2);background:var(--accent-soft);border:1px solid var(--color-border-strong);color:var(--accent-2);padding:3px 9px;border-radius:var(--r-sm);display:flex;align-items:center;gap:6px}
+.ftag .x{cursor:pointer;opacity:.6}.ftag .x:hover{opacity:1}
+.fadd{font-size:var(--fs-2);border:1px dashed var(--chip-bd);color:var(--text-2);background:transparent;padding:3px 11px;border-radius:var(--r-ctl-sm)}
+.fadd:hover{border-color:var(--accent);color:var(--accent-2)}
+.srt{margin-left:auto;height:var(--btn-h-sm);font-size:var(--fs-2);color:var(--btn-outline-text);border:1px solid var(--btn-outline-border);background:var(--btn-outline-bg);padding:0 var(--btn-pad-sm);border-radius:var(--r-ctl-sm)}
+
+/* ═══════════ 攻坚区（重构：紧凑列表 + 顶部跨条目诊断）═══════════ */
+.xdiag{border:1px solid var(--color-attention-border);background:var(--color-surface);border-radius:var(--r-card);padding:16px 19px;margin-bottom:18px}
+.xdiag .h{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--color-attention);text-transform:uppercase;margin-bottom:8px}
+.xdiag p{margin:0;font-size:var(--fs-4);line-height:1.8;color:var(--color-text-2)}
+.xdiag p b{color:var(--color-text);font-family:var(--serif)}
+.at{font-family:var(--serif);font-size:var(--fz-body-ui);line-height:1.5;color:var(--text-2);display:flex;gap:9px;align-items:baseline;padding:2px 0}
+.at .d{font-family:var(--mono);font-size:10px;color:var(--muted);flex:none;width:36px}
+.at .x{background:var(--color-danger-subtle);border-bottom:2px solid var(--color-danger);padding:0 2px;border-radius:3px 3px 0 0}
+
+/* ═══════════ 我的上传库 ═══════════ */
+.ugrp{font-size:var(--fs-1);font-weight:700;letter-spacing:.9px;color:var(--muted);text-transform:uppercase;margin:20px 0 5px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.ugrp::after{content:"";flex:1;height:1px;background:var(--line)}
+.ur{padding:9px 5px;border-bottom:1px solid var(--line);cursor:pointer}
+.ur:hover{background:var(--hover)}
+.ur .s{font-family:var(--serif);font-size:var(--fs-4);line-height:1.6}
+.ur .m{font-size:var(--fs-1);color:var(--muted);margin-top:3px;display:flex;gap:12px}
+.ur .m .e{color:var(--accent-2)}
+.deriv{margin:7px 0 3px;padding:9px 12px;background:var(--sidebar-bg);border-radius:var(--r-md);display:none;flex-direction:column;gap:6px}
+.deriv.show{display:flex}
+.dv{display:flex;align-items:center;gap:9px;font-size:var(--fs-2)}
+.dv .t{font-family:var(--serif);font-size:var(--fz-body-ui);font-weight:600;min-width:150px}
+.dv .st{font-family:var(--mono);font-size:10px;color:var(--text-3)}
+.dv .go{margin-left:auto;font-size:var(--fs-1);color:var(--accent-2)}
+
+/* ═══════════ 静默库（游戏框）═══════════ */
+/* 纹理用 color-mix 从主色兑出来（Chromium 136 原生支持），不再写死 rgba：
+   旧值 rgba(109,94,252,...) 是**上一套紫**，换体系后它会是全屏唯一一处外来色。 */
+.frame{position:relative;border:1px solid var(--color-border);border-radius:var(--r-card);padding:24px 28px;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--color-primary) 3%,transparent) 0 2px,transparent 2px 7px),linear-gradient(180deg,var(--color-bg-elevated),var(--color-surface));margin-bottom:6px}
+.frame::before{content:"";position:absolute;inset:5px;border:1px solid var(--accent-soft);border-radius:10px;pointer-events:none}
+.cn{position:absolute;width:13px;height:13px;border-color:var(--accent);border-style:solid;border-width:0;pointer-events:none}
+.cn.tl{top:9px;left:9px;border-top-width:2px;border-left-width:2px;border-radius:3px 0 0 0}
+.cn.tr{top:9px;right:9px;border-top-width:2px;border-right-width:2px;border-radius:0 3px 0 0}
+.cn.bl{bottom:9px;left:9px;border-bottom-width:2px;border-left-width:2px;border-radius:0 0 0 3px}
+.cn.br{bottom:9px;right:9px;border-bottom-width:2px;border-right-width:2px;border-radius:0 0 3px 0}
+.sh2{text-align:center;position:relative;z-index:1}
+.sh2 .rune{font-size:var(--fs-6);color:var(--accent);letter-spacing:5px;opacity:.45}
+.sh2 h2{margin:8px 0 4px;font-size:var(--fs-7);font-weight:700;letter-spacing:2.5px}
+.sh2 p{margin:0;font-size:var(--fs-2);color:var(--text-3);letter-spacing:.4px}
+.sstat{display:flex;justify-content:center;gap:32px;margin-top:17px;padding-top:15px;border-top:1px solid var(--accent-soft)}
+.sstat div{text-align:center}
+.sstat .n{font-family:var(--mono);font-size:var(--fs-7);font-weight:700;color:var(--accent-2)}
+.sstat .l{font-size:var(--fs-1);color:var(--text-3);margin-top:1px;letter-spacing:.5px}
+.tabs2{display:flex;gap:3px;margin:18px 0 0;border-bottom:1px solid var(--line)}
+.tabs2 button{border:0;background:transparent;font-size:var(--fz-body-ui);color:var(--text-2);padding:8px 14px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs2 button.on{color:var(--accent-2);font-weight:600;border-bottom-color:var(--accent)}
+.srow{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line);font-size:var(--fz-body-ui);min-height:var(--row-list)}
+.srow:hover{background:var(--hover)}
+.srow .t{font-family:var(--serif);font-weight:600;font-size:var(--fs-4);min-width:150px}
+.srow .g{color:var(--text-3);font-size:var(--fs-2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ═══════════ 文件学习 ═══════════ */
+.two{display:grid;grid-template-columns:1fr 372px;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;height:560px}
+@media(max-width:1080px){.two{grid-template-columns:1fr;height:auto}}
+.doc{padding:20px 24px;border-right:1px solid var(--line);overflow-y:auto}
+.doc h4{margin:0 0 11px;font-size:var(--fs-2);color:var(--text-3);font-weight:400}
+.doc p{font-family:var(--serif);font-size:var(--fs-5);line-height:1.85;margin:0 0 13px}
+.doc p.hl{background:var(--color-knowledge-subtle);border-radius:5px;padding:7px 10px;margin-left:-10px;margin-right:-10px}
+.rp{background:var(--color-bg-subtle);display:flex;flex-direction:column;min-height:0}
+.rt2{display:flex;gap:3px;padding:11px 14px 0;flex:none}
+.rt2 button{border:0;background:transparent;font-size:var(--fz-body-ui);color:var(--text-2);padding:6px 12px;border-radius:8px 8px 0 0;border-bottom:2px solid transparent}
+.rt2 button.on{color:var(--accent-2);font-weight:600;border-bottom-color:var(--accent);background:transparent}
+.rt2 .n{font-family:var(--mono);font-size:10px;opacity:.65;margin-left:4px}
+.rb{padding:13px 14px;overflow-y:auto;flex:1}
+.msg{font-size:var(--fz-body-ui);line-height:1.75;border-radius:var(--r-md);padding:10px 13px;margin-bottom:9px}
+.msg.ai{background:var(--color-surface);border:1px solid var(--line);color:var(--text-2)}
+.msg.me{background:var(--accent-soft);color:var(--accent-2);margin-left:30px}
+.inp{padding:11px 14px;border-top:1px solid var(--line);display:flex;gap:7px;background:var(--color-surface);flex:none}
+.inp input{flex:1;border:1px solid var(--chip-bd);border-radius:var(--r-ctl);padding:7px 11px;font-family:inherit;font-size:var(--fs-2);outline:none}
+.fd{display:flex;align-items:center;gap:9px;padding:7px 3px;border-bottom:1px solid var(--line);font-size:var(--fz-body-ui)}
+.fd .t{font-family:var(--serif);font-weight:600;flex:1}
+.fd .o{font-size:var(--fs-1);color:var(--muted);font-family:var(--serif);font-style:italic}
+.fcard{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-md);margin-bottom:9px;cursor:pointer}
+.fcard:hover{border-color:var(--color-border-strong);background:var(--hover)}
+.fcard .ic{font-size:var(--fs-6);opacity:.6}
+.fcard .nm{font-weight:600;font-size:var(--fs-4)}
+.fcard .pa{font-size:var(--fs-1);color:var(--muted);margin-top:2px}
+.fcard .pr{margin-left:auto;font-family:var(--mono);font-size:var(--fs-2);color:var(--text-3)}
+
+/* ═══════════ 报告 ═══════════ */
+/* == Segmented · BUTTON_SYSTEM 四（定案：**下划线式，不做填充胶囊堆**）==
+   选中 = 主色字 + 2px 底线。只在「选项同时看得见」时用，否则用 Dropdown。 */
+.segs{display:inline-flex;gap:18px;background:transparent;border:0;border-bottom:1px solid var(--color-border);border-radius:0;padding:0}
+.segs button{border:0;background:transparent;font-size:var(--fz-body-ui);color:var(--color-text-2);padding:6px 0 8px;border-radius:0;border-bottom:2px solid transparent;margin-bottom:-1px}
+.segs button:hover{color:var(--color-text)}
+.segs button.on{color:var(--color-text-accent);font-weight:600;border-bottom-color:var(--color-primary)}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rg .full{grid-column:1/-1}
+@media(max-width:1000px){.rg{grid-template-columns:1fr}}
+.rc{padding:18px 20px;border-radius:var(--r-lg)}
+.rc h3{margin:0 0 2px;font-size:var(--fs-4);font-weight:700}
+.rc .cap2{font-size:var(--fs-1);color:var(--text-3);margin-bottom:14px;line-height:1.6}
+.rc svg{display:block;width:100%;height:auto}
+.rlg{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--fs-1);color:var(--text-2);margin-top:11px}
+.rlg span{display:flex;align-items:center;gap:5px}
+.rlg i{width:9px;height:9px;border-radius:2.5px;display:block}
+/* 图例色块 —— 与图里那四条带同一条阶梯（CL-Q7）。
+   ★ 在这之前是组件里写死的 `style="background:#efecff"`：图和图例各写一份颜色，
+     改一处不报错、只会让图例和图对不上。现在两边都从 --chart-* 取。 */
+.rlg i.c1{background:var(--chart-1);border:1px solid var(--color-border)}
+.rlg i.c2{background:var(--chart-2)}
+.rlg i.c4{background:var(--chart-4)}
+.rlg i.catt{background:var(--chart-attention)}
+.bigl{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+.bigl .n{font-family:var(--mono);font-size:34px;font-weight:700;letter-spacing:-1.4px;line-height:1}
+.delta{font-size:var(--fs-2);font-family:var(--mono);padding:1px 7px;border-radius:6px;background:var(--color-success-subtle);color:var(--color-success);border:1px solid var(--color-success-border)}
+.flow{display:flex;align-items:center;gap:7px;margin:5px 0}
+.flow .bx{flex:1;text-align:center;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 5px}
+.flow .bx .n{font-family:var(--mono);font-size:var(--fs-7);font-weight:700}
+.flow .bx .l{font-size:var(--fs-1);color:var(--text-3);margin-top:1px}
+.flow .ar{color:var(--color-icon-muted)}
+.flow .bx.in{border-color:var(--color-attention-border);background:var(--color-attention-subtle)}
+.flow .bx.out{border-color:var(--color-success-border);background:var(--color-success-subtle)}
+.flow .bx.stay{border-color:var(--chip-bd);background:var(--sidebar-bg)}
+
+/* ── 学习证据（T-4.11）· 每块的数据源 + 逐行的小条 ── */
+.rc .src{font-family:var(--mono);font-size:10.5px;line-height:1.75;color:var(--muted);margin:-10px 0 13px}
+.rc .evt{margin-top:11px}
+.rc .evh{font-size:var(--fs-2);color:var(--text-2);margin:13px 0 4px}
+.rc .ev0{font-size:var(--fs-1)}
+.rc .evg{margin-top:14px;gap:20px}
+.evr{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:var(--fs-2)}
+.evr:last-child{border-bottom:0}
+.evr .k{width:132px;flex:none;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.evr .bar{flex:1;height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.evr .bar i{display:block;height:100%;border-radius:5px;background:var(--chart-4)}
+.evr .v{flex:none;min-width:150px;text-align:right;font-family:var(--mono);font-size:var(--fs-1);color:var(--text-3)}
+.hrs{display:grid;grid-template-columns:repeat(24,1fr);gap:3px}
+.hrs i{aspect-ratio:1;border-radius:2.5px;background:var(--line);display:block}
+.hrs i.l1{background:var(--chart-1)}.hrs i.l2{background:var(--chart-2)}.hrs i.l3{background:var(--chart-3)}.hrs i.l4{background:var(--chart-4)}
+.hrx{display:grid;grid-template-columns:repeat(4,1fr);font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:3px}
+.whyl{display:flex;flex-direction:column;gap:9px}
+.whyi{border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px}
+.whyi .tx{font-size:var(--fz-body-ui);color:var(--text-1)}
+.whyi .mt{font-family:var(--mono);font-size:10.5px;line-height:1.75;color:var(--muted);margin-top:5px}
+.whyi .refs{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);max-height:170px;overflow:auto;font-family:var(--mono);font-size:10.5px;line-height:1.85;color:var(--text-3)}
+.sh{font-size:var(--fs-5);font-weight:700;margin:0 0 2px}
+.shs{font-size:var(--fs-2);color:var(--text-3);margin-bottom:13px}
+.sblk{margin-bottom:30px}
+.sr{display:flex;align-items:center;gap:15px;padding:11px 0;border-bottom:1px solid var(--line)}
+.sr:last-child{border-bottom:0}
+.sr .l{flex:1}
+.sr .t3{font-size:var(--fz-body-ui);font-weight:600;margin-bottom:2px}
+.sr .s3{font-size:var(--fs-2);color:var(--text-3);line-height:1.6}
+.sw{width:36px;height:20px;border-radius:var(--r-pill);background:var(--color-border);position:relative;cursor:pointer;flex:none}
+.sw::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:var(--color-surface);top:2px;left:2px;transition:.16s;box-shadow:var(--shadow-sm)}
+.sw.on{background:var(--accent)}.sw.on::after{left:18px}
+/* ══ 开关的第三态 · B7 / ST-Q6「正在生效」══════════════════════
+   在这之前只有开 / 关两态：切的那一下要等一次 IPC，屏幕上什么都没有。
+   ★ **不转圈**（全应用不用 spinner，ST-Q1）—— 滑块停在中间就是「正在过去」，
+     轨道退成中性色说明「现在既不是开也不是关」。指针给 progress，按不动。 */
+.sw.busy{background:var(--color-border-strong);cursor:progress;pointer-events:none}
+/* D-482 · 这一条现在用不上（例：没勾「场景补全」时的「换个场合再考」）。
+   变灰**不隐藏** —— 隐藏会让他以为功能没了；理由写在那一行的说明里 */
+.sw.nope{opacity:.4;cursor:not-allowed;pointer-events:none}
+.sw.busy::after{left:10px}
+.adv{border:1px solid var(--color-attention-border);background:var(--color-attention-subtle);border-radius:var(--r-ctl);padding:11px 14px;font-size:var(--fs-2);color:var(--color-text-2);line-height:1.7;margin-top:11px}
+.adv b{color:var(--color-text)}
+.dev{font-size:10px;background:var(--color-attention-subtle);color:var(--color-attention);border:1px solid var(--color-attention-border);padding:1px 7px;border-radius:5px;margin-left:7px}
+
+/* ═══════════ 全屏练习浮层 ═══════════ */
+.ov{position:absolute;inset:0;background:var(--color-scrim-strong);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:300;padding:34px}
+.ov.on{display:flex}
+/* A7 / CL-Q6 定案：**练习专注面从整屏深色容器改亮** ——
+   深面「只做窄带不做容器，不许四边完整封闭」（DS 7.2）。
+   现在深色只剩顶上那一条 `.ftop`；卡本体是白面。 */
+.focus{width:min(860px,100%);max-height:100%;background:var(--color-surface);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-lg);display:flex;flex-direction:column}
+.ftop{display:flex;align-items:center;gap:13px;padding:0 20px;min-height:var(--row-nav);background:var(--color-deep);color:var(--color-on-deep);flex:none}
+.ftop .lb{font-size:var(--fs-2);color:var(--color-on-deep-2);letter-spacing:.5px}
+.fpr{flex:1;height:var(--progress-h);background:var(--color-on-deep-3);border-radius:var(--progress-r);overflow:hidden}
+.fpr i{display:block;height:100%;background:var(--color-on-deep-accent);border-radius:var(--progress-r)}
+.ftop .n{font-family:var(--mono);font-size:var(--fs-2);color:var(--color-on-deep-2)}
+.ftop .x{color:var(--color-on-deep-2);cursor:pointer;font-size:14px}
+.fbody{background:var(--color-surface);padding:26px 30px;overflow-y:auto}
+.qt{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--accent-2);background:var(--accent-soft);padding:3px 10px;border-radius:6px;text-transform:uppercase}
+.qx{font-family:var(--serif);font-size:var(--fs-6);line-height:1.65;margin:14px 0 5px}
+.qx b{background:var(--accent-soft);padding:0 4px;border-radius:4px;font-weight:600}
+.qm{font-size:var(--fs-2);color:var(--text-3);display:flex;gap:13px;align-items:center;margin-bottom:16px}
+.qm .hb{margin-left:auto;font-size:var(--fs-2);color:var(--text-2);border:1px dashed var(--chip-bd);background:transparent;border-radius:var(--r-ctl-sm);padding:3px 10px}
+.qm .hb:hover{border-color:var(--accent);color:var(--accent-2)}
+.ans{width:100%;font-family:var(--serif);font-size:var(--fs-5);line-height:1.7;border:1px solid var(--chip-bd);border-radius:var(--r-md);padding:14px 16px;min-height:92px;outline:none;resize:vertical}
+.ans:focus{border-color:var(--accent)}
+.ans[readonly]{background:var(--sidebar-bg);color:var(--text-2)}
+.scale{display:flex;gap:5px;margin:18px 0 14px}
+.sg{flex:1;text-align:center;padding:8px 4px;border-radius:var(--r-ctl);border:1px solid var(--line);font-size:var(--fs-1);color:var(--color-text-2);background:var(--color-surface)}
+.sg .nm{font-family:var(--mono);font-size:9.5px;display:block;color:var(--muted);margin-bottom:2px}
+.sg.hit{color:var(--color-text-inverse);font-weight:600;border-color:transparent}
+.sg.hit .nm{color:var(--color-on-deep-2)}
+.sg.hit.h1{background:var(--g1)}.sg.hit.h3{background:var(--g3)}
+.yours{font-family:var(--serif);font-size:var(--fs-5);line-height:1.9;background:var(--sidebar-bg);border-radius:var(--r-md);padding:13px 16px;border:1px solid var(--line)}
+.yours .bad{background:var(--color-danger-subtle);border-bottom:2px solid var(--red);padding:0 2px;border-radius:3px 3px 0 0}
+.an{display:flex;gap:9px;font-size:var(--fz-body-ui);line-height:1.65;color:var(--text-2);margin-top:11px}
+.an .tg2{flex:none;font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;background:var(--color-danger-subtle);color:var(--color-danger);height:18px;line-height:16px;margin-top:2px}
+.an b{color:var(--text);font-family:var(--serif)}
+.frow{display:flex;gap:9px;margin-top:18px;align-items:center;flex-wrap:wrap}
+.frow .gv{margin-left:auto;font-size:var(--fs-2);color:var(--text-3);cursor:pointer}
+/* Anki 卡 */
+.acard{width:min(560px,100%);background:var(--color-surface);border-radius:var(--r-lg);padding:28px 30px 24px;box-shadow:var(--shadow-lg)}
+/* I-125 · 这一行是卡片标题，不是左侧栏。
+   基础 .side 是侧栏本体（250px 定宽 + 灰底 + 右边框 + flex 列 + 内边距），
+   这条原来只覆盖了字体属性 —— 于是标题在浮层卡片里渲染成一个 250px 灰块，
+   同一行里的「3 / 8」还被 flex-direction:column 挤到了第二行。
+   总原型 v2 自带的旧伤，一路照搬进来；「样式零重写」随 D-454 退役后按回去（T-4.1）。
+   用它的有三处：Reading 认读练习浮层 · App 测试弹窗 · ItemDetail 改块弹窗。 */
+.acard .side{width:auto;padding:0;background:none;border:0;display:block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:15px}
+.cloze{font-family:var(--serif);font-size:var(--fs-6);line-height:1.75;text-align:center}
+.cloze .gap{display:inline-block;min-width:94px;border-bottom:2px solid var(--accent);margin:0 4px;vertical-align:-2px}
+.hints{margin-top:20px;border-top:1px dashed var(--line);padding-top:15px;display:flex;flex-direction:column;gap:8px}
+.hr2{display:flex;gap:11px;font-size:var(--fz-body-ui);line-height:1.6}
+.hr2 .k{flex:none;width:50px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;padding-top:3px}
+.hr2 .v{color:var(--text-2);font-family:var(--serif);font-size:var(--fs-4)}
+.hr2 .v em{font-style:italic;color:var(--text-3)}
+.aw{font-family:var(--display);font-size:28px;font-weight:400;text-align:center;letter-spacing:-.4px;margin:22px 0 6px}
+.ag{text-align:center;font-size:var(--fz-body-ui);color:var(--text-3);margin-bottom:20px}
+.grades{display:flex;gap:7px}
+/* ★ 显式竖排：`<button>` 自己的匿名内容盒会在内容变宽时把子元素排成两行 ——
+   四档里只有「想了一下」是四个字，于是只有它的记号跑到文字左边，四个按钮长得不一样。
+   写死 column + center，四档才是同一个形状。 */
+.gd{flex:1;border:1px solid var(--chip-bd);border-radius:var(--r-ctl);padding:10px 4px;text-align:center;background:var(--color-surface);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gd:hover{border-color:var(--accent);background:var(--accent-soft)}
+.gd .g{font-size:var(--fs-2);font-weight:600}
+.gd .iv{font-family:var(--mono);font-size:var(--fs-1);color:var(--text-3);margin-top:2px}
+.gd .kb{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px}
+/* ══ 判分记号 · B3 / ST-Q7 / D-341 ══════════════════════════════
+   四条非颜色通道里的**形**。颜色（--g1…g4）只是第五条 ——
+   验收判据：把颜色全关掉，四个形状仍然分得开。 */
+.gd .mk{display:block;line-height:0;margin-bottom:6px;color:var(--color-icon-muted)}
+.gd.g1 .mk{color:var(--g1)}
+.gd.g2 .mk{color:var(--g2)}
+.gd.g3 .mk{color:var(--g3)}
+.gd.g4 .mk{color:var(--g4)}
+/* 按下那一刻就出现：不等 IPC 回来（I-076「点了没有反馈」那一课）*/
+.gd.hit{border-color:var(--color-border-focus);background:var(--color-surface-selected)}
+/* 结算 */
+.sum{width:min(760px,100%);background:var(--color-surface);border-radius:var(--r-lg);padding:26px 28px;box-shadow:var(--shadow-lg);max-height:100%;overflow-y:auto}
+.bars{display:flex;height:48px;border-radius:var(--r-md);overflow:hidden;margin-bottom:10px}
+.bars div{display:flex;align-items:center;justify-content:center;color:var(--color-text-inverse);font-family:var(--mono);font-size:var(--fz-body-ui);font-weight:700}
+.blg{display:flex;gap:14px;flex-wrap:wrap;font-size:var(--fs-2);color:var(--text-2);margin-bottom:22px}
+.blg span{display:flex;align-items:center;gap:5px}
+.blg i{width:9px;height:9px;border-radius:2.5px;display:block}
+.sgd{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+@media(max-width:700px){.sgd{grid-template-columns:1fr}}
+.sbx{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px}
+.sbx .h{font-size:var(--fs-2);color:var(--text-3);margin-bottom:9px}
+/* ★★ A-1/A-2（2026-09-03 · UI 审计）· 这三条原来写的是 `.sbx .li`，
+   而首页「今日练习」那个列表**不在 .sbx 里** —— 于是 flex、flex:1、Mono 数字
+   一条都没生效，讲次名和条数直接黏成「The Mo2 条」，视觉上是一个词。
+   典型的**跨层级选择器静默失效**：不报错、就是不生效。
+   提成独立规则（.sbx .li 那种后代写法照样匹配，Practice 一个像素不变）。
+   ★ 同时补省略号：名字放不下时要有「…」，不是硬切一半。 */
+.li{display:flex;align-items:center;gap:10px;font-size:var(--fz-body-ui);padding:4px 0}
+.li .t{font-family:var(--serif);font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .r{font-family:var(--mono);font-size:var(--fs-1);color:var(--text-3);flex:none;font-variant-numeric:tabular-nums}
+.aic{border:1px solid var(--accent-soft);background:linear-gradient(115deg,var(--color-primary-soft),var(--color-surface));border-radius:var(--r-md);padding:16px 18px}
+.aic .h{font-size:10px;font-weight:700;letter-spacing:.9px;color:var(--accent-2);text-transform:uppercase;margin-bottom:8px}
+.aic p{margin:0;font-size:var(--fs-4);line-height:1.8;color:var(--text-2)}
+.aic p b{color:var(--text);font-family:var(--serif)}
+
+/* ═══════════ 通用浮动菜单 · D-200 ═══════════ */
+.pm{position:fixed;z-index:500;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--r-card);box-shadow:var(--shadow-md);padding:5px;min-width:180px;display:none}
+.pm.on{display:block}
+.pm .mi{font-size:var(--fz-body-ui);padding:6px 11px;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--text-2);white-space:nowrap}
+.pm .mi:hover{background:var(--hover);color:var(--text)}
+.pm .mi.dg{color:var(--red)}
+.pm .mi.dg:hover{background:var(--color-danger-subtle)}
+/* 勾也走 `core/icons.ts` 的 check（DS-Q18）：菜单里占位那一枚只是隐形，不改宽度 */
+.pm .mi .mck{flex:none;display:inline-flex;align-items:center;color:var(--color-primary);visibility:hidden}
+.pm .mi.ck2 .mck{visibility:visible}
+.pm .mi .k{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted);padding-left:14px}
+.pm .sp2{height:1px;background:var(--line);margin:4px 7px}
+.pm .cp{font-size:9.5px;font-weight:700;letter-spacing:.8px;color:var(--muted);padding:7px 11px 3px;text-transform:uppercase}
+
+/* ═══════════ 弹窗 ═══════════ */
+.mo{position:absolute;inset:0;background:var(--color-scrim);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:400;padding:40px}
+.mo.on{display:flex}
+.mbox{width:min(460px,100%);background:var(--color-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);padding:24px 26px;max-height:100%;overflow-y:auto}
+.mbox h3{margin:0 0 5px;font-size:var(--fs-5);font-weight:700}
+.mbox .ms{font-size:var(--fz-body-ui);color:var(--text-3);margin-bottom:18px;line-height:1.65}
+.mact{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+.mfield{margin-bottom:14px}
+.mfield .fl{font-size:var(--fs-2);color:var(--text-3);margin-bottom:6px}
+.mfield .fv{display:flex;gap:6px;flex-wrap:wrap}
+.mfield .fv button{height:var(--btn-h-sm);border:1px solid var(--btn-outline-border);background:var(--btn-outline-bg);font-size:var(--fs-2);padding:0 var(--btn-pad-sm);border-radius:var(--r-ctl-sm);color:var(--btn-outline-text)}
+.mfield .fv button.on{background:var(--btn-secondary-bg);border-color:var(--btn-secondary-border);color:var(--btn-secondary-text);font-weight:600}
+
+/* ═══════════ 搜索浮层 · D-196 ═══════════ */
+.so{position:absolute;inset:0;background:var(--color-scrim);backdrop-filter:blur(2px);display:none;justify-content:center;align-items:flex-start;padding-top:90px;z-index:450}
+.so.on{display:flex}
+.sbox{width:min(620px,100%);background:var(--color-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;max-height:calc(100% - 40px);display:flex;flex-direction:column}
+.sinp{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--line);flex:none}
+.sinp span{color:var(--color-icon-muted);font-size:var(--fs-5)}
+/* 搜索框比别的控件更圆一档（DS-Q10：它是「随便说点什么」的入口，不是执行按钮）*/
+.sinp input{flex:1;border:1px solid var(--color-border-subtle);border-radius:var(--r-search);outline:none;font-family:inherit;font-size:var(--fs-5);color:var(--text);padding:6px 14px;background:var(--color-bg)}
+.sinp input:focus{border-color:var(--color-border-focus)}
+.sinp .esc{font-family:var(--mono);font-size:10px;color:var(--muted);border:1px solid var(--chip-bd);border-radius:5px;padding:2px 6px}
+.sres{overflow-y:auto;padding:8px}
+.sgrp2{font-size:9.5px;font-weight:700;letter-spacing:.9px;color:var(--muted);text-transform:uppercase;padding:9px 10px 4px}
+.sitem{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:var(--fz-body-ui)}
+.sitem:hover,.sitem.on{background:var(--hover)}
+.sitem .ic2{width:var(--ic);text-align:center;opacity:.55;font-size:var(--ic)}
+.sitem .t{font-weight:600}
+.sitem .t.en{font-family:var(--serif);font-size:var(--fs-4)}
+.sitem .g{color:var(--text-3);font-size:var(--fs-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.sitem .w{margin-left:auto;font-size:var(--fs-1);color:var(--muted);white-space:nowrap}
+.sitem em{font-style:normal;background:var(--color-knowledge-subtle);border-radius:2px;padding:0 1px}
+.sfoot{border-top:1px solid var(--line);padding:8px 14px;font-size:var(--fs-1);color:var(--muted);display:flex;gap:14px;flex:none}
+
+/* 空状态 · D-184 */
+.empty{text-align:center;padding:56px 20px;color:var(--text-3)}
+.empty .i{font-size:26px;opacity:.35;margin-bottom:12px}
+.empty h4{margin:0 0 5px;font-size:var(--fs-4);color:var(--text-2);font-weight:600}
+.empty p{margin:0;font-size:var(--fz-body-ui)}
+
+/* ── Nyx 图标（D-410「图标系统两端一起重画」· 2026-09-01）────────
+   在这之前 Windows 是**文字当图标**：› ‹ ✕ ▾ ＋，79 处。
+   那些字符每个字体里长得都不一样（`▾` 在 Segoe UI 与 PingFang 下不是一个形状），
+   粗细跟着文字走、不受设计控制，而且与 Android 那 32 枚毫无关系。
+
+   几何在 @core/icons.ts（两端唯一一份），由 Sprite.svelte 铺成隐藏 <defs>。
+   ★ 只给盒子与对齐，颜色一律 currentColor —— 跟着上下文走，不在这里定死。 */
+.nic{display:inline-block;vertical-align:-.12em;flex:none;color:inherit}
+/* ▾ 那一档：同一枚 caret 转 90°（与折叠头同一个转法，不另画一枚） */
+.nic.dn{transform:rotate(90deg)}
+.nic.up{transform:rotate(-90deg)}

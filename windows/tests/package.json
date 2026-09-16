@@ -1,0 +1,4 @@
+{
+  "//": "让 tests/ 下的 .ts 按 ESM 解析，node --test 才能直接跑。",
+  "type": "module"
+}

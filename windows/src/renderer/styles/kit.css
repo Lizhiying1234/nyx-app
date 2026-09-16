@@ -1,0 +1,766 @@
+/* ══════════════════════════════════════════════════════════════
+   样式一览（Kit）—— 开发期的实物页 · 2026-09-07 · Nyx-DS 会话
+
+   ── 它是什么 ────────────────────────────────────────────
+   把「总标准」里的按钮五档 · 十一态 · 五种反馈载体 · 空 / 加载 / 错误 ·
+   进度 · 标签 · 输入 · 表面层级，全部画成看得见的东西，
+   给使用者当「等你确认」那张清单的实物。
+   入口：设置 › 数据 › 样式一览（开发用，不进主导航）。
+   Android 那边的对应物是 Kit.svelte（Settings › ABOUT 连点五下）。
+
+   ── 三条自我约束 ────────────────────────────────────────
+   ① 这里的每一个颜色都取 --color-* / --btn-* / --progress-*，一行 HEX 都没有；
+      令牌本身来自 src/core/design/color-tokens.css（两端唯一一份颜色真相）。
+   ② 只加不改：全部 class 以 kit- 开头，不碰任何既有样式，删掉这个文件
+      与 Kit.svelte，软件其余部分一个像素都不变。
+   ③ 尺寸用的是 DESIGN_SYSTEM.md / BUTTON_SYSTEM.md 里**我提的**那组值
+      控件高 36 / 小号 28（BTN-Q1 定案，2026-09-07）· 圆角 10 · 面板圆角 14。
+
+   ── 颜色令牌从哪来（2026-09-08 改）──────────────────────
+   这一页原来自己 `@import` 了一次 core 的 `color-tokens.css` ——
+   因为那时 Windows 的 tokens.css 还是旧的一套名字，不接语义层。
+   **UI-Win 第一轮之后 tokens.css 自己 @import 了**，这里那一行就成了第二个入口：
+   拆掉 tokens.css 的 import 做负向对照时，软件照样有颜色（走的是这一行），
+   **闸看着是绿的**。所以这一行删掉 —— 令牌只从一个地方进来。
+   ══════════════════════════════════════════════════════════════ */
+
+.kit {
+  --kit-h: 36px;
+  --kit-h-sm: 28px;
+  --kit-r: 10px;
+  --kit-r-lg: 14px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  padding: 20px 22px 40px;
+  border-radius: var(--kit-r-lg);
+  border: 1px solid var(--color-border);
+  margin-top: 14px;
+}
+
+.kit h2 {
+  margin: 0 0 2px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+
+.kit .kit-lead {
+  font-size: 13px;
+  color: var(--color-text-2);
+  line-height: 1.7;
+  max-width: 42em;
+  margin-bottom: 6px;
+}
+
+.kit-sec {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-text-2);
+  margin: 28px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.kit-sec::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.kit-note {
+  font-size: 12px;
+  color: var(--color-text-2);
+  line-height: 1.7;
+  margin: 8px 0 0;
+  max-width: 42em;
+}
+
+/* ── 按钮矩阵 ── */
+.kit-grid {
+  display: grid;
+  grid-template-columns: 92px repeat(6, minmax(96px, 1fr));
+  gap: 10px 12px;
+  align-items: center;
+}
+.kit-grid .kit-hd {
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+}
+.kit-grid .kit-rowname {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-2);
+}
+
+/* 五档按钮 —— 值全部来自 U-012（使用者裁）*/
+.kit-btn {
+  height: var(--kit-h);
+  min-width: 0;
+  padding: 0 14px;
+  border-radius: var(--kit-r);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+.kit-btn.k-sm { height: var(--kit-h-sm); padding: 0 10px; font-size: 12px; border-radius: 8px; }
+
+.kit-btn.k-pri { background: var(--btn-primary-bg); color: var(--btn-primary-text); }
+.kit-btn.k-pri:hover, .kit-btn.k-pri.is-hover { background: var(--btn-primary-hover); }
+.kit-btn.k-pri:active, .kit-btn.k-pri.is-pressed { background: var(--btn-primary-pressed); }
+
+.kit-btn.k-sec {
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border-color: var(--btn-secondary-border);
+}
+.kit-btn.k-sec:hover, .kit-btn.k-sec.is-hover { background: var(--btn-secondary-hover); }
+.kit-btn.k-sec:active, .kit-btn.k-sec.is-pressed { background: var(--btn-secondary-pressed); }
+
+.kit-btn.k-out {
+  background: var(--btn-outline-bg);
+  color: var(--btn-outline-text);
+  border-color: var(--btn-outline-border);
+}
+.kit-btn.k-out:hover, .kit-btn.k-out.is-hover { background: var(--btn-outline-hover); }
+.kit-btn.k-out:active, .kit-btn.k-out.is-pressed { background: var(--btn-outline-pressed); }
+
+.kit-btn.k-acc { background: var(--btn-accent-bg); color: var(--btn-accent-text); }
+.kit-btn.k-acc:hover, .kit-btn.k-acc.is-hover { background: var(--btn-accent-hover); }
+.kit-btn.k-acc:active, .kit-btn.k-acc.is-pressed { background: var(--btn-accent-pressed); }
+
+.kit-btn.k-gho { background: var(--btn-ghost-bg); color: var(--btn-ghost-text); }
+.kit-btn.k-gho:hover, .kit-btn.k-gho.is-hover { background: var(--btn-ghost-hover); }
+.kit-btn.k-gho:active, .kit-btn.k-gho.is-pressed { background: var(--btn-ghost-pressed); }
+
+/* 危险 = Ghost 底 + danger 文字，不填色（D-322 不羞辱）*/
+.kit-btn.k-dgr { background: transparent; color: var(--color-danger); }
+.kit-btn.k-dgr:hover, .kit-btn.k-dgr.is-hover { background: var(--color-danger-subtle); }
+
+.kit-btn.is-focus {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.kit-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+/* active = 这颗按钮代表的模式正开着（松手之后还在）*/
+.kit-btn.is-active {
+  background: var(--color-surface-selected);
+  color: var(--color-text-accent);
+  box-shadow: inset 0 0 0 1px var(--color-border-strong);
+}
+
+/* ── 图标钮 · 分段 · 开关 ── */
+.kit-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.kit-iconbtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--btn-outline-border);
+  background: transparent;
+  color: var(--color-icon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+}
+.kit-iconbtn:hover { background: var(--btn-outline-hover); color: var(--color-icon-active); }
+
+.kit-seg { display: inline-flex; gap: 18px; border-bottom: 1px solid var(--color-border); }
+.kit-seg button {
+  background: none;
+  border: 0;
+  padding: 6px 0 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-text-2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.kit-seg button.k-on {
+  color: var(--color-text-accent);
+  font-weight: 600;
+  border-bottom-color: var(--color-primary);
+}
+
+.kit-sw {
+  width: 38px;
+  height: 21px;
+  border-radius: 999px;
+  background: var(--color-border);
+  position: relative;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  flex: none;
+}
+.kit-sw::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: var(--color-shadow-sm);
+  transition: left .18s ease;
+}
+.kit-sw.k-on { background: var(--color-primary); }
+.kit-sw.k-on::after { left: 19px; }
+
+/* ── 反馈载体 ── */
+.kit-inline {
+  font-size: 12px;
+  color: var(--color-text-2);
+  border-left: 3px solid var(--color-border-strong);
+  padding: 2px 0 2px 10px;
+}
+.kit-inline.k-bad { border-left-color: var(--color-danger); color: var(--color-danger); }
+
+.kit-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-deep);
+  color: var(--color-on-deep);
+  border-radius: var(--kit-r);
+  padding: 10px 14px;
+  font-size: 13px;
+  box-shadow: var(--color-shadow-lg);
+}
+.kit-toast .kit-undo {
+  color: var(--color-on-deep-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.kit-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-attention-subtle);
+  border: 1px solid var(--color-attention-border);
+  border-radius: var(--kit-r);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-text);
+}
+.kit-banner .kit-sp { flex: 1; }
+
+.kit-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-primary-subtle);
+  color: var(--color-text-accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+.kit-badge.k-warn { background: var(--color-attention-subtle); color: var(--color-attention); }
+
+.kit-tip {
+  display: inline-block;
+  background: var(--color-deep);
+  color: var(--color-on-deep);
+  font-size: 11px;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.kit-dialog {
+  width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--kit-r-lg);
+  box-shadow: var(--color-shadow-lg);
+  padding: 18px 20px;
+}
+.kit-dialog h4 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+.kit-dialog p { margin: 0 0 16px; font-size: 13px; color: var(--color-text-2); line-height: 1.7; }
+.kit-dialog .kit-row { justify-content: flex-end; }
+
+/* ── 空 / 加载 / 错误 ── */
+.kit-three {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.kit-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--kit-r-lg);
+  padding: 18px;
+  min-height: 168px;
+}
+.kit-empty { text-align: center; padding: 14px 6px; }
+.kit-empty .kit-mark {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--color-primary-subtle);
+}
+.kit-empty h5 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--color-text); }
+.kit-empty p { margin: 0 0 14px; font-size: 12px; color: var(--color-text-2); }
+
+.kit-skel { display: grid; gap: 10px; }
+.kit-skel i {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--color-surface-subtle);
+  animation: kit-breathe 1.6s ease-in-out infinite;
+}
+.kit-skel i.k-w70 { width: 70%; }
+.kit-skel i.k-w45 { width: 45%; }
+@keyframes kit-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kit-skel i { animation: none; }
+}
+
+.kit-err {
+  border-left: 3px solid var(--color-danger);
+  background: var(--color-danger-subtle);
+  border-radius: var(--kit-r);
+  padding: 12px 14px;
+}
+.kit-err .kit-h { font-weight: 700; color: var(--color-danger); font-size: 13px; margin-bottom: 4px; }
+.kit-err p { margin: 0 0 12px; font-size: 12px; color: var(--color-text-2); line-height: 1.7; }
+
+/* ── 进度 · 标签 · 输入 ── */
+.kit-prog {
+  height: var(--progress-h);
+  border-radius: var(--progress-r);
+  background: var(--progress-track);
+  overflow: hidden;
+  max-width: 260px;
+}
+.kit-prog i { display: block; height: 100%; border-radius: var(--progress-r); background: var(--progress-primary); }
+.kit-prog i.k-sec { background: var(--progress-secondary); }
+.kit-prog i.k-done { background: var(--progress-complete); }
+.kit-prog i.k-att { background: var(--progress-attention); }
+.kit-prog i.k-off { background: var(--progress-inactive); }
+
+.kit-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  border-radius: 6px;
+  padding: 2px 8px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-2);
+  border: 1px solid var(--color-border);
+}
+.kit-tag.k-a {
+  background: var(--color-primary-subtle);
+  color: var(--color-text-accent);
+  border-color: var(--color-border-strong);
+  font-weight: 600;
+}
+.kit-tag.k-b {
+  background: var(--color-review-subtle);
+  color: var(--color-text-accent);
+  border-color: var(--color-border-strong);
+}
+.kit-tag.k-know {
+  background: var(--color-knowledge-subtle);
+  color: var(--color-text-pink);
+  border-color: var(--color-accent-subtle);
+}
+
+.kit-inp {
+  height: var(--kit-h);
+  width: 220px;
+  padding: 0 11px;
+  border-radius: var(--kit-r);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 13px;
+}
+.kit-inp::placeholder { color: var(--color-text-3); }
+.kit-inp.is-focus { outline: 2px solid var(--color-border-focus); outline-offset: 1px; }
+.kit-inp.k-bad { border-color: var(--color-danger); }
+.kit-inp:disabled { opacity: .45; }
+
+/* ── 表面层级（面最多两层，往亮走）── */
+.kit-surf { display: flex; gap: 14px; flex-wrap: wrap; }
+.kit-surf > div {
+  border-radius: var(--kit-r);
+  padding: 14px;
+  min-width: 150px;
+  font-size: 12px;
+  color: var(--color-text-2);
+  border: 1px solid var(--color-border-subtle);
+}
+.kit-surf .k-l0 { background: var(--color-bg); }
+.kit-surf .k-l1 { background: var(--color-bg-subtle); }
+.kit-surf .k-l2 { background: var(--color-surface-subtle); }
+.kit-surf .k-l3 { background: var(--color-surface); }
+.kit-surf .k-l4 { background: var(--color-bg-warm); }
+.kit-surf .k-l5 { background: var(--color-deep); color: var(--color-on-deep-2); border-color: var(--color-deep); }
+
+/* ── 判分四档（颜色只是第五条通道）── */
+.kit-grade { display: flex; gap: 10px; flex-wrap: wrap; }
+.kit-grade button {
+  height: 44px;
+  min-width: 104px;
+  border-radius: var(--kit-r);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-text-2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.kit-grade button .kit-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.6px solid currentColor;
+  flex: none;
+}
+.kit-grade button.k-g1 { color: var(--color-attention); }
+.kit-grade button.k-g1 .kit-dot { border-style: dashed; }
+.kit-grade button.k-g2 { color: var(--color-text-3); }
+.kit-grade button.k-g3 { color: var(--color-text-accent); }
+.kit-grade button.k-g3 .kit-dot { background: currentColor; }
+.kit-grade button.k-g4 { color: var(--color-primary); }
+.kit-grade button.k-g4 .kit-dot { background: currentColor; box-shadow: 0 0 0 3px var(--color-primary-subtle); }
+
+.kit-progs {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 260px);
+  gap: 10px 14px;
+  align-items: center;
+}
+.kit-plab { font-size: 11px; color: var(--color-text-2); }
+.kit-prog i.k-p20 { width: 20%; }
+.kit-prog i.k-p35 { width: 35%; }
+.kit-prog i.k-p55 { width: 55%; }
+.kit-prog i.k-p80 { width: 80%; }
+.kit-prog i.k-p100 { width: 100%; }
+
+/* 设置页里那个入口的两处间距（D-227：不在组件里写内联样式）*/
+.sec-gap { margin-top: 20px; }
+.sec-gap-b { margin-bottom: 8px; }
+
+/* ══ 参考图落点（DS §九～§十二）· 2026-09-07 补 ═════════════════
+   十四条手感里能画成实物的那几条：双语标签 · 状态胶囊 · 星粒子 ·
+   图标选中态方块 · 数字排版 · 词条卡 · 启动页两方案 · 按钮两档高。
+   同样一行 HEX 都没有；修饰类一律 k- 前缀（撞名那次的教训）。 */
+.kit-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.kit-pane {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--kit-r-lg);
+  padding: 16px 16px 8px;
+}
+
+/* ★ W-3（UX-Q2 已裁）· 双语标签**英文主位**，2026-09-14 从中文主位改过来。
+   产品侧的 `.secthead`（global.css）早就是英文主位了（I-173），这一处是 DS 的实物样例、
+   一直没跟上 —— 于是「样式一览」教的和产品做的相反。
+   ★ 字号 / 字色 / 字距**照抄 `.secthead` 用的那几个令牌**，不再写死 16 / 11：
+   样例和产品各写一份数，迟早只改一边（同 F 类「判据只有一份」）。 */
+.kit-bl { display: block; margin-bottom: 10px; }
+.kit-bl .k-en {
+  display: block;
+  font-size: var(--fz-body-ui);
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: var(--color-text);
+}
+.kit-bl .k-zh {
+  display: block;
+  font-size: var(--fz-micro-zh);
+  letter-spacing: var(--ls-micro-zh);
+  color: var(--color-text-3);
+  margin-top: 1px;
+}
+
+.kit-plainrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-text);
+  padding: 7px 0;
+}
+.kit-plainrow.k-quiet { color: var(--color-text-3); }
+
+.kit-chip {
+  font-size: 11px;
+  line-height: 20px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.kit-chip.k-doing { background: var(--color-primary-subtle); color: var(--color-text-accent); }
+.kit-chip.k-done2 { background: var(--color-surface-subtle); color: var(--color-text-2); }
+.kit-chip.k-due { background: var(--color-attention-subtle); color: var(--color-attention); }
+.kit-chip.k-mute { border: 1px solid var(--color-border); color: var(--color-text-3); }
+
+/* 星粒子：两级尺寸 · 透明度 30–45% · 第二眼才看见
+   ★ 几何走 core/icons.ts 的衍射星（D-410 只许一份），这里只管大小 · 颜色 · 透明度
+   ★ ≤16px 用 star-16（只有核）：整星的四芒与核之间有间隙，小尺寸下会读成一个「+」——
+     DS v5 §4.2 第三条就是这个意思，第一版画成整星，截图上当场看出来了 */
+.kit-star {
+  display: inline-flex;
+  color: var(--color-primary);
+  opacity: .42;
+  vertical-align: middle;
+}
+.kit-star.k-s1 { margin-left: 8px; }
+.kit-star.k-s2 { margin-left: 4px; opacity: .3; }
+.kit-star.k-corner {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: var(--color-accent);
+  opacity: .9;
+  margin: 0;
+}
+
+.kit-num { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 10px; }
+.kit-num b {
+  font-family: var(--mono, monospace);
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: -.02em;
+  color: var(--color-text);
+  line-height: 1;
+}
+.kit-num span { font-size: 11px; color: var(--color-text-3); }
+.kit-num.k-sm b { font-size: 20px; color: var(--color-text-accent); }
+
+.kit-pct { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.kit-pct .kit-prog { flex: 1; }
+.kit-pct span {
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  color: var(--color-text-2);
+}
+
+/* 图标选中态：不换实心，进一个淡水色圆角方块 */
+.kit-ib {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-icon);
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+.kit-ib.is-on { background: var(--color-primary-subtle); color: var(--color-icon-active); }
+.kit-ib.k-round2 { border-radius: 50%; margin: 2px 0 8px; }
+.kit-inp.k-round { border-radius: 18px; min-width: 220px; }
+
+/* 对照：未采纳的 32（BTN-Q1 里我提过，使用者取了他原话的下限 36）*/
+.kit-btn.k-h32 { height: 32px; }
+
+/* 词条卡 · 垂直节奏 */
+.kit-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--kit-r-lg);
+  padding: 16px 18px 14px;
+  max-width: 420px;
+}
+.kit-card .k-word {
+  font-family: var(--display, serif);
+  font-size: 28px;
+  color: var(--color-text-accent);
+  line-height: 1.1;
+}
+.kit-card .k-ipa {
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  color: var(--color-text-3);
+  margin-top: 3px;
+}
+.kit-card .k-gloss {
+  font-family: var(--serif, serif);
+  font-size: 14px;
+  color: var(--color-text);
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 10px;
+}
+.kit-card .k-eg {
+  font-family: var(--serif, serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--color-text-2);
+  background: var(--color-bg-warm);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+.kit-card .k-src {
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--color-text-3);
+  margin-top: 10px;
+}
+
+/* == 字体（已定案 D · 2026-09-07 U-009 DS-Q26 + U-017）================
+   同一段内容排两遍，只换字族。两套的字号 / 行高 / 字距完全一样 ——
+   不这么做的话，看到的差别里有一半是版式的差别，不是字的差别。
+   D  = Windows 现役（四族全是系统自带，零打包）
+   D' = Android 那一套（能打包的开源等价字，DS 2.4 明说这一档留作参考）
+   A / B / C 三个候选与它们打包的五族字已随定案退役，形不留在这一页。 */
+.kit-spec {
+  --sp-display: var(--display, serif);
+  --sp-serif: var(--serif, serif);
+  --sp-ui: var(--font, sans-serif);
+  --sp-mono: var(--mono, monospace);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--kit-r-lg);
+  padding: 14px 18px 16px;
+  margin-bottom: 12px;
+}
+.kit-spec .s-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font, sans-serif);
+  font-size: 13px;
+  color: var(--color-text);
+}
+.kit-spec .s-head span { font-size: 11px; color: var(--color-text-2); }
+.kit-spec .s-desc {
+  font-family: var(--font, sans-serif);
+  font-size: 11px;
+  color: var(--color-text-3);
+  margin: 2px 0 12px;
+}
+.kit-spec .s-word {
+  font-family: var(--sp-display);
+  font-size: 30px;
+  line-height: 1.1;
+  color: var(--color-text-accent);
+}
+.kit-spec .s-ipa {
+  font-family: var(--sp-mono);
+  font-size: 11px;
+  color: var(--color-text-3);
+  margin-top: 3px;
+}
+.kit-spec .s-eg {
+  font-family: var(--sp-serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin-top: 10px;
+}
+.kit-spec .s-zh {
+  font-family: var(--sp-zh, var(--sp-serif));
+  font-size: 14px;
+  line-height: 1.75;
+  letter-spacing: .03em;
+  color: var(--color-text-2);
+  margin-top: 6px;
+  max-width: 42em;
+}
+.kit-spec .s-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.kit-spec .s-nav {
+  font-family: var(--sp-zh, var(--sp-ui));
+  font-size: 14px;
+  color: var(--color-text);
+}
+.kit-spec .s-btn {
+  font-family: var(--sp-zh, var(--sp-ui));
+  font-size: 13px;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+.kit-spec .s-meta {
+  font-family: var(--sp-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+}
+.kit-spec .s-num {
+  font-family: var(--sp-mono);
+  font-size: 18px;
+  letter-spacing: -.02em;
+  color: var(--color-text-accent);
+}
+
+/* D · Windows 现役 —— 不覆盖任何变量，用的就是软件现在的字（tokens.css 的四族）*/
+
+/* D' · Android 那一套（能打包的等价字）
+   Windows 用的 Sitka / Segoe UI Variable / 微软雅黑不能随软件分发，手机上也不存在 ——
+   Android 换成气质对齐的开源集。四族里只有 Cascadia Mono 这台机器上有真货；
+   ★ Source Serif 4 与 Inter **本机没装**，下面看到的是兜底字（Georgia / Segoe UI），
+     思源黑体也没装，落到微软雅黑（两款本来就近）。
+   换字体包那一轮在真机上换成真货再复看 —— 这一页现在给的是**版式与气质的位置**，不是终稿。
+   （替身不再借用已退役的 Literata / Schibsted：那两族已经从软件里删掉了，
+     写它们等于让 CSS 说的和屏幕上发生的不是一回事。）*/
+.kit-spec.f-dp {
+  --sp-display: "Source Serif 4", Georgia, serif;
+  --sp-serif: "Source Serif 4", Georgia, serif;
+  --sp-ui: Inter, "Segoe UI", sans-serif;
+  --sp-mono: "Cascadia Mono", Consolas, monospace;
+  --sp-zh: "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei UI", sans-serif;
+}
+
+/* ★ 2026-09-07 收尾：标志的两轮候选（L1–L6 · M1–M6）与 M3 的尺寸阶梯样式
+   在使用者定案「用他给的水獭图标」之后一并删掉 ——
+   作废的形留在样式表里，下一个人会以为它还是个选项。记录在 DESIGN_SYSTEM §9.1b～§9.1d。
+   启动页那两个带字标的方案同理，也已撤下。 */

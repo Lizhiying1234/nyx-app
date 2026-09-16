@@ -1,0 +1,36 @@
+/*
+ * core 在 **Android 那套编译器设置**下也得编得过 · T-9.16
+ *
+ * ── 病 ────────────────────────────────────────────────────
+ *
+ * `src/core/` 是两端共用的同一份源码（D-238 / D-365），Android 经 submodule 消费它。
+ * 而两边的 `tsconfig` 不一样：**Android 开着 `noUncheckedIndexedAccess`，本仓没开**。
+ * 于是本仓 `npm run check` 全绿、`gate` 全绿，而同一份 core 在对面**编译不过** ——
+ * 2026-09-08 真发生了：`core/dedup/plan.ts::pickCanonical` 末尾 `sort(…)[0]` 在那边是
+ * `DedupItem | undefined`，C 第一次 import 就撞上（T-9.13）。
+ *
+ * 这类失败最贵的地方是**发现得晚**：本仓这边看不见，要等另一个仓的另一个人去踩。
+ *
+ * ── 药 ────────────────────────────────────────────────────
+ *
+ * 拿 Android 那一条设置，在**本仓**把 `src/core` 再编一遍。`check:core-strict` 跑它。
+ *
+ * ★ 为什么只有 `noUncheckedIndexedAccess` 这一条：它是两仓 `tsconfig` 之间**唯一**
+ *   会让同一份 core 一边过一边不过的差异（2026-09-08 逐条比对过）。
+ *   其余差异（`types` / `lib` / `paths`）不改变判据，抄过来只会引进假红。
+ *
+ * ★ 为什么 **排除 `*.test.ts`**：core 的用例里到处是 `groups[0].xxx` 这种写法，
+ *   在这条设置下会红 19 处 —— 而 **Android 根本编不到它们**：那边的 `include` 是
+ *   `src/** + tests/**`，`nyx-core/` 在 `src/` 外，只有**经 import 到达**的文件才被检查，
+ *   而 `core-link.ts` 不 import 任何 `.test.ts`。把它们算进来就是**假红**，
+ *   而假红的闸用不了几次就会被人绕过去。
+ *   ★ 反过来说：哪天 Android 真的开始编 core 的用例，这一行要跟着改。
+ */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["src/core/**/*.ts"],
+  "exclude": ["src/core/**/*.test.ts"]
+}

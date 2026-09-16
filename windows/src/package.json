@@ -1,0 +1,4 @@
+{
+  "//": "让 src/ 下的 .ts 按 ESM 解析，这样 core/ 的单元测试能用 `node --test` 直接跑（D-238：core 不依赖界面，必须能脱离应用运行）。",
+  "type": "module"
+}

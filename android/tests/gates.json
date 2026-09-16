@@ -1,0 +1,587 @@
+{
+  "_": [
+    "具名闸清单（ZA-2 · 2026-09-15）—— 本仓每一道闸在这儿有个名字。",
+    "",
+    "★★★ 为什么要这张表：闸被删掉、被合并盖掉、或者悄悄不再盯它原来盯的东西，",
+    "  **四门照样全绿** —— 这一轮已经撞过两次（I-187 的修复与它的闸死在同一次合并里；",
+    "  port-names 那条数出现次数的断言被一条注释顶替）。清单让『少了一道闸』本身变成红的。",
+    "",
+    "★ guards 写的是它**现在**盯什么，一句人话，**不许比断言大**（闸名不许比断言大，N-3 同族）。",
+    "  说不清的宁可写窄；写宽了下一个人会以为有人在看着。",
+    "★ titles 是 it/test 的条数，**只许往上**（check:gates 拦着）。",
+    "  ☞ 数它的时候必须先剥注释、且排除 `/re/.test(x)` 里那个 `.test(` ——",
+    "    第一版两样都没做，`tiers-gone` 真标题 4 条被数成 12。",
+    "★ control 只搬**真记过**的（提交信息 / 派单交付里写了『红在哪句』的）；",
+    "  说不出红在哪句的一律 null，**不许补写**（ZA-4）。",
+    "★ helpers.ts / fixtures/ 不是闸，但在册，titles 为 null。"
+  ],
+  "gates": [
+    {
+      "name": "svelte-check",
+      "path": "package.json::check",
+      "guards": "全仓 TS/Svelte 类型错误为 0（--threshold error）",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:plan",
+      "path": "tools/check-plan.mjs",
+      "guards": "PLAN 指针文件与知识库入口文件存在且没指向死链",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:css",
+      "path": "tools/check-css.mjs",
+      "guards": "三份 CSS 里没有提前关掉的注释（`*/` 缺失会把后面整段样式吃掉）",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:tokens",
+      "path": "tools/check-tokens.mjs",
+      "guards": "tokens.css 与生成物 nyx_tokens.xml 对得上（改了令牌没重新生成会红）",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:java-sql",
+      "path": "tools/check-java-sql.mjs",
+      "guards": "Java 文件里没有业务 SQL；受管表 32 张，白名单放行 2 处开关读取",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:engine-bundle",
+      "path": "tools/check-engine-bundle.mjs",
+      "guards": "无头引擎那个包里不许混进 App 侧模块（ALLOWED 名单空着，靠产物本身那一段硬闸）",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:gates",
+      "path": "tools/check-gates.mjs",
+      "guards": "具名闸清单自己那道：path 存在 · 没名字的闸不许存在 · titles 只升 · 没对照的只许变少 · 有对照的按名字钉住",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:guide-ids",
+      "path": "tools/check-guide-ids.mjs",
+      "guards": "屏上每个 data-guide 的 id 都在 core PAGE_GUIDES 里 · 名单每条有人引用（PENDING 有寿命 / NOT_ON_THIS_END 永久不做，两张表分开、理由必填）· 永久名单里的 id 屏上不许有靶子 · 触发与目标成对（有靶子还得有人扣扳机）· 扫描前剥注释",
+      "titles": null,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "① 把 NOT_ON_THIS_END 里 today-paste 的理由清空 ② 把摘掉的 data-guide=\"today-paste\" 靶子加回 Atlas",
+        "red_at": "① 「today-paste」没写理由 —— 不写理由的免检，下一个人无从判断它还成不成立 ② 「today-paste」写着这一端永久不做，屏上却有 data-guide 靶子"
+      }
+    },
+    {
+      "name": "check:copy",
+      "path": "tests/ui-copy.test.ts",
+      "guards": "屏上不出现废弃词；改过名的那几句真的在；闸的扫描范围覆盖屏上有字的四处",
+      "titles": 5,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "C1 新写一处「没能收起：」· C2 把折叠那三处改成「折叠」· C3 把四句「已收起 N 条」改成走常量（= 模拟 A-2 改完）· C4 原样",
+        "red_at": "C1「VaultHard.svelte:66 「收起」—— D-489 → 用 SILENCE_ACTIONS.shelve；折叠义见 FOLD_OK」· C2/C3 都红在 N-5「豁免表里的「…」屏上已经没有了 —— 把这一行删掉」· C4 绿（挂号的四处确实放行）"
+      }
+    },
+    {
+      "name": "analyse",
+      "path": "tests/analyse.test.ts",
+      "guards": "单条解析：块按 core 名单落库、edited 块不动、失败零改动且抛人话、详情页读得到",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "analysis-batch",
+      "path": "tests/analysis-batch.test.ts",
+      "guards": "批量解析：有解析的不花 AI、单条失败不停整批、offline/auth 停批留队列、租约只跑一个、取消不回滚",
+      "titles": 9,
+      "control": {
+        "date": "2026-09-01",
+        "removed": "拆掉租约开关",
+        "red_at": "租约开关拆掉 → 两个执行者都跑得起来"
+      }
+    },
+    {
+      "name": "assist-auth",
+      "path": "tests/assist-auth.test.ts",
+      "guards": "Assist 授权四态各说各的话；不把「系统撤了」说成「你关了」；措辞不许升级成承诺",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "batch-actions",
+      "path": "tests/batch-actions.test.ts",
+      "guards": "批量动作按状态出现：有失败给「重试失败的」、跑完干净一个都不出、原因同句归行",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "capture",
+      "path": "tests/capture.test.ts",
+      "guards": "收下全链（三级建齐/occurrence/晋升/流水）、跨讲才算重复、默认保存位置四种回落、saveTargetLabel 只说不建",
+      "titles": 15,
+      "control": null
+    },
+    {
+      "name": "color-parts",
+      "path": "tests/color-parts.test.ts",
+      "guards": "可调色令牌清单按可达性算（两跳闭包）、别名层不算使用、调不动的不摆出来、HEX 归一",
+      "titles": 10,
+      "control": {
+        "date": "2026-09-14",
+        "removed": "深面留一层本端别名",
+        "red_at": "★★ ①e 深面不许再长回一层本端别名"
+      }
+    },
+    {
+      "name": "color-picker-order",
+      "path": "tests/color-picker-order.test.ts",
+      "guards": "拾色器回调里 `picking = null` 必须排在那几个调用之后（顺序反了会丢掉这次选择）",
+      "titles": 1,
+      "control": null
+    },
+    {
+      "name": "contrast",
+      "path": "tests/contrast.test.ts",
+      "guards": "色彩令牌两两对比度达到各自下限（D-342 那五条硬规则里的对比度那条）",
+      "titles": 3,
+      "control": null
+    },
+    {
+      "name": "core-lock",
+      "path": "tests/core-lock.test.ts",
+      "guards": "依赖链里没有 Windows 物理路径、只指 submodule、指针=工作树、import 到的正文=锁定 commit、构建打出的 SHA 与指纹",
+      "titles": 5,
+      "control": {
+        "date": "2026-09-04",
+        "removed": "把链里一处改回指 Windows 工作树",
+        "red_at": "① 依赖链里没有物理路径"
+      }
+    },
+    {
+      "name": "core-parity",
+      "path": "tests/core-parity.test.ts",
+      "guards": "core 同输入同输出逐字对照（判分/排期/出题/今日/静默/偏好白名单 29 项/材料/查重/认读提示词）",
+      "titles": 17,
+      "control": null
+    },
+    {
+      "name": "dict-images-per-entry",
+      "path": "tests/dict-images-per-entry.test.ts",
+      "guards": "词典插图按词条取不跟着书缓存、扫 img 只住一处、张数上限按条算、取不到要分「太大」与「没有」",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "dict-recursive",
+      "path": "tests/dict-recursive.test.ts",
+      "guards": "词典文件夹递归扫描：子目录进库、跳过项说得出、同名书的卷与样式不串、退役行不算失踪",
+      "titles": 8,
+      "control": {
+        "date": "2026-09-05",
+        "removed": "只喂顶层（递归被拆掉）",
+        "red_at": "DR-1b · 只喂顶层就只有 16 本"
+      }
+    },
+    {
+      "name": "dict",
+      "path": "tests/dict.test.ts",
+      "guards": "本地词典：扫描登记与坏文件如实记、查词与失踪标记、@@@LINK 跟随、拖动排序、发音链接解析、读不了≠没这个词",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "edit-item",
+      "path": "tests/edit-item.test.ts",
+      "guards": "改知识点：uid 不变、只动该动的列、出处跟改、corrections 留痕、非法输入抛人话且零改动",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "guide",
+      "path": "tests/guide.test.ts",
+      "guards": "页面引导第二层：没看过的都出、看过的不再出、内容改了只有那一条重出、seen 记号进 settings",
+      "titles": 12,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "把 seen 记号改成写 user_preferences",
+        "red_at": "GD-4 · ui.guide.seen 不进同步表"
+      }
+    },
+    {
+      "name": "kit",
+      "path": "tests/kit.test.ts",
+      "guards": "Kit 屏引用的令牌都真有定义、图标清单与 core/icons.ts 一一对应",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "lecture-select",
+      "path": "tests/lecture-select.test.ts",
+      "guards": "Lecture 多选三态、按一下全选/退出、选中 N 条进认读队列就是那 N 条（不看到期日）",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "lookup-ledger",
+      "path": "tests/lookup-ledger.test.ts",
+      "guards": "查词记账：整段不记成 term 也不抄原文进库、词与短语照记、库里已有的脏行当场不列",
+      "titles": 9,
+      "control": null
+    },
+    {
+      "name": "lookup",
+      "path": "tests/lookup.test.ts",
+      "guards": "Assist 查词三条路（quick/full/dict）分节与来源标注、认读牌面拼装与迁移、自建面进提示词、一面没勾不叫 AI",
+      "titles": 19,
+      "control": {
+        "date": "2026-09-14",
+        "removed": "把 onFaces 换成 onFaceIds（只递 id）",
+        "red_at": "R-5 · 自建那一面没进提示词"
+      }
+    },
+    {
+      "name": "manage-nodes",
+      "path": "tests/manage-nodes.test.ts",
+      "guards": "三级新建默认名与置顶、reorder 同父写 0..n 跨父拒收、移动与排序是两件事",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "merge",
+      "path": "tests/merge.test.ts",
+      "guards": "合并：被并条进回收站、学习史归主记录、term_ledger 一行都不留、不动被并条的收录行",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "mirror-handoff",
+      "path": "tests/mirror-handoff.test.ts",
+      "guards": "启动页镜像：TS 写进去的地址/内置档/配色，内联脚本原样拿回来并画上",
+      "titles": 4,
+      "control": {
+        "date": "2026-09-14",
+        "removed": "镜像格式两端改一端",
+        "red_at": "★★★ 我的图 · 内联脚本原样拿回来"
+      }
+    },
+    {
+      "name": "move-items",
+      "path": "tests/move-items.test.ts",
+      "guards": "移动知识点：旧收录行软删不删除、条目数按活着的算、移回原讲复活同一行（uid 不变）",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "notify",
+      "path": "tests/notify.test.ts",
+      "guards": "同步提醒的触发条件：有孤本且久未成功才说、没孤本不说、从没成功过不按积压算",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "onboarding",
+      "path": "tests/onboarding.test.ts",
+      "guards": "首次引导：新库该出、看过不再出、记号进 settings 不进偏好、文案参数化不写死",
+      "titles": 10,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "把 onboardingSteps 改回写死的 ONBOARDING_STEPS",
+        "red_at": "O-7 · 出厂 3 改 2 引导就说假话"
+      }
+    },
+    {
+      "name": "port-names",
+      "path": "tests/port-names.test.ts",
+      "guards": "同步端口的文件名守卫：坏名字读不出也写不进目录外；read/write 两处都要有且在碰文件系统之前",
+      "titles": 6,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "拿掉 write 那道守卫、原地留一条提到 checkAudioName 的注释",
+        "red_at": "★★ read / write 里那两道守卫不是两条了（★ 改用共用剥注释之前这条是绿的）"
+      }
+    },
+    {
+      "name": "practice",
+      "path": "tests/practice.test.ts",
+      "guards": "产出线：变量填充不许发半截提示词、生成只在缺题时、四个出题选项真进发出去的那段字、内置题型不读 prompt",
+      "titles": 13,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "typesBrief 不调 buildPracticeRules",
+        "red_at": "P-0 · W-3 没跟着题型拼进去"
+      }
+    },
+    {
+      "name": "prompt-ia",
+      "path": "tests/prompt-ia.test.ts",
+      "guards": "设置 › Prompt 的信息架构：顶部模式开关且两块各在一个分支、不出现文件学习那一枝、归类与空标题",
+      "titles": 5,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "把两块合回一页（撤掉 {#if}/{:else}）",
+        "red_at": "IA-1 · 认读那块没被放进 {#if} 分支"
+      }
+    },
+    {
+      "name": "purge",
+      "path": "tests/purge.test.ts",
+      "guards": "回收站彻底删除：过期硬删加墓碑、时钟偏移太大一行不清并说一句、没时钟参照照常清",
+      "titles": 4,
+      "control": null
+    },
+    {
+      "name": "qtypes-frozen",
+      "path": "tests/qtypes-frozen.test.ts",
+      "guards": "题型排序真的会改顺序（不是空壳）、没点到的不受影响",
+      "titles": 2,
+      "control": null
+    },
+    {
+      "name": "quiz-rules",
+      "path": "tests/quiz-rules.test.ts",
+      "guards": "出题规则七个选项存取来回与出厂值、退役键写不进、老数据认账、lastFace 走 settings 且轮转真读到它",
+      "titles": 8,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "readingBuild 不递 lastFaceId",
+        "red_at": "Q-6c · 上次那一面没排到后面"
+      }
+    },
+    {
+      "name": "read-path",
+      "path": "tests/read-path.test.ts",
+      "guards": "读路径：讲次页与详情页读得全、软删不出现、行上记号口径一致",
+      "titles": 9,
+      "control": null
+    },
+    {
+      "name": "reading",
+      "path": "tests/reading.test.ts",
+      "guards": "认读：到期卡筛选与排序、指定 ids 连静默也给、判分只碰该碰的两张表并带 device/duration",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "receipt-text",
+      "path": "tests/receipt-text.test.ts",
+      "guards": "回执文案：空 Error 也有一句话、认得出原因时照旧说原因、AiError 标题与详情接上",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "search",
+      "path": "tests/search.test.ts",
+      "guards": "搜索：词条与释义都搜、字面命中排前、软删不出现、LIKE 通配符转义",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "silence-kind",
+      "path": "tests/silence-kind.test.ts",
+      "guards": "静默两种成因：手动收起来/自动已练成各说各的词、放回去清记号、老数据按已练成算",
+      "titles": 6,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "自动那条不标 earned",
+        "red_at": "SK-3 · 老数据按已练成算"
+      }
+    },
+    {
+      "name": "splash-label-keys",
+      "path": "tests/splash-label-keys.test.ts",
+      "guards": "启动页图片键的前缀往返恒等、内置两档原样穿过、名字与时间读写",
+      "titles": 15,
+      "control": null
+    },
+    {
+      "name": "splash-names",
+      "path": "tests/splash-names.test.ts",
+      "guards": "启动页图片改名：新旧两种形状都读得出名字与时间、改名只动这一条",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "splash-one-frame",
+      "path": "tests/splash-one-frame.test.ts",
+      "guards": "启动只画一帧：系统那帧指向全透明 drawable、应用那帧画在 index.html 里",
+      "titles": 11,
+      "control": {
+        "date": "2026-09-09",
+        "removed": "把 drawable 换成不透明的",
+        "red_at": "① 负向 · 那张 drawable 真的是透明的"
+      }
+    },
+    {
+      "name": "spx",
+      "path": "tests/spx.test.ts",
+      "guards": "spx 音频包拆解：包结构、头里的数、解码器用模式标称率而不是文件头播放率",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "start-learning",
+      "path": "tests/start-learning.test.ts",
+      "guards": "开始学：进轮转与 fresh 卡当场到期、首次间隔、已练出来的间隔与未到排期一个字不动",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "sync-engine",
+      "path": "tests/sync-engine.test.ts",
+      "guards": "同步引擎：没配的门、首推与水位、新设备首同步与双向跟随、冲突裁决、压实触发",
+      "titles": 19,
+      "control": null
+    },
+    {
+      "name": "sync-first-port",
+      "path": "tests/sync-first-port.test.ts",
+      "guards": "同步优先口子：没装时账上说「没装口子」而不是「跳过了」、三处各带自己的标签、引擎包闸名单为空",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "three-layers",
+      "path": "tests/three-layers.test.ts",
+      "guards": "三层补齐接线：两把新键存取与宽容读法、封顶档只有 core 一份、比对尺只用 core、屏上字不写死、B-5 锚点、focus 真推得走东西",
+      "titles": 8,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "把 PEEK_CAP 写回 Reading.svelte",
+        "red_at": "TL-3 · 又长出了一份本地封顶档"
+      }
+    },
+    {
+      "name": "tiers-gone",
+      "path": "tests/tiers-gone.test.ts",
+      "guards": "档位机制退役：设置与练习屏没有档位控件、出题取题不拿 tier 当判据（列还在没人读）",
+      "titles": 4,
+      "control": null
+    },
+    {
+      "name": "today",
+      "path": "tests/today.test.ts",
+      "guards": "今日：没到期讲次说 core 的原话、pending 只数产出线、目标键与半数规则停点用 core 那份",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "tokens-live",
+      "path": "tests/tokens-live.test.ts",
+      "guards": "每个 var(--x) 都真有定义或在运行时白名单里；白名单里的每一个都还真被 JS 写着",
+      "titles": 2,
+      "control": null
+    },
+    {
+      "name": "trash-days-copy",
+      "path": "tests/trash-days-copy.test.ts",
+      "guards": "回收站天数不写死在屏上；闸本身不误报（日期范围那类「N 天」是无辜的）；core 两个常量跟着 TRASH_DAYS",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "tree-caret-gone",
+      "path": "tests/tree-caret-gone.test.ts",
+      "guards": "树上没有折叠记号、折叠功能还在、死样式不留",
+      "titles": 3,
+      "control": null
+    },
+    {
+      "name": "tree-count",
+      "path": "tests/tree-count.test.ts",
+      "guards": "树上的计数：一条挂两讲各算一次而单元项目只算一条、空项目是 0 不是 undefined、软删不算",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "tts",
+      "path": "tests/tts.test.ts",
+      "guards": "朗读设置：空库默认、语速夹取、没设过两档都开",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "ui-notify",
+      "path": "tests/ui-notify.test.ts",
+      "guards": "回执归位：一次性成功不写常驻 note、失败不写 4 秒回执条、note 那一行还活着",
+      "titles": 3,
+      "control": null
+    },
+    {
+      "name": "upgrade",
+      "path": "tests/upgrade.test.ts",
+      "guards": "升库：保全清单全量、空库直建、全程离线、逐版迁移与幂等、结构指纹",
+      "titles": 26,
+      "control": {
+        "date": "2026-08-30",
+        "removed": "保全清单只留写入面",
+        "red_at": "U-0 · 只保写入面会静默错链"
+      }
+    },
+    {
+      "name": "vault",
+      "path": "tests/vault.test.ts",
+      "guards": "Vault 列表：默认排掉静默、含静默与只看静默两档互补、层/来源/重复收集各一个开关",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "voice-android",
+      "path": "tests/voice-android.test.ts",
+      "guards": "朗读两档执行器：词典音优先与系统音兜底、预算不等卡住的那一步、账本连被跳过的一起讲",
+      "titles": 15,
+      "control": {
+        "date": "2026-09-13",
+        "removed": "把账本里 tried 那一半拿掉",
+        "red_at": "V-10 · 账本连被跳过的一起讲"
+      }
+    },
+    {
+      "name": "voice-fast",
+      "path": "tests/voice-fast.test.ts",
+      "guards": "Assist 语音快路径：预算生效、没有音频卷的书不开、命中只开一本、预热与 LRU 钉住",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "helpers",
+      "path": "tests/helpers.ts",
+      "guards": "不是闸 —— 测试脚手架（造库与夹具），只造环境不含任何判据",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "fixtures",
+      "path": "tests/fixtures/",
+      "guards": "不是闸 —— 夹具数据（照真机抄，不许自己造名字）",
+      "titles": null,
+      "control": null
+    }
+  ],
+  "controls_recorded": [
+    "analysis-batch",
+    "check:copy",
+    "check:guide-ids",
+    "color-parts",
+    "core-lock",
+    "dict-recursive",
+    "guide",
+    "lookup",
+    "mirror-handoff",
+    "onboarding",
+    "port-names",
+    "practice",
+    "prompt-ia",
+    "quiz-rules",
+    "silence-kind",
+    "splash-one-frame",
+    "three-layers",
+    "upgrade",
+    "voice-android"
+  ],
+  "controls_missing_max": 39
+}

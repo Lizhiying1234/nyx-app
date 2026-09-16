@@ -1,0 +1,255 @@
+/* ══════════════════════════════════════════════════════════════
+   Nyx Windows 设计令牌 —— 总标准 v1 落地 · 2026-09-08（UI-Win 第一轮）
+
+   ── 颜色的真相不在这里 ★★★ ────────────────────────────
+   `src/core/design/color-tokens.css` 是两端唯一的一份颜色真相
+   （原语 → 语义 → 组件三层，U-010～U-015）。本文件对颜色只做两件事：
+   ① @import 它；
+   ② 把 Windows 这一侧沿用多年的旧令牌名（--bg / --accent / --text-3 …，
+      global.css + enhancements.css 近 700 处引用）**对到语义层**。
+   于是旧名成了过渡期的别名：改值去 core 改，这里不再出现任何 HEX。
+   ★ **新写的样式一律直接用 --color-* / --btn-* / --progress-* / --chart-*，
+      别再添旧名的引用**（U-010）。旧名一个都不许再生。
+
+   ── 尺寸这一层是 Windows 自己的（使用者已允许各端不同）──────
+   字号阶梯 · 圆角 · 密度 · 按钮尺寸的**数**归 Windows，
+   **岗位名**两端共用（DS-Q2）。判据：
+     DESIGN_SYSTEM.md §二 字体 · §三 圆角 · §四 影 · §六 密度 · §八 图标
+     BUTTON_SYSTEM.md §一 五档尺寸
+     LAYOUT_TEMPLATES.md §三 度量（导航行 48 / 数据行 36 / 页边距 24）
+
+   ── 之前是什么 ─────────────────────────────────────────
+   2026-09-01「跟吧」：值换成 DS v5「夜光」（纯白底 · 淡紫面 · 品牌紫）。
+   2026-09-03 使用者「不要纯白到底 / 不要冷灰主体系」与它相反，
+   2026-09-07 使用者给出 Aqua / Teal / Pink 全新体系（U-009 那 53 条），本文件按它重写。
+   ══════════════════════════════════════════════════════════════ */
+@import '../../core/design/color-tokens.css';
+
+:root {
+  /* ══ 颜色 · 旧名 → 语义层（过渡期别名，COLOR_SYSTEM §二 那张表）══ */
+
+  /* ── 面 ────────────────────────────────────────────── */
+  --bg: var(--color-bg);                       /* 应用面 · 主区 · 标题栏 */
+  --sidebar-bg: var(--color-bg-subtle);        /* 侧栏 · 安静区块（带一点水色）*/
+  --surface: var(--color-surface);             /* 卡 · 面板 · 输入框 · 浮层 */
+  --paper: var(--color-surface);
+  --hover: var(--color-surface-hover);
+  --active: var(--color-surface-selected);     /* 选中行 · 控件面 */
+  --chip: var(--color-surface-subtle);
+  --chip-bd: var(--color-border-strong);       /* 按钮 / 输入框描边 */
+  --accent-soft: var(--color-primary-subtle);  /* 淡水面（选中 Tab · 标签 · 次级按钮面）*/
+  --soft: var(--color-primary-subtle);
+
+  /* ── 线 ────────────────────────────────────────────── */
+  --line: var(--color-border-subtle);          /* 发丝线（行间）*/
+  --line-2: var(--color-border);
+  --border: var(--color-border);               /* 结构线（组顶 · 面边）*/
+
+  /* ── 墨 ────────────────────────────────────────────────
+     ★★ U-015 · text-3 只许坐在 白 / neutral-50 / neutral-100 / aqua-50 上
+        （4.92 / 4.76 / 4.60 / 4.61）。压在 aqua-100 上只有 4.26、
+        neutral-200 上 4.35、暖底 warm-100 上 4.03 —— **那三种面上要读的字用 --text-2**，
+        暖底上用 --text。本轮已按这条把违例处逐个换过（A1）。
+     ★★ 第四级墨（原来的 --muted）见下面那一段：它在 Windows 干着两份工作，本轮拆成两个名字。 */
+  --text: var(--color-text);
+  --text-1: var(--color-text);
+  --text-2: var(--color-text-2);
+  --text-3: var(--color-text-3);
+  /* ★★ `--muted` 在 Windows 这一侧**干着两份工作**（这是换体系时抖出来的事实，不是我改的）：
+     ① 45 处是「要读的小字」—— 元数据 · 分区小标题 · 计数 · 快捷键提示 · 数据源那一行
+     ② 9 处才是 COLOR_SYSTEM §二 说的「编号 / 坐标 / 失效」—— 圆点 · caret 字形 · 禁用描边
+     §二 把 `--muted` 对到原语 `--neutral-400`，而它压白只有 **1.93** ——
+     ①那 45 处会直接掉到「看得见但读不动」。DS-Q23 定案「AA 4.5 当硬线」压过它，
+     所以拆成两个名字：要读的走 text-3（4.92 / 4.60 / 4.61 / 4.76），纯记号走 `--faint`。
+     代价：第四级墨没了，页面层次少一档（DS-Q23 影响列写过这一句）。
+     ★★ **总控 2026-09-08 已裁并入宪**（U-015 补 · COLOR_SYSTEM §二 改）：这个拆法采纳，
+        而且 `--faint` 不由 Windows 自己定值 —— core 新加了语义 `--color-text-faint`
+        （= neutral-500，压白 2.74：占位 · 禁用 · 装饰性数字 · 分隔点，**不许写要读的字**）。
+        Android 那一档淡字令牌同样按「要读 / 不要读」拆到这两档。 */
+  --muted: var(--color-text-3);
+  --faint: var(--color-text-faint);
+
+  /* ── 主色（Aqua）· 分工：--accent 给线与图形，--accent-2 给文字 ──
+     --color-primary 压白只有 2.83，**当文字用一律换 --accent-2**（CL-Q8 / COLOR_SYSTEM §三.8）*/
+  --accent: var(--color-primary);
+  --accent-2: var(--color-text-accent);
+
+  /* ── 深面（只给专注态顶条 · 多选条这类窄带，不做容器 · DS §7.2 / CL-Q6）── */
+  --night: var(--color-deep);
+
+  /* ── 状态色 ────────────────────────────────────────── */
+  --red: var(--color-danger);                  /* 错 · 破坏性 */
+  --amber: var(--color-attention);             /* 到期 · 欠账 · 攻坚 · 该看一眼 */
+  --green: var(--color-success);
+  --gold: var(--color-accent);                 /* 「被重复收集」徽章（SrcBadge）*/
+  --danger: var(--color-danger);
+  --bad: var(--color-danger);
+  --warn: var(--color-attention);
+  --warn-soft: var(--color-attention-subtle);
+  --warn-bd: var(--color-attention-border);
+  --ok-soft: var(--color-success-subtle);
+  --ok-bd: var(--color-success-border);
+
+  /* ── 来源徽章（D-044）────────────────────────────────── */
+  --src-self: var(--color-primary);            /* 自己收的 */
+  --src-ai: var(--color-accent);               /* 分析出来的 */
+  --src-both: var(--color-primary-pressed);    /* 两者都有 */
+
+  /* ── 两条线：产出 = 主色（aqua）；认读 = review 那一档 ────
+     COLOR_SYSTEM §三.2：产出 = 主色 aqua · 认读 = aqua-300 填充 + teal-800 墨。
+     「扫一眼列表就知道这一条走的是哪条线」这份工作不变，只是两个颜色都进了水色家族。 */
+  --cyan: var(--teal-800);                     /* 认读线的墨 */
+  --cyan-soft: var(--color-review-subtle);
+  --cyan-bd: var(--color-review);
+
+  /* ── 四档判定 · D-341 / D-322 ────────────────────────
+     语义优先走非颜色通道（形 · 文案 · 动效方向 · 点数），颜色只是第五条。
+     忘了不用正红（D-322）—— 用 attention 那一档（COLOR_SYSTEM §三.3）*/
+  --g1: var(--color-attention);   /* 忘了 */
+  --g2: var(--color-text-3);      /* 想了一下 */
+  --g3: var(--color-text-accent); /* 会了 */
+  --g4: var(--color-primary);     /* 太简单 */
+
+  /* ── 影（navy 调，轻到「看不出来才对」· DS §四）──────────
+     ★ 影只给真正浮起来的东西：浮层 · 菜单 · 打断层。页面内容一律无影。 */
+  --shadow-sm: var(--color-shadow-sm);
+  --shadow-md: var(--color-shadow-md);
+  --shadow-lg: var(--color-shadow-lg);
+
+  /* ══ 字体 · Windows 原样用 D（U-017 · DS §2.4 · DS-Q26）══════════
+     ★ 四族全是这台机器上**已经装好**的字，零打包（Nyx 是绿色文件夹自用不分发，D-346）。
+     ★★ 贯到底的三条（不随换字体作废）：
+        ① 机器知道的事用等宽，语言本身用衬线（D-386）
+        ② **CJK 必须排在纯拉丁兜底之后**（D-342④）——
+           反过来会让拉丁标点被按全角渲染，页面上看不出来，只能靠量
+        ③ 禁写 font-variation-settings（D-364 真机教训：可变轴是死开关）
+     ★ 兜底不是摆设：`Segoe UI Variable` 只有 Win11 有（Win10 落回 `Segoe UI`）·
+       `Cascadia Mono` 随 Windows Terminal 装（干净的旧系统落回 `Consolas`）。
+     ★ 退役：Instrument Serif · Literata · Schibsted Grotesk · Martian Mono · 思源宋体
+       （fonts.css 已清空，@fontsource 依赖同轮删）。 */
+  --display: 'Sitka Display', Constantia, Georgia, 'Microsoft YaHei UI', 'Microsoft YaHei', serif;
+  --serif: 'Sitka Text', Constantia, Georgia, 'Microsoft YaHei UI', 'Microsoft YaHei', serif;
+  --font: 'Segoe UI Variable Text', 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  --mono: 'Cascadia Mono', Consolas, 'Microsoft YaHei UI', 'Microsoft YaHei', monospace;
+  /* ★ **Windows 这边没有手写体令牌**，这是有意的，不是漏了。
+     DS §2.3「注记之声」（Caveat）写着「白名单只剩空态（D-392），**Windows 未装**」，
+     而「Windows 装不装 Caveat」是 DS 的 **F5，至今没答** —— 手写体今天只在 Android 空态出现一次。
+     ★★ 2026-09-15 我为引导标题临时加过一个 `--note`（Ink Free / Segoe Script，
+       系统自带、零打包成本）。当天使用者裁掉了那一处用法：Ink Free 没有中文字形，
+       「这是什么」整行落回雅黑 —— **规则写着手写体、屏上是黑体，两边都不报错**。
+       裁完之后它的引用归零，所以连令牌一起删掉：
+       **留一个没人用的字体令牌，下一个人只会当它是「可以用的」而去用它**。
+       哪天 F5 答「装」，这一行照抄回来就是（系统字那版一个字节都不用打包）。 */
+
+  /* ══ 字号 · 8 级数值（Windows 自己的）+ 11 个岗位名（两端共用）══
+     ★ 两条硬下限（D-342③ / D-364 真机）：拉丁 9px 底 · **中文 11.5px 底**。
+     ★ DS-Q2：**保留两套数值，共用一套岗位名。** 名字统一之后跨端审查才有共同语言。
+       新写的样式一律用岗位名 `--fz-*`，不要再挑 `--fs-n`。 */
+  --fs-1: 11px;
+  --fs-2: 12px;
+  --fs-3: 13px;   /* ★ 岗位表里没有它 —— 界面正文已按 DS-Q22 抬到 14，这一档只留给还没迁的旧引用 */
+  --fs-4: 14px;
+  --fs-5: 16px;
+  --fs-6: 19px;
+  --fs-7: 23px;
+  --fs-8: 30px;
+
+  --fz-display: var(--fs-8);     /* 30 · 页面大标题 · 词条（展示衬线，只在 ≥24px）*/
+  --fz-word: var(--fs-8);        /* 30 · 词条本体 */
+  --fz-title: var(--fs-7);       /* 23 · 页面标题 · 大数字标题 */
+  --fz-note: var(--fs-6);        /* 19 · 提问句 · 完形填空这类「读一句」*/
+  --fz-body-lang: var(--fs-5);   /* 16 · 语言材料：原句 · 释义 · 他写的答案 */
+  --fz-example: var(--fs-4);     /* 14 · 例句（比语言正文小一档）*/
+  --fz-body-ui: var(--fs-4);     /* 14 · 界面正文 —— ★ DS-Q22 定案，从 13 抬到 14 */
+  --fz-number: var(--fs-7);      /* 23 · 大数字（等宽 · tabular-nums）*/
+  --fz-meta: var(--fs-2);        /* 12 · 元数据 · 计数 · 日期 */
+  --fz-section: var(--fs-1);     /* 11 · 分区小标题（大写 + 字距）*/
+  --fz-micro: var(--fs-1);       /* 11 · 微标签（拉丁）*/
+  --fz-micro-zh: 11.5px;         /* 11.5 · 中文微标签 —— **这是下限不是选择**（D-342③ / D-364 真机）*/
+
+  /* ★ DS-Q3 定案：中文微标签字距 `.05em`（取「不加」与 `.10em` 的中）。两端同改。
+     用法：中文小标签给 `--ls-micro-zh`，拉丁大写小标签仍用各自的字距。 */
+  --ls-micro-zh: .05em;
+
+  /* 行宽上限（DS-Q7 两端共用）· 42em ≈ 中文 40 字 */
+  /* ══ 断点 · LT-B1～B4（UX-Q10 定案：**1100**，不是 DS-Q22 写的 1024）══
+     窗口 `minWidth` 就是 1100（`src/main/index.ts`）—— 1024 那一档**永远触发不到**，
+     所以断点抬到 1100，minWidth 不动（960 宽放不下「列表 ‖ 详情」，降下去只多一档没人用的版式）。
+     ★ CSS 的 @media 里用不了 var()，下面那几条断点是写死的数；**改这里也要改那几条**。 */
+  --bp-narrow: 1100px; /* 以下：侧栏收成图标条 56 · 详情栏覆盖式 */
+  --bp-mid: 1280px;    /* 以下：详情栏覆盖式 */
+  --bp-wide: 1440px;   /* 以上：详情栏 360 就地推开 */
+  --rail: 56px;        /* 图标条宽 */
+  /* ★ 侧栏一级入口的行高 —— **不是** --row-nav（那一档 48 是给内容区的导航行的）。
+     使用者 2026-09-09 裁：48 之后最小窗口（1100×700）下项目树只剩一行，
+     「project 区域要大一点，现在太小了，也太靠下」。侧栏是常驻的密集导航，
+     40 让固定区少占约 90px，都还给树。
+     ★ DS-Q22 那张表里侧栏没有单独一行 —— 这一档是**新加的**，归总控补进 DS。 */
+  --row-side: 40px;
+  --aside: 360px;      /* 详情栏 · 宽档 */
+  --aside-mid: 320px;  /* 详情栏 · 中档 */
+
+  /* 文件学习正文的字号倍数（使用者 2026-09-13 · 4.1）。
+     ★ 默认 1 = 不放大；真正的值由 FileStudy 写在 `.doc` 的行内样式上，
+       存在 `settings` 的 `ui.fileStudy.fontScale`（这台机器自己的习惯，不同步）。
+     ★ 在这儿给它一个定义，而不是进 check:tokens 的白名单 ——
+       它真的是一个令牌，只是默认值在这里、实际值在元素上。 */
+  --doc-scale: 1;
+
+  --measure: 42em;
+  --measure-wide: 52em;
+
+  /* ══ 圆角 · DS-Q4 / Q10 ════════════════════════════════
+     一条分工要记住：**圆角属浮层 · 直角属纸面** ——
+     它让「系统给的东西」与「你的语言材料」不用颜色就分得开。 */
+  --r-ctl: 10px;      /* 按钮 · 输入 · 标签（使用者给的 10–12 取下限：桌面控件只有 36 高）*/
+  --r-ctl-sm: 8px;    /* 小号控件（高 28）*/
+  --r-card: 14px;     /* 卡 · 面板 · 浮层 · 弹窗 —— 比控件大一档，层级靠角也能读出来 */
+  --r-search: 18px;   /* 搜索框：它是「随便说点什么」的入口，不是执行按钮 */
+  --r-paper: 0;       /* 纸面印刷件：判分表格 · 引文块 */
+  --r-pill: 999px;    /* 进度条 · 胶囊 */
+  /* 旧名（近 700 处引用）→ 新档 */
+  --r-sm: var(--r-ctl-sm);
+  --r-md: var(--r-ctl);
+  --r-lg: var(--r-card);
+
+  /* ══ 按钮尺寸 · BUTTON_SYSTEM §一（BTN-Q1 定案：桌面 36 · 小号 28）══
+     ★ 只有这两个数 —— 使用者若想改 32，**只动这一处**。
+     ★ 36 比 32 厚一圈：工具条与行内按钮所在的行高要跟着调
+       （LAYOUT_TEMPLATES §三：行内按钮一律小号 28，工具条那一行 = 48）。 */
+  --btn-h: 36px;
+  --btn-h-sm: 28px;
+  --btn-pad: 14px;
+  --btn-pad-sm: 10px;
+  --icon-btn: 28px;   /* 图标钮命中区（桌面）*/
+
+  /* ══ 密度 · DS-Q22 定案（Android 56 / 44 各减 8）· LAYOUT_TEMPLATES §三 ══ */
+  --row-nav: 48px;    /* 导航行 = 动作行 · 开关行 · 工具条那一行 */
+  --row-data: 36px;   /* 数据行 = 只读行 · 表格行 */
+  --pad-work: 24px;   /* 页边距（工作区）*/
+  /* ★ UX-Q11 定案：两端**同一条间距刻度** 4 / 8 / 12 / 16 / 24 / 32 / 48。
+     14 不在刻度上（它是总原型带过来的数），按判据那句「实施时改 12 或 16」取 12 —— 往紧收一档。 */
+  --pad-list: 12px;
+  /* 刻度本身也做成令牌，新写的样式从这儿取，别再现编 */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  /* 旧名 */
+  --row-work: var(--row-nav);
+  --row-list: var(--row-data);
+
+  /* ══ 图标显示尺寸 · DS-Q8 定案 ══════════════════════════
+     几何只有一份（`src/core/icons.ts`，D-410）；这里只定「显示多大」。 */
+  --ic: 16px;         /* 行内 · 侧栏 */
+  --ic-caret: 12px;   /* caret（原来 9px，已低于图标几何的可辨阈值）*/
+  --ic-btn: 18px;     /* 图标钮里的图标 */
+
+  /* ══ 动效 · DS-Q6 / Q25（第一轮只落时长令牌，行为归第二轮 B9）══ */
+  --t-press-in: 90ms;
+  --t-press-out: 160ms;
+  --t-state: 180ms;   /* 状态切换：进出同曲线同时长 —— 对称让人相信这件事可逆 */
+}

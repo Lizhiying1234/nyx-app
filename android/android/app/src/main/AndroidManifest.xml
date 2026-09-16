@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- D-374 · 系统 TTS：API 30+ 的包可见性 —— 不声明就查不到语音引擎，
+         TextToSpeech 会初始化失败（表现为「没有可用的语音引擎」，很难查） -->
+    <!-- D-373 · 数据安全通知（仅两类：积压/连败）。API 33+ 运行时权限 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
+    <!-- ★ F-010（2026-09-01）· 明文流量从「全放」收窄成「只放本机」。
+         usesCleartextTraffic="true" 让「同步地址不小心填成 http://」变成
+         静默可行的事，而同步密码会跟着明文过网。
+         网络白名单见 res/xml/network_security_config.xml：
+         只留 127.0.0.1 / localhost / 10.0.2.2（④ 档对拷试验场要用），
+         其余一律 https。
+
+         ★ allowBackup 保持 true：关掉它会让使用者换手机时丢掉本机还没
+         上传的孤本，与 D-249 红线直接冲突。同号相撞的问题由 F-009 的
+         设备编号防撞解决（DevicePlugin + core/device-rebind.ts），
+         **不是**靠关备份解决的。 -->
+    <application
+        android:allowBackup="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <!-- D-248 · 只支持竖屏（android:screenOrientation="portrait"）。
+             不做横屏与平板适配 —— 三件事都是单列内容，横屏无增益 -->
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Nyx Assist 入口 · D-304「像原生复制一样」：
+                 I-1 选中文本菜单（PROCESS_TEXT）+ I-2 系统分享（SEND）。
+                 零权限、零常驻服务（ASSIST_CONTRACT）。 -->
+            <intent-filter android:label="@string/assist_label">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter android:label="@string/assist_label">
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- D-394 通道② · 快捷设置磁贴「Nyx Assist」：任何 App 复制 → 下拉 → 点它 -->
+        <service
+            android:name=".AssistTileService"
+            android:label="@string/assist_label"
+            android:icon="@drawable/ic_assist_tile"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- D-398 · Assist Selection（无障碍原型）：宿主禁选时的自定义选择层。
+             按需读取（点悬浮星那一刻），不后台监听（D-335）。 -->
+        <service
+            android:name=".NyxAssistService"
+            android:label="@string/assist_label"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/assist_service_config" />
+        </service>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

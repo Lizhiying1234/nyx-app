@@ -1,0 +1,13 @@
+# 全仓文本文件一律 LF 进出（T-1.3 · 2026-09-04）
+#
+# 理由：Android 经 git submodule 消费本仓的 src/core · schema · prompts。
+# Git for Windows 的系统级 core.autocrlf=true 会让任何新 clone 检出 CRLF，
+# 手机那边读到的提示词 / SQL 就和提交的字节不一样（prompts 的分段解析当场歪掉，P-3 红过）。
+# 索引里 391 个文本文件本来就全是 LF（git ls-files --eol），这条只是把「拿到的 = 提交的」写死。
+* text=auto eol=lf
+
+# 二进制不碰
+*.png binary
+*.ico binary
+*.woff2 binary
+*.db binary

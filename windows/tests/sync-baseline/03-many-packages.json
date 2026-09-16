@@ -1,0 +1,53 @@
+{
+  "input": "5 个包，每个一行",
+  "observation": {
+    "case": "03-many-packages",
+    "tally": {
+      "received": 5,
+      "applied": 5,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 5,
+      "applied": [
+        "other-1700000000000.json",
+        "other-1700000000001.json",
+        "other-1700000000002.json",
+        "other-1700000000003.json",
+        "other-1700000000004.json"
+      ],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [
+      "projects",
+      "projects",
+      "projects",
+      "projects",
+      "projects"
+    ],
+    "boundaryLookups": 8,
+    "problems": []
+  }
+}

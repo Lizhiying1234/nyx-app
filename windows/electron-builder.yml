@@ -1,0 +1,51 @@
+# 打包 · D-224 / D-223 / D-233
+#
+# D-224 ·「**不做安装程序**，绿色文件夹放 D:\ 之类位置。」
+#         放进 Program Files 会因目录不可写导致启动失败 —— 而数据就在软件文件夹里（D-263）。
+#         所以 target 是 dir，不是 nsis：产物是一个可以整个拷走的文件夹。
+# D-223 ·「**prompts/ 必须排除在 asar 归档之外**」——
+#         打包后使用者要能用记事本改提示词（D-213）。塞进 asar 就等于改不了，
+#         而 D-213 当场失效。这条是 CLAUDE.md 点名的「一旦违反就出事」。
+
+appId: com.noa.nyx
+productName: Nyx
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  - '!**/*.ts'
+
+# 跟着软件走、但**不进 asar**的东西。
+# prompts 是 D-223 点名的；两者都要让使用者用资源管理器点得到、用记事本改得动。
+extraResources:
+  - from: prompts
+    to: ../prompts
+  - from: 使用说明.md
+    to: ../使用说明.md
+  # B8 · 启动页那张插画。和 prompts 同一个道理（D-223）：**在 asar 之外**，
+  # 换图 = 换这一个文件，不用重新打包；文件不在就自动退回「没图版」，不许白屏。
+  - from: resources
+    to: ../resources
+
+asar: true
+# better-sqlite3 是原生模块，进 asar 之后加载不了 .node
+asarUnpack:
+  - '**/*.node'
+
+win:
+  target:
+    - target: dir
+      arch: [x64]
+  # ★ App 图标 = 使用者 2026-09-07 给的水獭 Master（U-009 DS-Q27，M3 撤下）。
+  #   直接指 assets/brand/ 那一份，**不再往 build/ 里放一份副本** ——
+  #   副本会漂，而这枚图标是这个软件最显眼的品牌形象。
+  #   全套产物与做法：assets/brand/README.md（重跑 node scripts/gen-brand-icons.mjs）。
+  #   旧的星形图标由 scripts/gen-icon.mjs 生成，已随本轮退役。
+  icon: assets/brand/windows/nyx.ico
+
+# 不签名。个人自用、绿色文件夹，签名证书是纯成本
+forceCodeSigning: false

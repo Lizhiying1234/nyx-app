@@ -1,0 +1,42 @@
+{
+  "input": "第一趟有行失败，第二趟同一个包重来",
+  "observation": {
+    "case": "18-retry-after-failure",
+    "tally": {
+      "received": 2,
+      "applied": 0,
+      "skipped": 1,
+      "failed": 1,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 0,
+      "byTable": {}
+    },
+    "purged": 0,
+    "writeOrder": [
+      "item_lectures"
+    ],
+    "boundaryLookups": 0,
+    "problems": [
+      {
+        "kind": "row",
+        "what": "item_lectures/remote-item-lecture-1",
+        "head": "FOREIGN KEY constraint failed"
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "input": "一个包里一行好、一行外键指空",
+  "observation": {
+    "case": "04-partial-failure",
+    "tally": {
+      "received": 2,
+      "applied": 1,
+      "skipped": 0,
+      "failed": 1,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [
+      "projects",
+      "item_lectures"
+    ],
+    "boundaryLookups": 8,
+    "problems": [
+      {
+        "kind": "row",
+        "what": "item_lectures/remote-item-lecture-1",
+        "head": "FOREIGN KEY constraint failed"
+      }
+    ]
+  }
+}

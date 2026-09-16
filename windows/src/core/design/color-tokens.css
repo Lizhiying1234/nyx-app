@@ -1,0 +1,224 @@
+/* ══════════════════════════════════════════════════════════════
+   Nyx Global Color System —— 两端唯一的一份颜色真相 · 2026-09-07
+
+   使用者原话（docs/指令-2026-09-07-晚-UI六问裁决与配色指令.md）：
+   「Windows 和 Android 必须共享 Primitive color · Semantic color ·
+     Functional color meaning · Button semantic · State semantic · Progress semantic。
+     两个平台可以不同：layout · spacing · density · navigation · component size ·
+     interaction pattern。但不能各自重新定义一套颜色语义。」
+
+   方向：Aquatic × Magical × Playful × Elegant。
+   Aqua / Teal → Nyx 核心学习与操作 · Pink → 特殊、重要、情绪性、高亮 ·
+   Deep Teal / Navy → 结构和文字 · Neutral → 页面层级。
+   比例：Background / Surface 60–70% · Aqua / Teal 20–25% · 深墨 5–10% · Pink 3–5%。
+
+   ── 三层 ─────────────────────────────────────────────────
+   ① Primitive   --aqua-500 这种：只在本文件出现，业务样式不许直接引用
+   ② Semantic    --color-* ：组件与页面用这一层（背景 / 面 / 文字 / 边 / 主色 / 强调 / 图标 / 功能 / 反馈）
+   ③ Component   --btn-* · --progress-* · --chart-*：按钮 / 进度 / 图表这几族的固定配方
+
+   ── 谁在消费 ─────────────────────────────────────────────
+   Windows  src/renderer/styles/tokens.css   @import 本文件，再把 Windows 的旧令牌名对到 --color-*
+   Android  src/ui/styles/tokens.css         同上；原生层 res/values/nyx_tokens.xml 由
+            tools/tokens-to-android.mjs 从两份 CSS 解析 var() 链生成
+   改值先改这里（D-326 的精神：真相只有一份）。两端的旧名只是过渡期的别名，
+   新写的样式一律直接用 --color-* / --btn-* / --progress-*。
+
+   ── 我提的（使用者指令里没有，D-413 要求标明）────────────
+   · 反馈色族 success / warning / attention / danger：指令只给了 progress.attention = pink，
+     其余按「Pink = 情绪性 / 高亮」推出来，全部取自上面的原语表，一个新色值都没造
+   · --aqua-250 / --aqua-450：指令的语义层用到 #A8DEDA（border.strong）与 #73BFC4（atlas）
+     两个原语表里没列的值，登记成原语免得语义层裸写 HEX
+   · 图表阶梯 --chart-1…4、遮罩 --color-scrim*、阴影 --color-shadow*：指令没提，按同一套推
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  /* ── ① Primitive ─────────────────────────────────────── */
+  --aqua-50:#EAFBFA;
+  --aqua-100:#DDF3F1;
+  --aqua-200:#C4ECE9;
+  --aqua-250:#A8DEDA;   /* 指令 border.strong · secondary 描边 */
+  --aqua-300:#A9F2EE;
+  --aqua-400:#73E1DF;
+  --aqua-450:#73BFC4;   /* 指令 atlas.default */
+  --aqua-500:#38A8B4;
+  --aqua-600:#2F929D;
+  --aqua-700:#287986;
+  --teal-800:#205B73;
+  --teal-900:#153B4A;
+  --navy-950:#052F53;
+  --pink-50:#FCE5EB;
+  --pink-100:#F9D4DE;
+  --pink-300:#F598B0;
+  --pink-500:#E87593;
+  --neutral-0:#FFFFFF;
+  --neutral-50:#F8FCFB;
+  --neutral-100:#F4F8F7;
+  --neutral-200:#E8F3F2;
+  --neutral-300:#D7E5E4;
+  --neutral-400:#B8BCB6;
+  --neutral-500:#8AA0A5;
+  --neutral-550:#5A757B;   /* text-3 的落地值（DS-Q23 · U-015）：白 4.92 · neutral-100 4.60 · aqua-50 4.61 · neutral-50 4.76 */
+  --neutral-600:#52717A;
+  --warm-100:#EEE7E4;
+
+  /* ── ② Semantic · Background ──────────────────────────── */
+  --color-bg:var(--neutral-100);            /* 页面底 */
+  --color-bg-subtle:var(--aqua-50);         /* 带一点水色的底（侧栏 · 安静区）*/
+  --color-bg-elevated:var(--neutral-50);    /* 比页面底再亮一档 */
+  --color-bg-warm:var(--warm-100);          /* 暖底：语言材料 · 引文 */
+
+  /* ── Surface ─────────────────────────────────────────── */
+  --color-surface:var(--neutral-0);          /* 卡 · 面板 · 输入框 · 浮层 */
+  --color-surface-subtle:var(--neutral-200); /* 安静块 · 从属行 */
+  --color-surface-hover:var(--aqua-100);
+  --color-surface-selected:var(--aqua-200);
+  --color-surface-pressed:var(--aqua-300);
+
+  /* ── Text ────────────────────────────────────────────── */
+  --color-text:var(--teal-900);
+  --color-text-2:var(--neutral-600);
+  --color-text-3:var(--neutral-550);        /* ★ U-015：只许坐在白 / neutral-50 / neutral-100 / aqua-50 上；别的面上要读的字用 text-2 或 text */
+  --color-text-faint:var(--neutral-500);    /* ★ U-015 补（2026-09-08）：不承载要读的信息的字 —— 占位 · 禁用 · 装饰性数字 · 分隔用的点；压白 2.74，不许写要读的字。Windows 旧 --muted 拆成 --muted(=text-3) + --faint(=这一档) */
+  --color-text-inverse:var(--neutral-0);
+  --color-text-accent:var(--aqua-700);      /* 强调文字（白 / 淡水面上 ≥4.8:1）*/
+  --color-text-pink:var(--pink-500);
+
+  /* ── Border ──────────────────────────────────────────── */
+  --color-border:var(--neutral-300);
+  --color-border-subtle:var(--neutral-200);
+  --color-border-strong:var(--aqua-250);
+  --color-border-focus:var(--aqua-500);
+
+  /* ── Primary（Aqua）─────────────────────────────────── */
+  --color-primary:var(--aqua-500);          /* 线 · 图形 · 填充；当文字用请换 --color-text-accent */
+  --color-primary-hover:var(--aqua-600);
+  --color-primary-pressed:var(--aqua-700);
+  --color-primary-subtle:var(--aqua-100);
+  --color-primary-soft:var(--aqua-50);
+  --color-primary-contrast:var(--neutral-0);
+
+  /* ── Accent（Pink · 3–5%，不是第二主色）───────────────── */
+  --color-accent:var(--pink-300);
+  --color-accent-hover:var(--pink-500);
+  --color-accent-subtle:var(--pink-50);
+  --color-accent-contrast:var(--neutral-0);
+
+  /* ── Icon ────────────────────────────────────────────── */
+  --color-icon:var(--neutral-600);
+  --color-icon-muted:var(--neutral-500);
+  --color-icon-active:var(--aqua-500);
+  --color-icon-accent:var(--pink-300);
+  --color-icon-inverse:var(--neutral-0);
+
+  /* ── Nyx 功能语义 ────────────────────────────────────── */
+  --color-assist:var(--aqua-500);
+  --color-assist-glow:var(--aqua-400);
+  --color-assist-subtle:var(--aqua-100);
+  --color-lecture:var(--aqua-500);
+  --color-lecture-subtle:var(--aqua-50);
+  --color-atlas:var(--aqua-450);
+  --color-atlas-subtle:var(--aqua-50);
+  --color-vault:var(--neutral-600);
+  --color-vault-subtle:var(--neutral-200);
+  --color-knowledge:var(--pink-300);
+  --color-knowledge-subtle:var(--pink-50);
+  --color-practice:var(--aqua-500);
+  --color-practice-subtle:var(--aqua-100);
+  --color-review:var(--aqua-300);
+  --color-review-subtle:var(--aqua-50);
+
+  /* ── 反馈（我提的，见文件头）────────────────────────── */
+  --color-success:var(--aqua-700);          /* 文字用 */
+  --color-success-subtle:var(--aqua-50);
+  --color-success-border:var(--aqua-200);
+  --color-attention:var(--pink-500);        /* 到期 · 欠账 · 攻坚 · 「该看一眼」 */
+  --color-attention-subtle:var(--pink-50);
+  --color-attention-border:var(--pink-100);
+  --color-danger:var(--pink-500);           /* 错 · 破坏性文字 */
+  --color-danger-subtle:var(--pink-50);
+  --color-danger-border:var(--pink-100);
+  --color-warning:var(--teal-800);          /* 暖底上的提醒文字 */
+  --color-text-on-warm:var(--teal-800);     /* ★ 2026-09-08：暖底（引文块）上要读的字，6.13；使用者裁「字深一档」后 Android 先用了 --color-warning，改叫这个名免得下一个人以为引文是警告；Windows 同改 */
+  --color-warning-subtle:var(--warm-100);
+  --color-warning-border:var(--neutral-300);
+
+  /* ── 结构 · 深面（只给专注态顶条 · 多选条这类窄带，不做容器）── */
+  --color-deep:var(--navy-950);
+  --color-on-deep:var(--neutral-0);
+  --color-on-deep-2:rgba(255,255,255,.72);
+  --color-on-deep-3:rgba(255,255,255,.5);
+  --color-on-deep-accent:var(--aqua-400);  /* 深面上的水色（#73E1DF 压 navy ≈ 9:1）*/
+
+  /* ── 遮罩与阴影（navy 调，不用黑）──────────────────── */
+  --color-scrim:rgba(5,47,83,.42);
+  --color-scrim-strong:rgba(5,47,83,.55);
+  --color-scrim-light:rgba(5,47,83,.28);
+  --color-shadow-sm:0 1px 2px rgba(5,47,83,.06);
+  --color-shadow-md:0 4px 16px rgba(5,47,83,.08);
+  --color-shadow-lg:0 16px 48px rgba(5,47,83,.16);
+
+  /* ── ③ Component · Button ─────────────────────────────
+     指令：圆角偏精致 · 不要巨大高度 · 不要过粗边框 · 不要大面积阴影 · 不要厚重渐变
+
+     ★★ 2026-09-08 使用者裁「**只改两颗按钮**」（Nyx-UI-Win 会话当面问的，三选一）：
+        起因 —— DS-Q23 定案「AA 4.5 当硬线」，而按这张表实算，两颗**实心**按钮的字都压不过：
+          白字压 --aqua-500  **2.83**       ← Primary，全软件最常按的那一颗
+          白字压 --pink-300  **2.10**       ← Accent
+        他的裁决：**底与字在这两颗上各动一处，不造新色**（值全部取自上面那张原语表）：
+          Primary 底 aqua-500 → **aqua-700**（白字 5.04）· 按下去要更深，
+            于是 hover / pressed 顺着往下接 teal-800（7.49）/ teal-900（11.96）
+          Accent 底不动（粉还是 pink-300 / pink-500），**字白 → navy-950**
+            （压 pink-300 6.50 · 压 pink-500 4.81 —— 两个状态都过线）
+        ★ **没动的那两组**（他明令不造新色，粉再深就得加原语）：
+          `--color-attention` / `--color-danger`（pink-500）当文字压白 **2.84**；
+          `--btn-secondary-text`（aqua-700）压 `--btn-secondary-bg`（aqua-100）**4.36**、
+          压 `--color-surface-selected`（aqua-200）**3.96**。两组记在 UI-Win 派单 §六。
+        ★ 这一条改的是**按钮语义**，而按钮语义是两端必须共用的（使用者 2026-09-07 原话）——
+          所以改在这里，Android 提 `nyx-core` 指针就跟上，不许各改各的。
+        ★ 判据文件（BUTTON_SYSTEM §一 / COLOR_SYSTEM / U-012）里还写着「Primary = 实心 aqua-500」，
+          静默期不许子会话改判据 —— 已记进 UI-Win 派单 §六「回报总控」，恢复后由总控改。
+        ★★ **同一条裁决落了两遍，值一模一样** —— 本会话 `093eb8d` 与总控 `482876b`
+          各自落过一次（他先在 Android 真机对照上裁，两条线都听见了）。
+          2026-09-09 合并时留的是这一份注释（它多记了上面那两组还没解决的 AA 欠账），
+          总控那份的一行说明并入这里。**不是分歧，是重复落地。** */
+  --btn-primary-bg:var(--aqua-700);
+  --btn-primary-hover:var(--teal-800);
+  --btn-primary-pressed:var(--teal-900);
+  --btn-primary-text:var(--neutral-0);
+  --btn-secondary-bg:var(--aqua-100);
+  --btn-secondary-hover:var(--aqua-200);
+  --btn-secondary-pressed:var(--aqua-300);
+  --btn-secondary-text:var(--aqua-700);
+  --btn-secondary-border:var(--aqua-250);
+  --btn-outline-bg:transparent;
+  --btn-outline-hover:var(--aqua-50);
+  --btn-outline-pressed:var(--aqua-100);
+  --btn-outline-text:var(--aqua-700);
+  --btn-outline-border:var(--aqua-250);
+  --btn-accent-bg:var(--pink-300);
+  --btn-accent-hover:var(--pink-500);
+  --btn-accent-pressed:var(--pink-500);
+  --btn-accent-text:var(--navy-950);   /* ★ 使用者 2026-09-08：白字压粉只有 2.10，换深墨（6.50 / 4.81）*/
+  --btn-ghost-bg:transparent;
+  --btn-ghost-hover:var(--aqua-50);
+  --btn-ghost-pressed:var(--aqua-100);
+  --btn-ghost-text:var(--neutral-600);
+
+  /* ── Component · Progress（4px · 全圆角 · 轻）──────── */
+  --progress-track:var(--neutral-300);
+  --progress-primary:var(--aqua-500);
+  --progress-secondary:var(--aqua-400);
+  --progress-complete:var(--aqua-600);
+  --progress-attention:var(--pink-300);
+  --progress-inactive:var(--neutral-400);
+  --progress-h:4px;
+  --progress-r:999px;
+
+  /* ── Component · Chart（同一条水色阶梯 + 一个 attention）── */
+  --chart-1:var(--aqua-100);
+  --chart-2:var(--aqua-200);
+  --chart-3:var(--aqua-400);
+  --chart-4:var(--aqua-600);
+  --chart-attention:var(--pink-300);
+  --chart-grid:var(--neutral-300);
+}

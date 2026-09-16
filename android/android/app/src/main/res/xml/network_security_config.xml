@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  明文流量收窄 · F-010（2026-09-01）
+
+  ── 为什么不是干脆全关 ──────────────────────────────────────
+  ④ 档「两端对拷」验收要在真机上打 `adb reverse tcp:8722` 起来的
+  本机测试云（tools/dev-cloud.mjs），那条是 http://127.0.0.1。
+  全关掉，最重要的一档验收就没法在真机上做了。
+
+  ── 为什么不能继续 usesCleartextTraffic="true" ──────────────
+  它让「同步地址不小心填成 http://」变成一件**静默可行**的事，
+  而同步密码会跟着明文过网。真实端点（坚果云 WebDAV / Supabase）
+  全是 https —— 没有任何正当理由让公网地址走明文。
+
+  ★ 放行的只有这三个，都是「跑在这台机器上/模拟器宿主上」的地址：
+      127.0.0.1     adb reverse 转进来的本机端口
+      localhost     同上，写法不同
+      10.0.2.2      Android 模拟器里的「宿主机」
+    除此之外一律要 https，且失败就是失败 —— 不静默降级。
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

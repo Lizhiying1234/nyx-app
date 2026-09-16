@@ -1,0 +1,44 @@
+{
+  "input": "同上，但他选「用本地的」",
+  "observation": {
+    "case": "07-resolved-conflict-local",
+    "tally": {
+      "received": 1,
+      "applied": 0,
+      "skipped": 1,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [
+        "other-100.json"
+      ],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 16,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3,
+        "resolutions": 1
+      }
+    },
+    "purged": 0,
+    "writeOrder": [],
+    "boundaryLookups": 8,
+    "problems": []
+  }
+}

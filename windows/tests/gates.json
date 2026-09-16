@@ -1,0 +1,1213 @@
+{
+  "controls_missing_max": 134,
+  "controls_recorded": [
+    "scripts/check-copy.mjs",
+    "scripts/check-css-dead.mjs",
+    "scripts/check-guide-ids.mjs",
+    "scripts/check-question-replace-order.mjs",
+    "scripts/check-silence-one-source.mjs",
+    "scripts/check-trash-days.mjs",
+    "scripts/install.mjs",
+    "src/core/ai/client.test.ts",
+    "src/core/ai/protocol.test.ts",
+    "src/core/onboarding.test.ts",
+    "src/core/purge-guard.test.ts",
+    "src/core/question-refresh.test.ts",
+    "src/core/quiz-rules.test.ts",
+    "src/core/silence.test.ts",
+    "src/core/sync/splash-sync.test.ts",
+    "tests/db-safety/qtypes.ts",
+    "tests/feedback.test.ts",
+    "tests/guide.test.ts",
+    "tests/settings-fold.test.ts",
+    "tests/sync.test.ts",
+    "tests/ui-real.test.ts"
+  ],
+  "note": [
+    "具名闸清单（Z-2，2026-09-15）。这仓的每一道闸在这里都有名字 —— 没名字的闸不许存在。",
+    "guards：它**现在**盯的是什么，一句人话。手写的：读每份文件自己声明的 describe 标题与头注之后写下来，不是扫断言生成的。",
+    "  ★ 不许比断言大。写它该盯什么、而它其实没盯 —— 那种句子会让人以为有东西看着，比没有清单更糟。该盯没盯的记 issues。",
+    "titles：该文件里 it( / test( 的条数，**量出来的**（check:gates 用同一套计数器，抽标题前先剥注释）。",
+    "  ★ 它是棘轮的地板，只许往上：少了 = 有人把闸拿走了；多了要回来把数字改上去。",
+    "control：最近一次「打掉它该盯的东西 → 真红」的记录。清单只证明闸存在，对照才证明闸睁着眼。",
+    "  ★ 不许补写没做过的对照。没做过就是 null。",
+    "★★ 2026-09-15 Z-7：② 档（`tests/db-safety/*.ts`，`test:db` 跑）整档补登记，23 条。`controls_missing_max` 117 → 140 是**登记带来的，不是放宽**：新登记的 23 条还没做过对照，所以上限跟着抬 23。棘轮的方向没变 —— 往后只许往下。",
+    "★ ② 档的 `titles` 单位是 `check(` / `checkAsync(`，不是 `it(`；它和 `test:db` 屏上报的 672 **不是一个数**：672 是**跑出来的**条数（循环里一条会跑多次），这里记的是**写下来的**条数。棘轮要的是后者。",
+    "★ `harness.ts` / `fixtures.ts` 不是闸（骨架与夹具），`titles` 记 null；在册是因为 `check()` 本身被改成不断言的话，整档 600 多条会一起变绿而没有任何东西会红。",
+    "★ 2026-09-15 I-194：`scripts/install.mjs` 那道「包里有 data/ 就拒装」进册。它既不是用例、也不是 `check:*` —— 是**脚本自己跑起来时的停机闸**，check:gates 的 ② 收不到（那一条只扫用例文件与 npm 脚本名），这类闸只能靠人登记。同一份文件里另外**五道**（包比纸条旧 · 旧目录没搬进 data/ · 名单之外的东西 · Nyx 正在运行 · 装完核对 data/ 还在不在）与 installed.mjs 那三处都还没登记 —— 数出来的，见 issues.md I-205（第一版写「三道」是凭印象少数了两道）。",
+    "path 为 null = 这条闸不是仓里的一份文件（外部工具或组合命令）。",
+    "删一条闸：条目留着，path 置 null，并在 guards 里写「删于哪天 / 为什么」。",
+    "★ 2026-09-16 D-496：controls_missing_max 136 → 134（core/ai 两份做了对照，锁进上限；这一栏只许往下）。"
+  ],
+  "gates": [
+    {
+      "name": "check:types",
+      "path": null,
+      "guards": "svelte-check 在 error 档扫全仓：类型对不上、组件属性对不上就红",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:dead",
+      "path": "scripts/deadctl.mjs",
+      "guards": "画着能点、点了没反应的控件；名单里的死控件不许变多",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:blocks",
+      "path": "scripts/check-blocks.mjs",
+      "guards": "解析块的区块名与形状：多一种少一种都要说出来",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:core-strict",
+      "path": "scripts/check-core-strict.mjs",
+      "guards": "src/core 的生产代码在 noUncheckedIndexedAccess 下零错误（= Android 那套设置）",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:prompts",
+      "path": "scripts/check-prompts.mjs",
+      "guards": "提示词文件与覆盖名单逐条对上；改过的提示词要留下历史",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:sql",
+      "path": "scripts/check-sql.mjs",
+      "guards": "SQL 写法闸：拼字符串、缺参数绑定那几种",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:ipc-guard",
+      "path": "scripts/check-ipc-guard.mjs",
+      "guards": "静默吞错的 catch 必须逐条写理由，白名单条数只许按批放宽",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:android-imports",
+      "path": "scripts/check-android-imports.mjs",
+      "guards": "Android core-link 直连的符号在本仓 HEAD 里还在；并报指针落后几个文件",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:hard-deletes",
+      "path": "scripts/check-hard-deletes.mjs",
+      "guards": "同步表上不许出现新的裸 delete（D-436），已审例外单独记",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:trash-days",
+      "path": "scripts/check-trash-days.mjs",
+      "guards": "回收站的保留天数只许有一个出处：碰 TRASH_DAYS 一族的文件里，天数算式（<数字> - Math.floor / <数字> * 86_400_000）不许出现裸数字。I-202：Trash.svelte 行上倒计时写死 30 而真正清除按 TRASH_DAYS=10，屏上向他承诺了 20 天他其实没有的时间，而彻底删除是立碑永不同步那一档。★ 只钉算式不钉「30 天」这几个字 —— Kit.svelte 有「近 30 天」统计按钮，连坐会让这道闸被加白名单然后失效。",
+      "titles": null,
+      "control": {
+        "date": "2026-09-16",
+        "removed": "不用造探针：闸写好时**修复还没落**，它直接红在线上那条真缺陷上；修完再跑转绿",
+        "red_at": "红并点名 src/renderer/src/Trash.svelte:124「数字 30」（EXIT=1）；改用 TRASH_DAYS 后绿，扫 9 份碰它的文件"
+      }
+    },
+    {
+      "name": "check:silence-one-source",
+      "path": "scripts/check-silence-one-source.mjs",
+      "guards": "「这一条算不算静默」只许有一个出处：除 core/silence.ts 与 core/sql/silence.ts 之外，任何一行都不许把「产出线静默」与「认读线静默」自己组合成判断。领域判据是条件式（跑产出线的只看产出线，不跑的只看认读线）；写成「或」严格更宽，错的方向只有一个：界面把条目藏了、引擎照样把它排进练习（I-204）。",
+      "titles": null,
+      "control": {
+        "date": "2026-09-16",
+        "removed": "不用造探针：闸写好时四处旧写法都还在，它直接红在真缺陷上",
+        "red_at": "红并逐行点名 4 处：main/db/repo.ts:922 · renderer/ItemDetail.svelte:912 · renderer/Search.svelte:53 · renderer/Workbench.svelte:646（EXIT=1）；★ 派单只点名了后两处，闸自己找出前两处（其中一处在主进程）。四处都改调 core 后绿，扫 240 份"
+      }
+    },
+    {
+      "name": "check:schema",
+      "path": null,
+      "guards": "库结构与 schema/vNN.sql 对得上；迁移自检真跑一遍",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:css",
+      "path": "scripts/check-css.mjs",
+      "guards": "样式表里没有提前关掉的注释（注释断掉会把下一条规则吃了）",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:css-dead",
+      "path": "scripts/check-css-dead.mjs",
+      "guards": "样式表里每条类选择器都能在 src/renderer 的**代码**里找到（2026-09-15 起真的剥注释）",
+      "titles": null,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "三向：① 造一条规则只在 Svelte 注释里提它 ② 同一局面把「剥注释」那一步拿掉 ③ 把它写进真 markup",
+        "red_at": "① 红并点名 .z1probe（TEST_EXIT=1）② 绿（证明 ① 的红是这一改带来的）③ 绿（证明没把活的判死）"
+      }
+    },
+    {
+      "name": "check:copy",
+      "path": "scripts/check-copy.mjs",
+      "guards": "屏上不许出现退役词；空白处不许留占位注释",
+      "titles": null,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "V-5 两条：① Library.svelte 那句「这些整支不再出题」改回「已练成」；② Workbench.svelte 的 silenceScopeAction(...) 换回手写字面「静默这个 Lecture / 恢复」",
+        "red_at": "两次都是「✖ 界面上还有废弃词 —— 1 处」并指到那一行（① Library.svelte「已练成」② Workbench.svelte「收起这个」）。PATCH_EXIT=0 / TEST_EXIT=1；还原后 TEST_EXIT=0"
+      }
+    },
+    {
+      "name": "check:plan",
+      "path": "scripts/check-plan.mjs",
+      "guards": "PLAN 的状态词只有那九个；NEXT ACTION 里只许点名 NEXT 的编号",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:suites",
+      "path": "scripts/check-suites.mjs",
+      "guards": "gate / verify 的套名单齐全、不并行、不短路；新加的 smoke 必须接进 verify",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:decisions",
+      "path": "scripts/check-decisions.mjs",
+      "guards": "宪法版本块的编号范围 = 文内最大 D- 编号",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:contract",
+      "path": "scripts/check-contract.mjs",
+      "guards": "DATA_CONTRACT 的表名单 / 偏好项数 / 引用路径 / 对照提交号都还对得上",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:tokens",
+      "path": "scripts/check-tokens.mjs",
+      "guards": "样式里引用的设计令牌都有定义；颜色令牌前缀都归了类",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:gates",
+      "path": "scripts/check-gates.mjs",
+      "guards": "这份清单本身：每条 path 真存在、仓里每道闸都在清单里、标题数只许往上、没做过对照的条数只许往下",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "check:guide-ids",
+      "path": "scripts/check-guide-ids.mjs",
+      "guards": "页面内引导的 id 两头接得上：屏上写的每个 id 都在 core 的 PAGE_GUIDES 里，名单里每条也都被某一屏引用",
+      "titles": null,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "新加的 NOT_ON_THIS_END 是空的，所以四条校验各造一条假条目试：① {id:today-paste}（这一端明明有靶子）② 不写 why ③ 写一个 PAGE_GUIDES 里没有的 id ④ 同一个 id 同时写进 PENDING 和 NOT_ON_THIS_END",
+        "red_at": "① 「在这一端的屏上已经有触发点（App.svelte…）—— 把它从这张名单里拿掉」② 「没写 why —— 这张名单是永久的」③ 「已经不在 PAGE_GUIDES 里了」④ 「同时在 PENDING 和 NOT_ON_THIS_END 里 —— 两张名单说的是相反的事」。四条都 PATCH_EXIT=0 / TEST_EXIT=1；还原后 EXIT=0"
+      }
+    },
+    {
+      "name": "install:no-data-in-package",
+      "path": "scripts/install.mjs",
+      "guards": "装机前拒装：打包产物里出现 KEEP 里的条目（data/）就停下来（--dry-run 也报，--force 不放行）；同一份 KEEP 三处共用 —— 删除循环让开它、拷贝循环跳过它、这道闸不许它出现在包里（I-194）",
+      "titles": null,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "局面两次都一样：往 release/win-unpacked/ 塞一个假 data/nyx.db（+ -wal），装到 scratchpad 里的假目标目录（真目录一个字节没动；使用者的 Nyx 开着，所以三趟都用同一个假 tasklist 让「Nyx 正在运行」那道闸让开，它是环境、不是被测对象）。① 整道闸拿掉 = git checkout 02f3945 那份带病的 install.mjs（真·修复前那一份，不是自己编的近似）② 只让闸空转（for (const f of KEEP) 改成 for (const f of [])），留着拷贝循环的 KEEP 过滤",
+        "red_at": "① 仓里这一份 TEST_EXIT=1「✖ 停下：打包产物里有 data/ …会盖住 <目标>/data」；换成带病那份 TEST_EXIT=0 一路放行，真装下去目标的 data/nyx.db 从 HIS-REAL-DB 被盖成 TEST-DB-FROM-PACKAGE（-wal 一起被盖，-shm 留着 —— 半盖比全盖更坏）。② 闸空转 + 真装 TEST_EXIT=0 且目标的 data/nyx.db 仍是 HIS-REAL-DB：拷贝循环那半自己也拦得住。基线（包里没有 data/）TEST_EXIT=0，证明红不是环境红的。两次 PATCH_EXIT=0 且 grep 核过落地，还原后 git status 干净、再跑一次仍红。★ ② 第一遍补丁没落地（POSIX 路径进了 node -e，被当成 D 盘根下的 d 目录），PATCH_EXIT=1 当场看出来 —— 分开记两个码救的就是这一下"
+      }
+    },
+    {
+      "name": "smoke",
+      "path": "tests/smoke.test.ts",
+      "guards": "外壳起得来；贴原文 → 归属 → chunk 整条走得通",
+      "titles": 30,
+      "control": null
+    },
+    {
+      "name": "smoke:study",
+      "path": "tests/study.test.ts",
+      "guards": "从审阅到认读到产出的整条学习流水，真 Electron 真库",
+      "titles": 172,
+      "control": null
+    },
+    {
+      "name": "smoke:report",
+      "path": "tests/report.test.ts",
+      "guards": "报告那一屏的三层结构与「建了没练」的口径",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "smoke:sync",
+      "path": "tests/sync.test.ts",
+      "guards": "两台真 Electron + 真 WebDAV：同步、冲突、删除、压实",
+      "titles": 52,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "remoteMetaSkew 改成恒返回 0（修成哑巴）；另一次删掉「本机不算」那一行",
+        "red_at": "「I-178 反面 · 别的设备那份 meta 真超前 → 照样报」·「改完名字再同步一趟 → 体检里没有时钟警告」"
+      }
+    },
+    {
+      "name": "smoke:layout",
+      "path": "tests/layout.test.ts",
+      "guards": "侧边栏三段固定不塌",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "smoke:ui",
+      "path": "tests/ui-real.test.ts",
+      "guards": "拖拽排序 / 题型管理 / 认读牌面与出题规则 / 清除数据 那几族真界面",
+      "titles": 53,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "把「产出练习」那个重复标题加回块里",
+        "red_at": "「D-488：块里又顶了一个「产出练习」—— 那正是他点名删掉的空标题」"
+      }
+    },
+    {
+      "name": "smoke:packaged",
+      "path": "tests/packaged.test.ts",
+      "guards": "打包出来的 exe 真能起、库是活的、prompts 在 asar 外面",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "smoke:errors",
+      "path": "tests/errors.test.ts",
+      "guards": "IPC 失败时屏上到底看得见什么（H-4 那一族）",
+      "titles": 17,
+      "control": null
+    },
+    {
+      "name": "smoke:delete",
+      "path": "tests/delete-semantics.test.ts",
+      "guards": "删除三档的语义：删掉的不许重新分析时回来",
+      "titles": 9,
+      "control": null
+    },
+    {
+      "name": "smoke:analyze",
+      "path": "tests/analyze-status.test.ts",
+      "guards": "分析途中把进程杀掉之后的状态",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "smoke:start",
+      "path": "tests/start-learning.test.ts",
+      "guards": "training → 重新分析 → review → 开始学 这条路",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "smoke:reading",
+      "path": "tests/reading-entry.test.ts",
+      "guards": "在练的讲加新知识点 → 立刻认读得到",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "smoke:dict-ui",
+      "path": "tests/ui-dict.test.ts",
+      "guards": "词典在真屏幕上的样子：@@@LINK、富媒体",
+      "titles": 29,
+      "control": null
+    },
+    {
+      "name": "smoke:nav",
+      "path": "tests/nav-back.test.ts",
+      "guards": "返回只退一层、回真正的来源页；全局返回手势",
+      "titles": 30,
+      "control": null
+    },
+    {
+      "name": "smoke:esc",
+      "path": "tests/esc-close.test.ts",
+      "guards": "Esc 关浮层只有一套逻辑",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "smoke:overlay",
+      "path": "tests/overlay.test.ts",
+      "guards": "Glance 置顶浮窗在别的窗口之上立得住",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "smoke:point-ocr",
+      "path": "tests/point-ocr.test.ts",
+      "guards": "Point 认出来的那一段，以及一个字都没认出来时说什么",
+      "titles": 16,
+      "control": null
+    },
+    {
+      "name": "smoke:ops",
+      "path": "tests/ops-journal.test.ts",
+      "guards": "动作账本：承诺记进账本的事真的看得见",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "smoke:hint",
+      "path": "tests/ai-setup-hint.test.ts",
+      "guards": "没配 AI 时首页给一条引导",
+      "titles": 4,
+      "control": null
+    },
+    {
+      "name": "smoke:fold",
+      "path": "tests/settings-fold.test.ts",
+      "guards": "Settings 该分层的地方长出层级；Prompt 那页没有折叠、四片叶子平级",
+      "titles": 13,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "`src/main/practice-rules.ts` 的 `savePracticeFace` 里那句写库拆掉（`return v`）—— 点了屏上照样选中，库里一个字不变",
+        "red_at": "12 条里**只有**「★★★ 存取来回：选了「分栏」，重进这一页它还是「分栏」」红，错是「★★★ 点了但没落库，库里是 \"plain\"」。还原后 12/0。★ 它钉的是**键面**不是渲染：控件画对了、点得动、屏上也变了，而那一下没写进库 —— 他下次进来发现又回到「整块」，只会以为这个设置是假的。"
+      }
+    },
+    {
+      "name": "smoke:badge",
+      "path": "tests/sync-badge.test.ts",
+      "guards": "侧边栏「待同步」是现在的数字；知识库行上的记号只在该出时出",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "smoke:first",
+      "path": "tests/first-look.test.ts",
+      "guards": "进一讲第一眼就看得见内容；第一次打开这个软件的五屏引导",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "smoke:guide",
+      "path": "tests/guide.test.ts",
+      "guards": "页面内第二层引导：与首次引导互斥、一次只出一条、看过就不再出；★ 2026-09-15 T-2：覆盖面清单 §二 新加的六条各钉一条（进那一页就出 · 洞套在该套的元素上）",
+      "titles": 19,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "四次，每次只拆一样：① `onmiss` 换空函数；② 摘掉 `today-paste` 的标记；③ `askGuide` 改成 Android 那种排队接上的形状；④ **T-6**：把遮罩的「点外关」（`onclick={onclose}`）加回来",
+        "red_at": "① 只有「摘掉标记之后触发」红；② 只有 `today-paste` 那三条红；③ 「收掉第一条第二条立刻接上来了」红；④ 只有「★★★ 点在遮罩上：框还在 · 页面没跳 · 看过表一个字没变」红（13 里 12 绿）。四次都做了反向对照，还原后 13/0/0。"
+      }
+    },
+    {
+      "name": "smoke:dedup",
+      "path": "tests/dedup.test.ts",
+      "guards": "讲次页一键去重",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "smoke:feedback",
+      "path": "tests/feedback.test.ts",
+      "guards": "删除先问一句且只有一种问法；删完给带撤销的回执",
+      "titles": 9,
+      "control": {
+        "date": "2026-09-14",
+        "removed": "拆掉 Dialog 的默认焦点（记在派单 UI-Win-总标准落地 §验收）",
+        "red_at": "smoke:feedback 当场红，还原即绿（原记录只到套一级，没记到哪一句）"
+      }
+    },
+    {
+      "name": "smoke:voice",
+      "path": "tests/voice-settings.test.ts",
+      "guards": "「声音」页两个开关看得见、按得动、存得住",
+      "titles": 11,
+      "control": null
+    },
+    {
+      "name": "test:mdx",
+      "path": "tests/dict-mdx.test.ts",
+      "guards": "自造 GBK / UTF-16 词典走完整条解码路；体检那条路说的话",
+      "titles": 16,
+      "control": null
+    },
+    {
+      "name": "test:has",
+      "path": "tests/dict-has.test.ts",
+      "guards": "hasKey 与全量索引逐字一致",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "test:gate",
+      "path": "tests/ipc-guard.test.ts",
+      "guards": "check:ipc-guard 这道闸本身在看什么（闸的闸）",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "test:esc",
+      "path": "tests/esc-stack.test.ts",
+      "guards": "Esc 栈一次只退一层",
+      "titles": 4,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/ai/client.test.ts",
+      "guards": "AI 客户端：空正文要说真话（四条岔路）· 思考绝不许当正文交出去（三协议各一条）· ★ D-496 发出去的请求体：判定为 DeepSeek 就带关闭项、任意模型名都成立、按 API 兼容形状给字段（官方两口 thinking · OpenRouter reasoning）、非 DeepSeek 一个字段都不多、reasoning 里不许有 exclude、400 点名那个字段才重试且只重一次",
+      "titles": 17,
+      "control": {
+        "date": "2026-09-16",
+        "removed": "三向，每向只改一处、跑完就还原：① 默认拨回「开」（noThinking 的 deepseek 支 thinking.type 由 disabled 改 enabled）② OpenRouter 那支换成 reasoning:{exclude:true}（照样想只是不回）③ 判据落到模型名上（providerOf 的 host 判断换成 model.includes(\"deepseek\")）",
+        "red_at": "① client.test 3 条红：「官方口 · 任意模型名都带 thinking.disabled」「Anthropic 兼容口 · 同一个字段名」「服务商拒了那个字段 → 去掉它重试一次」（TEST_EXIT=1）② client.test 1 条红：「OpenRouter 上的 deepseek/… · 不许出现 exclude」③ protocol.test 5 条红（含「长得像的域名不算 —— 这是不用 includes 的理由」「模型名带 deepseek 但 host 不是 → 不算」）+ client.test 2 条红。三次 PATCH_EXIT=0 且 grep 核过落地；还原后 git status 干净、两套回绿（TEST_EXIT=0）。★ ① 的补丁 grep「disabled 还剩 0 处」那句预期是我写错的（头注里也有这个词，剩 2 处是对的）—— 靠「enabled 出现 1 处」+ 真红判的落地，不是靠那个数"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/ai/protocol.test.ts",
+      "guards": "服务商快填清单的形状（id / 模型名 / baseUrl / 每家都写了核对来源）· ★ D-496 providerOf 的边界：官方 host 任何模型名都算 · 两个口与子域都算 · 长得像的域名不算（不用 includes 的理由）· OpenRouter 只认 deepseek/ 路由段 · 模型名带 deepseek 但 host 不是不算 · 空或畸形 baseUrl 判 unknown",
+      "titles": 16,
+      "control": {
+        "date": "2026-09-16",
+        "removed": "三向，每向只改一处、跑完就还原：① 默认拨回「开」（noThinking 的 deepseek 支 thinking.type 由 disabled 改 enabled）② OpenRouter 那支换成 reasoning:{exclude:true}（照样想只是不回）③ 判据落到模型名上（providerOf 的 host 判断换成 model.includes(\"deepseek\")）",
+        "red_at": "① client.test 3 条红：「官方口 · 任意模型名都带 thinking.disabled」「Anthropic 兼容口 · 同一个字段名」「服务商拒了那个字段 → 去掉它重试一次」（TEST_EXIT=1）② client.test 1 条红：「OpenRouter 上的 deepseek/… · 不许出现 exclude」③ protocol.test 5 条红（含「长得像的域名不算 —— 这是不用 includes 的理由」「模型名带 deepseek 但 host 不是 → 不算」）+ client.test 2 条红。三次 PATCH_EXIT=0 且 grep 核过落地；还原后 git status 干净、两套回绿（TEST_EXIT=0）。★ ① 的补丁 grep「disabled 还剩 0 处」那句预期是我写错的（头注里也有这个词，剩 2 处是对的）—— 靠「enabled 出现 1 处」+ 真红判的落地，不是靠那个数"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/ai-text.test.ts",
+      "guards": "AI 文本的强调段解析",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analysis/edit.test.ts",
+      "guards": "改 term / gloss 的计划：动哪几列、什么时候拒、留痕接不接得住失效判定",
+      "titles": 13,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analysis/plan.test.ts",
+      "guards": "分析结果写回的计划：手改过的一个字不动、例句来源、释义回写",
+      "titles": 17,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analysis/request.test.ts",
+      "guards": "发给 AI 的请求怎么拼",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analysis/stale.test.ts",
+      "guards": "哪一笔留痕算「改了词」、哪几个区块除外",
+      "titles": 14,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analytics/activity.test.ts",
+      "guards": "活动统计：按天 / 按小时 / 按设备、周对周",
+      "titles": 14,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analytics/evidence.test.ts",
+      "guards": "逐条证据与弱项 / 强项的算法",
+      "titles": 25,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analytics/funnel.test.ts",
+      "guards": "漏斗各级的口径",
+      "titles": 13,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analytics/performance.test.ts",
+      "guards": "按层级 / 题型的表现，以及知识点变化",
+      "titles": 11,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analytics/thresholds.test.ts",
+      "guards": "每个阈值说得出出处",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/analytics/why.test.ts",
+      "guards": "「为什么」那一段的生成判据",
+      "titles": 16,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/audio-name.test.ts",
+      "guards": "音频资源名的放行 / 拒绝规则",
+      "titles": 5,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/builtin-identity.test.ts",
+      "guards": "出厂内容在两台设备上算出同一个身份",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/chunk-text.test.ts",
+      "guards": "长文切块",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/daily-match.test.ts",
+      "guards": "今天练哪些：半数规则、按到期次序、空 lecture 不收",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dedup/plan.test.ts",
+      "guards": "去重：分组、分档、选主、逐表迁移计划",
+      "titles": 49,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/design/colors.test.ts",
+      "guards": "颜色值这道闸（坏值不许进 CSS）；配色方案的增删改与读写",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/device-rebind.test.ts",
+      "guards": "设备编号防撞",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/capability.test.ts",
+      "guards": "词典能力判定与诊断（每条都要说清为什么、能做什么）",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/decode/html-entry.test.ts",
+      "guards": "词条 HTML 解码：重定向、释义与对译分开、词性与义项不许翻倍",
+      "titles": 33,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/encoding.test.ts",
+      "guards": "词典编码：头部声明 → 用哪种解码；正文结尾的 NUL",
+      "titles": 13,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/html/parse.test.ts",
+      "guards": "词典 HTML 解析的容错与实体处理",
+      "titles": 16,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/html/sanitize.test.ts",
+      "guards": "词典 HTML / CSS 消毒：不许执行，资源引用变 ref，该留的留住",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/html/text.test.ts",
+      "guards": "词典 HTML 转纯文本：默认成块、行内白名单、整棵子树跳过",
+      "titles": 20,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/identity.test.ts",
+      "guards": "词典身份 uid：固定输入固定 uid，拿真实 21 本头部做碰撞对抗",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/lookup.test.ts",
+      "guards": "查词：键归一、词形还原、候选词、同形异义、多本词典",
+      "titles": 43,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/lzo1x.test.ts",
+      "guards": "LZO1X 解压；坏数据一律抛，不许静悄悄给半截",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict/media.test.ts",
+      "guards": "词典资源键归一与 ref 可逆；放不了的要当场说出来",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/dict-entry.test.ts",
+      "guards": "词条对象的形状",
+      "titles": 22,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/fk-map.test.ts",
+      "guards": "本地行 ↔ 同步行的列名映射，来回一趟不丢",
+      "titles": 24,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/glance.test.ts",
+      "guards": "Point / Glance：该抓的与不该抓的那一段，助手进程吐出来的东西怎么认",
+      "titles": 74,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/grading.test.ts",
+      "guards": "四档判分哪几档算正确；建立期前 3 次的第 2 档不清零",
+      "titles": 17,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/identity.test.ts",
+      "guards": "uid 编码与转义；七个具名入口；与库里已有 uid 不相交",
+      "titles": 24,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/json-repair.test.ts",
+      "guards": "AI 吐回来的残缺 JSON 怎么救",
+      "titles": 17,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/library-state.test.ts",
+      "guards": "知识库行的状态判据与边界",
+      "titles": 11,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/lookup-prompt.test.ts",
+      "guards": "查词提示词要的那个形状；一个前缀都没有时怎么办；绝不抛",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/lookup-sections.test.ts",
+      "guards": "查词结果分段：标题认得出来，短正文不许硬分",
+      "titles": 18,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/mark-saved.test.ts",
+      "guards": "已收下的标记；英文卡词边界（否则标记会变成噪音）",
+      "titles": 14,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/onboarding.test.ts",
+      "guards": "要不要出首次引导；讲哪五件（两端同一份）",
+      "titles": 28,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "主控对照（独立检出 ctrl-1414c9f）：① shouldShowGuide 的 `return at < version` 改 `return true`；② noteGuideSeen 的 `seen[id] = version` 拆掉",
+        "red_at": "① 「★★★ 别的那几条被一起重弹了」（TEST_EXIT=1）；② seen 表读回那两条 deep-equal / strict-equal 红（TEST_EXIT=1）；正向 TEST_EXIT=0"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/paragraphs.test.ts",
+      "guards": "正文自动分段",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/purge-guard.test.ts",
+      "guards": "回收站硬删的时钟护栏：什么时候拦、拦的话那句话说什么",
+      "titles": 8,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "why 那段文案改回 I-188 之前那版（「看起来本机时钟不太对」）",
+        "red_at": "PG-4「两种成因都说」——/30 天没同步过/ 与 /本机时间快了/ 两条断言"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/purity.test.ts",
+      "guards": "core/ 是纯逻辑：不许碰 node / 数据库 / AI",
+      "titles": 3,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/qtype-plan.test.ts",
+      "guards": "出题计划：连续正确必须跨题型",
+      "titles": 24,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/qtypes-parity.test.ts",
+      "guards": "题型规则 Windows 与 core 两份实现对拍",
+      "titles": 6,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/qtypes.test.ts",
+      "guards": "题型多选的规则",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/quiz-rules.test.ts",
+      "guards": "出题规则七个选项；理解层拼出来的那几句；「轮着来」的记忆",
+      "titles": 40,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "capReadingGrade 里那句封顶拆掉（`return grade`）—— 偷看 / 超时不再封顶第 2 档（I-083）",
+        "red_at": "npm test 1328 里**只有一条**红：「★★★ 超时 / 看过中文 → 最高「想了一下」（I-083 诚实降档）」。还原后 1328/0。★ 只红一条正是要的：红一片说明这套在验别的东西。"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/quote.test.ts",
+      "guards": "切句；从原文里找摘句",
+      "titles": 9,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/reading-face.test.ts",
+      "guards": "认读牌面：露答案红线、两行格式、四面各自的形状",
+      "titles": 33,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/resolution.test.ts",
+      "guards": "冲突裁决的判据、裁决行自己的身份、留痕",
+      "titles": 25,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/restore-merge.test.ts",
+      "guards": "导回时哪些事实不许倒退",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/schema-fingerprint.test.ts",
+      "guards": "库结构指纹：结构相同则相同，结构变了必须变",
+      "titles": 23,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/selection.test.ts",
+      "guards": "全选 / 反选的状态判据",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/silence.test.ts",
+      "guards": "整条静默看哪条线；三级升级；静默比例（练成的那一半才算）",
+      "titles": 22,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "SILENCE_ACTIONS.restore 从 '恢复' 改回 '放回去'（D-489 退役的那个词）",
+        "red_at": "⑤「动作只有「静默 / 恢复」两个」strictEqual 红，⑪「屏上不许再出现「已练成 / 收起来 / 放回去」」也红。PATCH_EXIT=0 / TEST_EXIT=1；还原后 22/22 绿"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sm2-item.test.ts",
+      "guards": "认读线 SM-2 间隔；按钮上标出各自的间隔",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sm2-lecture.test.ts",
+      "guards": "lecture 间隔扩张；样本不足时不动；到期日计算",
+      "titles": 11,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/splash-name.test.ts",
+      "guards": "启动页资源名的形状；屏上哪一档画「使用中」",
+      "titles": 9,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/splash-names.test.ts",
+      "guards": "启动页改名谁赢（最后一次为准）、墓碑三态、时钟偏移只对别的设备报",
+      "titles": 29,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sql/analysis.test.ts",
+      "guards": "待分析队列的 SQL 判据",
+      "titles": 8,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sql/analytics.test.ts",
+      "guards": "证据层的 SQL",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sql-split.test.ts",
+      "guards": "多语句 SQL 的切分",
+      "titles": 15,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/start-learning.test.ts",
+      "guards": "开始学的排期规则",
+      "titles": 12,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/audio-sync.test.ts",
+      "guards": "TTS 音频同步那条流",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/compact-trigger.test.ts",
+      "guards": "什么时候压实、桶大小上限、待压实标记",
+      "titles": 16,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/compact.test.ts",
+      "guards": "压实：快照里装什么、哪些包敢折、折完还原得回来",
+      "titles": 30,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/gate.test.ts",
+      "guards": "同步的排队闸（一次只跑一趟）",
+      "titles": 2,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/invariants.test.ts",
+      "guards": "同步五条不变量：水位单调、冲突冻结、applied 只进不退、四桶恒等、写入",
+      "titles": 27,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/restore.test.ts",
+      "guards": "从备份恢复：detail 解出来、形状判定、该不该写",
+      "titles": 15,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/retry.test.ts",
+      "guards": "传输层重试：什么重试、什么**不**重试",
+      "titles": 17,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/session.test.ts",
+      "guards": "一趟同步的编排：四桶记账、冲突行落哪个桶、每一步的顺序",
+      "titles": 64,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync/splash-sync.test.ts",
+      "guards": "启动页图片与名字的同步流；时钟警告的三态",
+      "titles": 26,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "remoteMetaSkew 里「本机不算」/「老 meta 跳过」两行，以及推 meta 时不盖设备号；另一次把警告文案改回「那一端的时钟可能不准」",
+        "red_at": "「本机自己写的 meta 再超前也不报」·「老 meta → 跳过不报」·「推上去的 meta 带本机设备号」·「话说的是「晚」」"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync-merge.test.ts",
+      "guards": "一行 / 一批行该怎么合；机器的账不拿去问他",
+      "titles": 19,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync-metadata.test.ts",
+      "guards": "清空之后写回什么；清完自检",
+      "titles": 14,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/sync-protocol.test.ts",
+      "guards": "包头分类；包里的行合不合法",
+      "titles": 18,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/tombstone.test.ts",
+      "guards": "墓碑判据；接上墓碑之后 decideRow 的完整矩阵",
+      "titles": 15,
+      "control": null
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/voice/voice.test.ts",
+      "guards": "朗读只有两档且顺序写死；两个都关 = 不出声但要说话",
+      "titles": 30,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/analytics.ts",
+      "guards": "T-4.12 Learning Evidence 在真库上的形状",
+      "titles": 7,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/asset-ports.ts",
+      "guards": "资产端口：名字先过判据再落盘（F-08）",
+      "titles": 3,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/conflict-persist.ts",
+      "guards": "R-4-F-a 裁决持久化：裁过的下一趟不再问",
+      "titles": 20,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/conflict.ts",
+      "guards": "R-4-F 冲突只挡自己那一行，不劫持整条流水线",
+      "titles": 9,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/convergence-cases.ts",
+      "guards": "同步协议后半：行为基线 · 双基线时序 · Oracle 自检 · 世代 · 时间源 · 双设备收敛",
+      "titles": 53,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/dict.ts",
+      "guards": "词典走真主进程：StarDict / MDict 解析 · 不再全量装载 · 默认词典 · @@@LINK · 富媒体",
+      "titles": 38,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/fixtures.ts",
+      "guards": "★ 不是闸：② 档共用的夹具（造库 / 造设备 / 造包）。在册是为了「没名字的东西不许住在这一目录」",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/harness.ts",
+      "guards": "★ 不是闸，是**骨架**：check / checkAsync / assert 的定义就在这里。它被改成不断言的话，整档 600 多条一起变绿而没有任何东西会红 —— 所以它在册",
+      "titles": null,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/lecture-state.ts",
+      "guards": "F-2-① analyzing 退出后 lectures.status 落到哪一档",
+      "titles": 29,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/lifecycle.ts",
+      "guards": "数据层闭环：启动 / 状态 / 导回 / 危险操作",
+      "titles": 52,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/prompts.ts",
+      "guards": "提示词覆盖的三层优先级，走真库",
+      "titles": 28,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/protocol.ts",
+      "guards": "同步协议前半：指纹握手 · 确定性身份 · 边界翻译 · 目标结构 · 分页起步",
+      "titles": 92,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/qtypes.ts",
+      "guards": "题型勾选：他勾什么就只出什么",
+      "titles": 33,
+      "control": {
+        "date": "2026-09-15",
+        "removed": "`src/main/study/production.ts` 里 `SPREAD: CONTEXT_SPREAD_LINES[rules.contextSpread]` 写死成 `CONTEXT_SPREAD_LINES.mixed` —— 他选的「语境跨度」从此不影响真发出去的那段字（W-2 彻底失效）",
+        "red_at": "`npm run test:db` TEST_EXIT=1，红在「★★★ D-482 · 四个选项真的到了模型手上（不是只在模板里有位置）」。还原后 672 / 0。★★ 这道闸的意义全在这儿：a446ef7 记过，**同一个补丁下** `check` + 当时 1279 条单测 + 670 条 ② 档**全绿** —— 旧用例自己造变量喂给 fill，只验到「模板有位置」，没验 production.ts 到底喂没喂。假绿的形状就是这样。"
+      }
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/reading-entry.ts",
+      "guards": "F-2-②-a 新知识点的认读入口",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/recent.ts",
+      "guards": "T-2.11 知识点合并",
+      "titles": 18,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/safety.ts",
+      "guards": "数据安全四件套：只增不删 · 备份 · 迁移自检（D-216 / D-217 / D-236）",
+      "titles": 61,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/settings.ts",
+      "guards": "默认词典与悬浮卡片的存取来回",
+      "titles": 35,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/splash-choice.ts",
+      "guards": "删掉正在用的那张启动页之后退回哪一档",
+      "titles": 3,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/sync-failure.ts",
+      "guards": "R-4 同步失败的可恢复性与可见性",
+      "titles": 33,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/sync-paging-pull.ts",
+      "guards": "R-4-C-a 拉取侧分批",
+      "titles": 10,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/sync-paging-push.ts",
+      "guards": "R-4-C 推送侧分页",
+      "titles": 13,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/tombstone.ts",
+      "guards": "R-3 墓碑：立碑 / 重放 / 不许复活",
+      "titles": 44,
+      "control": null
+    },
+    {
+      "name": "test:db",
+      "path": "tests/db-safety/voice.ts",
+      "guards": "D-466 语音两档接起来之后：开关落库、词典那一步取到字节、两个都关时说得出话",
+      "titles": 13,
+      "control": null
+    },
+    {
+      "name": "check:question-replace-order",
+      "path": "scripts/check-question-replace-order.mjs",
+      "guards": "出题必须「先生成成功、再替换」：同一个函数里 `delete from questions` 不许出现在这个函数第一次 `callAi(` 之前。I-207：老次序是先删未做的旧题、再去生成，而生成约一半会抛（模型把额度全写进「思考」，正文一个字都没有）——于是旧题没了、新题也没有，屏上只说模型额度。手机真机实测 `quixoticism` 未做 14 道 → 0 道、全库未做 145 → 116（`used_at` 没变多 = 不是做掉的，是删掉的）。I-198 那道闸挡不住：它护的是被 answers 指着的行，这些正好没做过。★ 只钉**函数内的行号先后**，靠顶层 function 声明切函数体；删与插是不是同一个事务由 `tests/db-safety/qtypes.ts` 的 I-207 三条钉。",
+      "titles": null,
+      "control": {
+        "date": "2026-09-16",
+        "removed": "不用造探针：闸写好时**修复还没落**，它直接红在线上那条真缺陷上；修完再跑转绿",
+        "red_at": "红并点名 src/main/study/production.ts:361「在 ensureQuestions() 里，之前没有 callAi(」（EXIT=1）；改成「先生成成功、再在同一事务里删旧插新」后绿，扫 206 份、核 1 处删除"
+      }
+    },
+    {
+      "name": "npm test",
+      "path": "src/core/question-refresh.test.ts",
+      "guards": "I-207 的判据本体（`planQuestionRefresh` / `onGenerateFailed`）：要替换就一定要先生成成功；生成失败时手上有旧题就照旧用、一道没有必须报出去；那句给他看的话里不许出现「额度」「思考」。",
+      "titles": 7,
+      "control": {
+        "date": "2026-09-16",
+        "removed": "把 `planQuestionRefresh` 里「手上有题、没过期」那一支改成 `{ generate: false, dropOld: true }`（删旧却不生成）",
+        "red_at": "红 2 条：「手上有题、没有过期的 → 什么都不做」与 ★★★「只要计划要替换，就一定同时要生成」；后者点名 AssertionError「staleCount=0 haveCount=1 算出了『删旧但不生成』」（TEST_EXIT=1，PATCH_EXIT=0 另记）"
+      }
+    }
+  ]
+}

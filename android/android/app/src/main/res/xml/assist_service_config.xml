@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nyx Assist Selection（D-398/D-402）：
+     「能读窗口内容」+「能注入手势」；事件订阅最小化 —— 读取只发生在取词模式里
+     用户按下手指那一刻（D-335：按需读取，不后台常驻监听）。
+     canPerformGestures：取词模式下非选词手势（滚动/点按）要原样转发回宿主 App，
+     不然模式一开宿主就没法正常用（D-402 持续取词的前提）。
+     flagIncludeNotImportantViews（指令第九则 · 覆盖审计）：不开它，被标
+     importantForAccessibility=no 的 TextView 整棵对服务不可见 ——
+     「屏幕上可见的文字」是目标，别让宿主的标注习惯替我们裁剪。
+     canTakeScreenshot（D-406 T3 · OCR 兜底）：只在「按点上结构化层没词」那一刻
+     截一帧（与树读取同一条 D-335 按需边界），识别完即弃，不落盘。
+     typeWindowsChanged + flagRetrieveInteractiveWindows（阶段 7 · IME 场景）：
+     只为一件事 —— 键盘弹起/收起时把取词层缩到键盘顶上（getWindows() 只看
+     窗口类型与几何，一个字的内容都不读）。 -->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowsChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:canTakeScreenshot="true"
+    android:canPerformGestures="true"
+    android:notificationTimeout="200"
+    android:description="@string/assist_a11y_desc" />

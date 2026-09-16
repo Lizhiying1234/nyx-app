@@ -1,0 +1,23 @@
+{
+  "says": "真词典回归的备案。规矩和 scripts/dom-baseline.json 一样：写得出理由的才能留在这里，写不出理由的就是 bug，去改解析器。",
+  "measuredAt": "2026-08-19",
+  "measuredOn": "D:/Nyx/data/dicts · 22 本 · 每本抽样 200 个词目",
+
+  "hardGates": {
+    "leakedLink": 0,
+    "decodeExceptions": 0,
+    "says": "这两条没有备案，任何一条大于 0 都判失败。"
+  },
+
+  "gluedBySource": {
+    "says": "这些词典**自己**把英文和它的中文译文放在同一个元素里、中间没有任何分隔符。结构上拆不开 —— 拆就是猜，而『错的结构化结果比没有结构化结果更糟』（core/dict-entry.ts）。不是解析器的缺陷。",
+    "21世纪大英汉词典": "实测 ASIO：<span class=\"def wordGroup\">Australian Security Intelligence Organization澳大利亚安全情报组织</span>。缩略语的英文全称与中文译名在同一个 span 里，源文件就没分开。",
+    "英语常用词疑难用法手册": "整本是中文行文的用法手册，英文例句直接接在中文后面，作者没打空格。实测 as1：『【例如】his duty as a father他做父亲的责任』。",
+    "英语词源词典 ": "词根拆解行把词缀与中文说明连写。实测 marginalia：『marg=mark + -in + -al形容词词尾 + -ia名词词尾』。"
+  },
+
+  "profiledMustBeClean": {
+    "says": "画像认得的这四本里，除上面备案过的之外不许再出现粘连 —— 它们有结构可依，粘连就说明画像取错了。",
+    "books": ["oald10", "ldoce6ec", "ldoce5", "c21"]
+  }
+}

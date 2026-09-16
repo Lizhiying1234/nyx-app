@@ -1,0 +1,45 @@
+{
+  "input": "父被终结，同一批里来了它的子行",
+  "observation": {
+    "case": "09-parent-blocking",
+    "tally": {
+      "received": 2,
+      "applied": 1,
+      "skipped": 1,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [
+        "other-100.json"
+      ],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [
+      "tombstones"
+    ],
+    "boundaryLookups": 8,
+    "problems": []
+  }
+}

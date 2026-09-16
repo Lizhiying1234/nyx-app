@@ -1,0 +1,45 @@
+{
+  "input": "收到一块碑，本地那一份还在",
+  "observation": {
+    "case": "08-tombstone",
+    "tally": {
+      "received": 1,
+      "applied": 1,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [
+        "other-100.json"
+      ],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [
+      "tombstones"
+    ],
+    "boundaryLookups": 8,
+    "problems": []
+  }
+}

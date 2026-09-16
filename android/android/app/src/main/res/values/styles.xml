@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- ★ DS v5 §十五 清账 D1（2026-08-31）：
+         · parent 从 DayNight 改成 Light —— Nyx **只做日间**（D-339 / D-368）。
+           DayNight 会跟系统走，深色系统下状态栏字变白，压在我们的浅底上看不见。
+         · windowLightStatusBar=true —— 状态栏图标与时间用**深色**，才配得上浅底。
+         · statusBarColor 直接引用生成的 @color/nyx_bg（令牌 bg），让状态栏和页面连成一片。
+         ★ XML 注释里不许出现两个连字符，所以上面写「令牌 bg」而不是 CSS 变量名。 -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:statusBarColor">@color/nyx_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+
+    <!-- ★★ 系统 Splash 那一帧 —— **什么图都不画**（2026-09-09 改）
+
+         使用者 2026-09-09 裁：「为什么先是小熊，然后是闪过了出厂插画，
+         我记得我说过，启动页只能保留一个」「以我的裁决为准，我就要 1 个」。
+
+         系统这一帧删不掉（Android 12+ 起进程之前就画了），而它画什么
+         是写死在主题里的、**运行时换不了** —— 所以「只留一张」只能让它别画图：
+           底   = @color/nyx_bg（令牌 bg，和应用内那一帧同一个值，接得上）
+           图标 = @drawable/nyx_splash_none（全透明）
+         于是启动看到的图只有应用内那一张 —— 他选的那张。
+         水獭没丢：它挪到应用内那一帧，变成候选里的第一张（Splash.svelte）。
+
+         ★ 不写那两个图标属性 ≠ 不画：不写的话系统退回用 android:icon
+           （带白瓷砖的启动器图标），反而多一张 —— 正好是他不要的那个瓷砖。
+         ★ 两套属性都写：不带前缀的是 androidx core-splashscreen 在 API 30 及以下走的，
+           带 android: 前缀的是 API 31+ 平台自己的。少写一套就有一档设备行为不一样。
+         ★ XML 注释里不许出现两个连字符，所以上面写「令牌 bg」而不是 CSS 变量名。 -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/nyx_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/nyx_splash_none</item>
+        <item name="android:windowSplashScreenBackground">@color/nyx_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/nyx_splash_none</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

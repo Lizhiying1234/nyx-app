@@ -1,0 +1,52 @@
+{
+  "input": "包头结构指纹对不上",
+  "observation": {
+    "case": "12-schema-mismatch",
+    "tally": {
+      "received": 0,
+      "applied": 0,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [],
+      "rejected": [
+        {
+          "chunk": "other-100.json",
+          "code": "schema-mismatch"
+        }
+      ],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [],
+    "boundaryLookups": 8,
+    "problems": [
+      {
+        "kind": "row",
+        "what": "变更包 other-100.json",
+        "head": "两台设备的数据库结构不一样 —— 另一台是 v30（指纹 deadbeef），这台是 v30（指纹 9dde78ab）。"
+      }
+    ]
+  }
+}

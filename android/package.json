@@ -1,0 +1,47 @@
+{
+  "name": "nyx-android",
+  "version": "0.1.0",
+  "description": "Nyx 的第二个端。不是另一个产品。",
+  "author": "Noa",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node tools/tokens-to-android.mjs && vite build && node tools/prune-woff.mjs && npm run build:engine",
+    "build:engine": "vite build --config vite.engine.config.ts && node tools/check-engine-bundle.mjs",
+    "preview": "vite preview",
+    "test": "node --test \"tests/*.test.ts\"",
+    "check": "svelte-check --tsconfig ./tsconfig.json --threshold error && npm run check:plan && npm run check:css && npm run check:tokens && npm run check:java-sql && npm run check:copy && npm run check:gates && npm run check:guide-ids",
+    "check:copy": "node --test tests/ui-copy.test.ts",
+    "check:tokens": "node tools/check-tokens.mjs",
+    "check:java-sql": "node tools/check-java-sql.mjs",
+    "check:css": "node tools/check-css.mjs",
+    "check:plan": "node tools/check-plan.mjs",
+    "check:gates": "node tools/check-gates.mjs",
+    "check:guide-ids": "npx tsx tools/check-guide-ids.mjs"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.8",
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "svelte": "^5.46.1",
+    "svelte-check": "^4.1.1",
+    "typescript": "^5.7.2",
+    "vite": "^7.1.14"
+  },
+  "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^7.1.6",
+    "@caitun/speex": "1.0.0",
+    "@capacitor-community/sqlite": "^7.0.0",
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.1.8",
+    "@fontsource/cascadia-mono": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/noto-sans-sc": "^5.3.0",
+    "@fontsource/source-serif-4": "^5.3.0",
+    "fflate": "^0.8.3"
+  }
+}

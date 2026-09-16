@@ -1,0 +1,49 @@
+{
+  "input": "一个包只有一行，而且注定写不进去",
+  "observation": {
+    "case": "05-single-row-failure",
+    "tally": {
+      "received": 1,
+      "applied": 0,
+      "skipped": 0,
+      "failed": 1,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [
+      "item_lectures"
+    ],
+    "boundaryLookups": 8,
+    "problems": [
+      {
+        "kind": "row",
+        "what": "item_lectures/remote-item-lecture-1",
+        "head": "FOREIGN KEY constraint failed"
+      }
+    ]
+  }
+}

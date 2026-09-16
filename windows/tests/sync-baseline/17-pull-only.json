@@ -1,0 +1,45 @@
+{
+  "input": "本地水位已经在最前，只拉不推",
+  "observation": {
+    "case": "17-pull-only",
+    "tally": {
+      "received": 1,
+      "applied": 1,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": false,
+      "frozenAtBefore": false,
+      "monotone": false
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [
+        "other-100.json"
+      ],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [
+      "projects"
+    ],
+    "boundaryLookups": 8,
+    "problems": []
+  }
+}

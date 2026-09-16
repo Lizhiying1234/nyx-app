@@ -1,0 +1,21 @@
+// 2026-08-24 · 这条网络连不上 dl.google.com，全局强制走国内镜像
+allprojects {
+    buildscript {
+        repositories {
+            clear()
+            maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+            maven { url 'https://maven.aliyun.com/repository/google' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+            mavenCentral()
+        }
+    }
+    repositories {
+        clear()
+            maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+            maven { url 'https://maven.aliyun.com/repository/google' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+            maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+            mavenCentral()
+    }
+}

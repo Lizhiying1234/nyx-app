@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <!-- ★ D-248 只竖屏；user-scalable=no 免得双击缩放把练习页搞乱 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <title>Nyx</title>
+    <!--
+      ★★ 启动页那一帧就画在这里（2026-09-13 · 使用者：「启动时会先出现一段空白，
+         然后才显示图标或图片 —— 让启动页面一开始就直接显示图，不要先出现空白」）。
+
+      ── 为什么挪进 index.html ──────────────────────────────────
+      在这之前这一帧是 Svelte 组件（`ui/lib/Splash.svelte`），于是它要等
+      **564 KB 的 JS 包下载 + 解析 + Svelte 挂载**之后才出现 ——
+      真机上量到的空白约 1 秒，其中绝大部分是这一段，不是系统那一帧。
+      写成静态标记之后，它跟着 HTML 一起画，**第一帧就有图**。
+
+      ── 为什么样式只能写在这儿 ────────────────────────────────
+      D-227 管的是「Svelte 里不写样式」；这一帧的存在意义就是**早于任何模块**，
+      所以它没法去引样式表里的类。颜色仍然只引令牌（`--color-bg`），
+      **一个 HEX 都不写** —— 令牌那份样式表是 render-blocking 的，画之前一定在。
+
+      ── 谁把它收走 ────────────────────────────────────────────
+      `ui/lib/Splash.svelte` —— 它现在不画，只负责按时把这块 DOM 删掉
+      （下限 500ms 免得一闪而过、上限 800ms 到点就让开）。
+      下面那个兜底定时器是**第二条命**：JS 包要是根本没起来，
+      这一帧不能把人永远挡在外面。
+    -->
+    <style>
+      #nyx-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        background: var(--color-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* 插画：高 ≤60% · 宽 ≤88% · 上移 3%（视觉中心比几何中心高） */
+      #nyx-splash .art {
+        max-height: 60%;
+        max-width: 88%;
+        object-fit: contain;
+        transform: translateY(-3%);
+      }
+      /* 图标：288px = 系统 Splash 图标画布（288dp）的同一组数，正中不上移 */
+      #nyx-splash .ic {
+        width: 288px;
+        max-width: 80%;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 两张候选放在 template 里：**不发请求**，脚本挑中哪张才克隆进去 -->
+    <template id="nyx-splash-src">
+      <img class="art" data-nyx="shipped" src="/src/ui/assets/splash-illustration.webp" alt="" />
+      <img class="ic" data-nyx="icon" src="/src/ui/assets/splash-icon.png" alt="" />
+    </template>
+    <div id="nyx-splash" aria-hidden="true"></div>
+    <script>
+      ;(function () {
+        /* ★★ 配色先上（2026-09-13）—— 比启动图还早。
+           他改过的颜色住在库里，而库要等 JS 包起来才开 ——
+           不先打上去的话，**每次启动都先闪一下出厂色再跳**，
+           而启动图自己就用着 --color-bg。所以读镜像（db/colors.ts 写的）。
+           ★ 这里**不写判据**：只认「令牌名 + 6 位 HEX」这个形状，
+             脏的一律跳过；真正的洗数据在 db/colors.ts::cleanOverrides。
+           ★ 绝不抛 —— 这段跑在一切之前，抛一次就是白屏。 */
+        try {
+          var raw = localStorage.getItem('nyx.colors.overrides')
+          if (raw) {
+            var o = JSON.parse(raw)
+            for (var k in o) {
+              if (/^color-[a-z0-9-]+$/.test(k) && /^#[0-9a-fA-F]{6}$/.test(o[k])) {
+                document.documentElement.style.setProperty('--' + k, o[k])
+              }
+            }
+          }
+        } catch (e) {
+          /* 没镜像 / 存储被关 —— 走出厂色，不影响任何事 */
+        }
+        var box = document.getElementById('nyx-splash')
+        var tpl = document.getElementById('nyx-splash-src')
+        if (!box || !tpl) return
+        /* 他选了哪一张 —— 读 `settings` 那份 localStorage 镜像（db/splash.ts 写的）。
+           读不出来 = 没设过 = 走默认（出厂那张）。这里**不写判据**，
+           只认 'icon' 这一个字面；其余一律落到插画（回退链第二档）。 */
+        var want = 'shipped'
+        var myUrl = null
+        try {
+          var c = localStorage.getItem('nyx.splash.choice')
+          if (c === 'icon') {
+            want = 'icon'
+          } else if (c && c.indexOf('user:') === 0) {
+            /* ★★ 「我的图」（2026-09-13）—— 图从电脑同步过来，
+               落在 Data/splash/ 里。文件名换成 WebView 能加载的地址要调
+               Filesystem.getUri，那是**异步**的 —— 启动这一刻等不起。
+               所以他选中的时候就把地址算好抄进了镜像。 */
+            var u = localStorage.getItem('nyx.splash.url')
+            /* 只收 http(s) 与 Capacitor 换出来的那种；
+               javascript: 这类一律不认 —— 镜像虽然是自己写的，
+               但把一个字符串直接当 src 用的地方就该有白名单。 */
+            if (u && /^(https?|capacitor|file):/i.test(u)) myUrl = u
+            else want = 'shipped'
+          }
+        } catch (e) {
+          /* 隐私模式 / 存储被关 —— 按没设过走，绝不抛：启动页上抛一次就是白屏 */
+        }
+        if (myUrl) {
+          var mine = document.createElement('img')
+          mine.className = 'art'
+          mine.alt = ''
+          /* 加载不出来（文件没了 / 地址过期）→ 退回出厂那张，不留一块空白 */
+          mine.onerror = function () {
+            box.innerHTML = ''
+            var f = tpl.content.querySelector('[data-nyx="shipped"]')
+            if (f) box.appendChild(f.cloneNode(true))
+          }
+          mine.src = myUrl
+          box.appendChild(mine)
+        } else {
+          var pick = tpl.content.querySelector('[data-nyx="' + want + '"]')
+          if (pick) box.appendChild(pick.cloneNode(true))
+        }
+        /* 兜底：JS 包没起来的话，这一帧不能永远挡着 */
+        setTimeout(function () {
+          if (box.parentNode) box.parentNode.removeChild(box)
+        }, 8000)
+      })()
+    </script>
+    <div id="app"></div>
+    <script type="module" src="/src/ui/main.ts"></script>
+  </body>
+</html>

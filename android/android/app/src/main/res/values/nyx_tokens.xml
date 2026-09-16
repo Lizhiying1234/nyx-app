@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ★★★ 这个文件是**生成的，别手改**。
+
+  真相在 nyx-core/src/core/design/color-tokens.css（两端共享）+ src/ui/styles/tokens.css（本端别名）。
+  生成器 tools/tokens-to-android.mjs，`npm run build` 每次都会跑。
+
+  为什么要它：Assist 的浮层与气泡是原生 View，不在 WebView 里，
+  以前那 34 个颜色是**手抄的** —— 改了 tokens.css 不报错，
+  只会让气泡和 App 慢慢长得不一样，而两边都说得通。
+-->
+<resources>
+    <color name="nyx_bg">#F4F8F7</color>
+    <color name="nyx_paper">#FFFFFF</color>
+    <color name="nyx_surface">#E8F3F2</color>
+    <color name="nyx_chip">#C4ECE9</color>
+    <color name="nyx_soft">#DDF3F1</color>
+    <color name="nyx_soft_bd">#A8DEDA</color>
+    <color name="nyx_ink">#153B4A</color>
+    <color name="nyx_ink_2">#52717A</color>
+    <color name="nyx_mute">#5A757B</color>
+    <color name="nyx_faint">#8AA0A5</color>
+    <color name="nyx_line">#E8F3F2</color>
+    <color name="nyx_line_2">#D7E5E4</color>
+    <color name="nyx_violet">#38A8B4</color>
+    <color name="nyx_violet_2">#287986</color>
+    <color name="nyx_warn">#E87593</color>
+    <color name="nyx_assist_glow">#73E1DF</color>
+
+    <!-- 带透明度：从基色推出来，基色一改这里跟着改 -->
+    <!-- 选区高亮底 —— 35%，压在宿主 App 自己的文字上 -->
+    <color name="nyx_sel">#5938A8B4</color>
+    <!-- 气泡卡面 —— 99%，几乎不透但不是死白 -->
+    <color name="nyx_card">#FCFFFFFF</color>
+    <!-- 星旁小卡 —— 96% -->
+    <color name="nyx_star_card">#F5F4F8F7</color>
+    <!-- 原生 toast 底 —— 95% -->
+    <color name="nyx_toast">#F2F4F8F7</color>
+</resources>

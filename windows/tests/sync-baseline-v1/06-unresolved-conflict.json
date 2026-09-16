@@ -1,0 +1,47 @@
+{
+  "input": "两边都改过同一行，不裁决",
+  "observation": {
+    "case": "06-unresolved-conflict",
+    "tally": {
+      "received": 1,
+      "applied": 0,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 1
+    },
+    "watermark": {
+      "advanced": false,
+      "frozenAtBefore": true,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [],
+    "boundaryLookups": 8,
+    "problems": [
+      {
+        "kind": "row",
+        "what": "projects/projects-<rand>",
+        "head": "两边都改过这一条 —— 去「设置 → 同步」选一边，冲突之外的内容已经正常同步了"
+      }
+    ]
+  }
+}

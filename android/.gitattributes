@@ -1,0 +1,18 @@
+# 全仓文本文件一律 LF 进出（第二轮集成 · 2026-09-05；与 Windows 仓 T-1.3 同一条约定）
+#
+# 理由：Git for Windows 的系统级 core.autocrlf=true 让每个新 worktree 检出 CRLF，
+# 于是 check:tokens 在全新 worktree 上第一次必红（生成物 nyx_tokens.xml 是 LF，盘上那份是 CRLF），
+# 红了还会短路 check 链，后面的闸（check:java-sql）根本轮不到跑。T-6.2 与 T-2.1 两个会话都踩到。
+# 索引里 237 个文本文件本来就全是 LF（git ls-files --eol），这条只是把「拿到的 = 提交的」写死。
+* text=auto eol=lf
+
+# 二进制不碰
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.jar binary
+*.keystore binary
+*.jks binary
+*.db binary
+*.woff2 binary

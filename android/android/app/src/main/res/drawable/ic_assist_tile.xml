@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nyx 衍射星 · DS v5 §4.2 —— 与 Sprite.svelte 的 #nyx-star 同一份几何。
+     ★ 磁贴要求单色 drawable，所以核用 fill、四芒用 stroke，分两条 path 画。
+     ★ 芒**不与核相连**：那个间隙是这个符号的全部识别点（§4.2 规则②）。
+     ★ 2026-08-31 之前这里是另一条完全不同的 sparkle 路径（连臂的），
+       与应用内、与悬浮星三处各画各的 —— 那正是 §4.5 点名要归一的漂移。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24"
+    android:tint="?android:attr/colorControlNormal">
+  <path
+      android:fillColor="@android:color/white"
+      android:pathData="M12,6.4 Q13.2,10.8 17.6,12 Q13.2,13.2 12,17.6 Q10.8,13.2 6.4,12 Q10.8,10.8 12,6.4 Z"/>
+  <path
+      android:strokeColor="@android:color/white"
+      android:strokeWidth="1.6"
+      android:strokeLineCap="round"
+      android:pathData="M12,2 V4.8 M12,19.2 V22 M2,12 H4.8 M19.2,12 H22"/>
+</vector>

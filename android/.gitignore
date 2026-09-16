@@ -1,0 +1,13 @@
+node_modules/
+build/
+dist/
+*.log
+.DS_Store
+
+# Vite 产物（只是根目录那个；探针壳的 www/ 是另一回事）
+/www/
+
+# Capacitor 往 android 里拷的 web 产物 + 引擎产物（都由 npm run build 生成）
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/assist-engine.js

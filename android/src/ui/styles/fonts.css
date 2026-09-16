@@ -1,0 +1,86 @@
+/* ══════════════════════════════════════════════════════════════
+   @font-face · 字体 **D′**（使用者 2026-09-07 选 D；DESIGN_SYSTEM §2.4 · U-009 / U-017）
+
+   ★ 两端不同字，是他要的：「桌面一套、手机一套，不用强行统一」。
+     Windows 原样用 D（Sitka / Segoe UI Variable / Cascadia Mono / 微软雅黑，
+     全是系统自带、不分发所以没有授权问题）；手机要打包，所以换成
+     **气质对得上、能分发的开源集** —— 这一套就是 D′。
+
+   | 岗位 | Windows（D）| Android（D′，本文件）|
+   |---|---|---|
+   | 展示 | Sitka Display          | Source Serif 4  |
+   | 语言 | Sitka Text             | Source Serif 4  |
+   | 界面 | Segoe UI Variable Text | Inter           |
+   | 机器 | Cascadia Mono          | **Cascadia Mono**（微软自己开源，两端真同款）|
+   | 中文 | 微软雅黑                | 思源黑体 Noto Sans SC |
+
+   ★★ 共用的那一层一个字没动：哪一族干什么 · 机器词等宽 · 语言衬线 ·
+     中文 11.5px 下限 · CJK 排在纯拉丁兜底之后（D-342④）。换的只是字族名。
+   ★★ 禁写 font-variation-settings（D-364 真机教训：可变轴是死开关）。
+
+   ── 授权与版本（A10 要求写进交付）────────────────────────────
+     Source Serif 4   OFL-1.1   @fontsource/source-serif-4  5.3.0
+     Inter            OFL-1.1   @fontsource/inter           5.3.0
+     Cascadia Mono    OFL-1.1   @fontsource/cascadia-mono   5.3.0
+     Noto Sans SC     OFL-1.1   @fontsource/noto-sans-sc    5.3.0
+     Caveat           OFL-1.1   @fontsource/caveat          5.3.0
+   四个新族的 OFL 原包随 npm 包一起躺在 node_modules/@fontsource/<族>/LICENSE。
+
+   权重取用面（按 v5 §2.3 / §2.5 / §2.7，与换字前逐档对齐）：
+     展示之声 Source Serif 4  400 + 400i        —— 只在 ≥24px（词条 · 大标题）
+     语言之声 Source Serif 4  300/400/600 + 400i/500i —— 一切语言材料
+       ★ 展示与语言在 D′ 里是**同一族**（D 那边也是 Sitka Display / Sitka Text 同门），
+         所以下面按两个岗位的并集引一次，不重复引。
+     界面之声 Inter           400/500/700       —— 导航 · 按钮 · 行主文
+     机器之声 Cascadia Mono   300/400/600/700   —— 元数据 · 计数 · 微标签 · 大数
+     中文     Noto Sans SC    400/600           —— **全部 CJK，只此一族**
+     注记之声 Caveat          500/600           —— 白名单只剩空态（D-392），D′ 没动它
+
+   ★ 退役并已卸包（U-009 §2.4）：Instrument Serif · Literata · Schibsted Grotesk ·
+     Martian Mono · 思源宋体 Noto Serif SC。（更早退役的：Space Mono · Newsreader · Noto Sans SC 旧包。）
+
+   ── 两条实现说明（技术决定，非设计）──
+   ① **只引 latin / latin-ext 子集**，不引 cyrillic / greek / vietnamese。
+      @fontsource 的聚合文件（`400.css`）会把全部子集的 @font-face 都写进来，
+      在**打包应用**里它们会一并进 APK（不像网页那样按 unicode-range 懒加载）。
+      逐子集引入是纯粹的体积优化，不影响任何显示效果。
+   ② **等宽用了 4 个字重**（300/400/600/700），因为 §2.7 Nyx Numeric 的
+      N1/N4 是 300、N3 是 600。等宽拉丁字重很轻，代价可忽略；
+      中文那一族才是预算所在（v5 §2.2）。
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 展示 + 语言之声 · Source Serif 4（同一族，两个岗位的并集）──── */
+@import '@fontsource/source-serif-4/latin-300.css';
+@import '@fontsource/source-serif-4/latin-400.css';
+@import '@fontsource/source-serif-4/latin-600.css';
+@import '@fontsource/source-serif-4/latin-400-italic.css';
+@import '@fontsource/source-serif-4/latin-500-italic.css';
+@import '@fontsource/source-serif-4/latin-ext-400.css';
+@import '@fontsource/source-serif-4/latin-ext-400-italic.css';
+
+/* ── 界面之声 · Inter ──────────────────────────────────────── */
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-700.css';
+@import '@fontsource/inter/latin-ext-400.css';
+@import '@fontsource/inter/latin-ext-500.css';
+
+/* ── 机器之声 · Cascadia Mono（两端真同款）───────────────────── */
+@import '@fontsource/cascadia-mono/latin-300.css';
+@import '@fontsource/cascadia-mono/latin-400.css';
+@import '@fontsource/cascadia-mono/latin-600.css';
+@import '@fontsource/cascadia-mono/latin-700.css';
+@import '@fontsource/cascadia-mono/latin-ext-400.css';
+
+/* ── 注记之声 · Caveat（配给制：白名单只剩空态）───────────────── */
+@import '@fontsource/caveat/latin-500.css';
+@import '@fontsource/caveat/latin-600.css';
+
+/* ── 中文 · Noto Sans SC（★ 全部 CJK 只此一族，只两个字重）──────
+   CJK 必须整族打包（unicode-range 分块由 @fontsource 自己切）。
+   ★ 换包必做（A10）：真机复验中文小字号横画 —— 按 DS v5 §2.2b 的量法
+     看「最暗」那一列，不看眼睛。黑体的横画本来就比宋体重，
+     v5 时代留给思源宋体的那条隐患（11.5–13px 横画太细）在这一族上应当消失，
+     但**要量过才算数**。 */
+@import '@fontsource/noto-sans-sc/400.css';
+@import '@fontsource/noto-sans-sc/600.css';

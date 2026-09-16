@@ -1,0 +1,41 @@
+{
+  "input": "本地一批行的 updated_at 全在同一毫秒上",
+  "observation": {
+    "case": "11-same-millisecond",
+    "tally": {
+      "received": 0,
+      "applied": 0,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 0,
+      "applied": [],
+      "rejected": [],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [],
+    "boundaryLookups": 8,
+    "problems": []
+  }
+}

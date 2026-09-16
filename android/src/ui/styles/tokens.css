@@ -1,0 +1,177 @@
+/* ══════════════════════════════════════════════════════════════
+   Nyx Android 设计令牌 —— 颜色来自 **Nyx Global Color System** · 2026-09-07
+
+   ── 颜色的真相不在这里 ★★★ ────────────────────────────
+   `nyx-core/src/core/design/color-tokens.css`（submodule 里那一份）是两端唯一的
+   颜色真相：原语 → 语义 → 组件三层。本文件只做两件事：
+   ① @import 它；
+   ② 把 Android 这一侧沿用的旧令牌名（--bg / --violet / --ink …，mobile.css 约 200 处引用）
+      **对到语义层**。旧名是过渡期的别名：改值去 core 改，这里不再出现任何颜色 HEX。
+   新写的样式一律直接用 --color-* / --btn-* / --progress-*。
+
+   ── 原生层 ─────────────────────────────────────────────
+   `res/values/nyx_tokens.xml` 由 tools/tokens-to-android.mjs 从**两份** CSS 解析 var() 链生成，
+   Java 只认 R.color.nyx_*（check:tokens 守着）。星与气泡的颜色因此与 App 同一份。
+
+   ── 之前是什么 ─────────────────────────────────────────
+   DS v5「夜光」（2026-08-31，紫）。2026-09-07 使用者给出 Aqua / Teal / Pink 全新体系，
+   颜色这一节以 docs/ui/COLOR_SYSTEM.md 为准；DS v5 的非颜色部分（字体 · 尺度 · 形状 · 图标 · 动效）照旧。
+
+   ── 对比度备忘（算过）────────────────────────────────────
+   · --mute = text-3，DS-Q23 定案调深到 neutral-550 —— **AA 4.5 是硬线**。
+     ★ U-015：它只许坐在**白 / neutral-50 / 页面底 neutral-100 / aqua-50** 这四个面上
+       （4.92 / 4.76 / 4.60 / 4.61）。压 --surface（neutral-200）只有 4.35、
+       压 --soft（aqua-100）只有 4.25 —— 那两个面上要读的字一律退回 --ink-2（4.63 / 4.52）。
+   · --violet（#38A8B4）是**线与图形**的色，压白 2.9:1；当文字用请换 --violet-2（#287986，4.8:1）
+     —— mobile.css 里原来 25 处 `color:var(--violet)` 的文字已改成 --violet-2，图标 / 星 / 线保留
+   ══════════════════════════════════════════════════════════════ */
+@import "../../../nyx-core/src/core/design/color-tokens.css";
+
+:root{
+  /* ── Color · 面 ─────────────────────────────────────── */
+  --bg:var(--color-bg);                      /* 页面底 */
+  --paper:var(--color-surface);              /* 浮层面（Dialog / 菜单 / Sheet / 气泡）· 卡 */
+  --surface:var(--color-surface-subtle);     /* 安静区块 · 组沉底 · 从属行 */
+  --chip:var(--color-surface-selected);      /* 按下态 · 选中行底 · Chip 底 */
+  --soft:var(--color-primary-subtle);        /* ★ 控件面 —— Secondary 面 · Toggle ON 轨 · 强调块 */
+  --soft-bd:var(--color-border-strong);      /* ★ 控件描边 —— 与 --soft 成对 */
+
+  /* ── Color · 深面 ───────────────────────────────────────
+     ★★ 2026-09-14（G-2）：本端**不再起别名**。
+     原来这儿有 `--deep` / `--on-deep` / `--on-deep-2` / `--on-deep-3` / `--violet-lift`，
+     `mobile.css` 和所有 svelte 里**各被引用 0 次** —— 专注态那一屏还没做（A7），
+     于是配色页上曾经摆着三个调了什么都不会发生的格子。
+     判据不退（DS-Q20「深面只留三处」是使用者按推荐定的），退的是这层别名：
+     ★ 深面**只从 core 取**：`--color-deep` / `--color-on-deep` / `--color-on-deep-2`
+       / `--color-on-deep-3` / `--color-on-deep-accent`（都在 @import 进来的那份里）。
+     ☞ A7 做星 ON 那一面时直接引 core 的名字，别再往这里加一层。 */
+
+  /* ── Color · 墨 ─────────────────────────────────────── */
+  --ink:var(--color-text);
+  --ink-2:var(--color-text-2);
+  --mute:var(--color-text-3);
+  /* ★ U-015 补（2026-09-08）：淡字原来干着两份工作 —— 既写「不用读的装饰」
+     又写「小号但要读的信息」，而它当时对到 neutral-400，压页面底只有 **1.80**。
+     core 加了 --color-text-faint（neutral-500）之后按「要读 / 不要读」拆开：
+       要读的小字（条数 · 出处 · 坐标 · 分节标签）→ --mute（text-3，4.60）
+       不用读的（图表星期轴标 · 占位 · 禁用 · 装饰性数字）→ --faint（2.56）
+     这里也顺手把它从**原语**改成引语义层（旧写法 var(--neutral-400) 违反「业务样式只引语义层」）。*/
+  --faint:var(--color-text-faint);
+  --line:var(--color-border-subtle);         /* 发丝线（行间）*/
+  --line-2:var(--color-border);              /* 结构线 · 组顶线 */
+
+  /* ── Color · 强调 ───────────────────────────────────── */
+  --violet:var(--color-primary);             /* 线与图形 · 星 · 图标 */
+  --violet-2:var(--color-text-accent);       /* ★ 压在浅水面上的字用它 */
+  --corp:var(--color-success);               /* 「真实语料」徽章 */
+  --warn:var(--color-attention);             /* 警示 · 账本 · 破坏性文字 */
+  --warn-bg:var(--color-attention-subtle);
+  --warn-bd:var(--color-attention-border);
+  --mark:var(--color-knowledge-subtle);      /* 荧光笔 —— 只画在语言材料里的词上（知识 = pink）*/
+  --assist-glow:var(--color-assist-glow);    /* 星 ON 的柔光（原生层读 R.color.nyx_assist_glow）*/
+
+  /* ── Typography · §2.4（栈次序：显示 → 纯拉丁兜底 → CJK → 通用）*/
+  /* ★ 字体 D′（U-009 / U-017 · DESIGN_SYSTEM §2.4）—— 手机这一套要打包，
+     所以用气质对得上的开源集；桌面原样用系统自带的 D。换的只是字族名，
+     岗位规则一条没动。字重与授权见 fonts.css 文件头。
+     ★ 栈次序仍是 D-342④：显示 → 纯拉丁兜底 → CJK → 通用。
+       CJK 排前面会让拉丁标点按全角渲染 —— 页面上看不出来，只能靠量。 */
+  --display:"Source Serif 4",Georgia,"Noto Sans SC",serif;     /* 展示 · 只在 ≥24px */
+  --serif:"Source Serif 4",Georgia,"Noto Sans SC",serif;       /* 语言之声 */
+  --ui:Inter,system-ui,"Noto Sans SC",sans-serif;              /* 界面之声 */
+  --mono:"Cascadia Mono",Consolas,"Noto Sans SC",monospace;    /* 机器之声 */
+  --note:Caveat,cursive;                                       /* 注记 · 白名单=空态 */
+
+  /* ── 字号 · 岗位名（DS-Q2 定案：两端同名，值各端自己的）─────────
+     ★ 名字是两端共用的语义（DISPLAY · TITLE · WORD · SECTION · BODY-LANG ·
+       BODY-UI · EXAMPLE · NUMBER · META · MICRO · NOTE），值是 v5 §2.5 的
+       14 档实测值，**一个数都没改**。
+     ★ 为什么要统一名字：`--fs-3` 这种纯数字名说不出「它是界面正文还是说明文字」，
+       于是同一类信息在不同页面会用不同档。跨端审查需要共同语言。
+     两条硬下限不变：拉丁 9px 底 · 中文 11.5px 底。 */
+  --fs-display:40px;      /* DISPLAY  展示 */
+  --fs-title:28px;        /* TITLE    屏顶标题 */
+  --fs-word:30px;         /* WORD     词条头 */
+  --fs-section:12px;      /* SECTION  分区标签（拉丁）*/
+  --fs-section-zh:12.5px; /* SECTION·ZH */
+  --fs-body-lang:16px;    /* BODY-LANG 语言材料 */
+  --fs-body-ui:14px;      /* BODY-UI   界面正文 */
+  --fs-body-zh:14px;      /* BODY·ZH */
+  --fs-example:15px;      /* EXAMPLE   例句 */
+  --fs-number:40px;       /* NUMBER    大数 */
+  --fs-meta:10px;         /* META      元数据 */
+  --fs-micro:9px;         /* MICRO     微标签（拉丁，硬下限）*/
+  --fs-micro-zh:11.5px;   /* MICRO·ZH  微标签（中文，硬下限）*/
+  --fs-note:19px;         /* NOTE      注记 */
+
+  /* 旧名 = 别名（与颜色同一个办法：新写的样式一律用岗位名）*/
+  --fs-lang:var(--fs-body-lang);
+  --fs-ui:var(--fs-body-ui);
+  --fs-zh:var(--fs-body-zh);
+  --fs-num:var(--fs-number);
+  --lab-en:var(--fs-section);
+  --lab-zh:var(--fs-section-zh);
+
+  /* ★ MICRO·ZH 的字距 —— DS-Q3 定案 `.05em`（v5 写的是 `.10em`）。
+     不加会挤，`.10em` 在中文上开始散，取中。这一档只有一个数，
+     写成令牌是为了「改一次全屏跟着改」，而不是散在十几条规则里。 */
+  --ls-micro-zh:.05em;
+
+  --lh:1.55; --lh-lang:1.62; --lh-zh:1.75; --lh-tight:1.10;
+
+  /* 数字五档 · §2.7 */
+  --n0-family:var(--serif);
+  --n1-size:10px;   --n1-ls:.10em;
+  --n2-size:40px;   --n2-ls:-.035em;
+  --n3-size:11px;   --n3-ls:.10em;
+  --n4-size:8.5px;  --n4-ls:.24em;
+
+  /* ── Radius · §三：圆角属浮层 · 直角属纸面 · 切角属引文 ────────
+     ★ DS-Q4 / DS-Q10 定案的阶梯（两端同一组数）：
+       控件 10 · 卡 / 面板 14 · Sheet 16（只上两角）· 搜索框 18 · 纸面 0 · 进度 999。
+     v5 的 12 / 8 / 21（full pill 按钮）全部改到这一组上。 */
+  --r-ctl:10px;      /* 控件：按钮 · 图标钮 · 输入控件 */
+  --r-ctl-sm:8px;    /* 控件 · 小号（高 34 那一档）*/
+  --r-card:14px;     /* 卡 · 面板 · 浮层（菜单 / 对话框 / Snackbar / 气泡）*/
+  --r-sheet:16px;    /* Sheet —— ★ 只上两角，贴底那两角是 0 */
+  --r-search:18px;   /* 搜索框（Android 的查词框是底线式，暂无落点；见交付）*/
+  --r-paper:0;       /* 纸面印刷件：判分表格 · 稿纸 */
+  --r-pill:999px;    /* 真正的胶囊：Toggle 轨 · 圆点 · 进度 */
+  --r-deep:4px;
+  /* 旧名 = 别名 */
+  --r-btn:var(--r-ctl);
+  --r-btn-sm:var(--r-ctl-sm);
+  --r-menu:var(--r-card);
+  --r-press:6px;
+  --chamfer:11px;
+  --chamfer-inline:4px;
+
+  /* ── Spacing · §七 ─────────────────────────────────── */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+
+  /* 结构尺寸 · §七 行高两档 */
+  --row-h:56px;
+  --row-data:44px;
+  --btn-h:40px;      /* 按钮实高（热区仍 44）—— BTN-Q1 定案：手机 40 */
+  --btn-h-sm:34px;   /* 小号（行内 · 工具条）—— BUTTON_SYSTEM 一表 Android 小 */
+  --touch:44px; --indent:14px;
+
+  /* ── Motion · §八 + §17.1（本轮未动）─────────────────── */
+  --m-tap:110ms;
+  --m-press-in:90ms;
+  --m-press-out:160ms;
+  --m-std:180ms;
+  --m-overlay:0ms;
+  --m-grade:320ms;
+  --m-star-on:320ms; --m-star-off:220ms;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-inout:cubic-bezier(.65,0,.35,1);
+
+  /* ── Elevation · §九（navy 调，轻）────────────────────── */
+  --e1:0 -2px 16px rgba(5,47,83,.06);    /* Bottom Sheet / 多选栏 */
+  --e2:0 4px 24px rgba(5,47,83,.14);     /* ★ 只给 Assist 气泡 */
+  --e-menu:0 4px 20px rgba(5,47,83,.14); /* ⋮ 菜单 · Snackbar */
+
+  /* ── Iconography · §四 ── */
+  --icon:22px; --icon-sm:16px;
+}

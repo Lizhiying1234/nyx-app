@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Nyx</string>
+    <string name="title_activity_main">Nyx</string>
+    <string name="package_name">com.nyx.android</string>
+    <string name="custom_url_scheme">com.nyx.android</string>
+    <string name="assist_label">Save to Nyx</string>
+    <string name="assist_a11y_desc">Nyx Assist Selection：在不允许选中文字的 App 里，提供 Nyx 自己的文字选择层。只在你点击悬浮星时读取一次当前屏幕；不后台监听。</string>
+</resources>

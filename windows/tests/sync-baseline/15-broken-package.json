@@ -1,0 +1,52 @@
+{
+  "input": "包读不出来（坏 JSON）",
+  "observation": {
+    "case": "15-broken-package",
+    "tally": {
+      "received": 0,
+      "applied": 0,
+      "skipped": 0,
+      "failed": 0,
+      "conflicted": 0
+    },
+    "watermark": {
+      "advanced": true,
+      "frozenAtBefore": false,
+      "monotone": true
+    },
+    "packages": {
+      "seen": 1,
+      "applied": [],
+      "rejected": [
+        {
+          "chunk": "other-100.json",
+          "code": "malformed"
+        }
+      ],
+      "failedChunks": [],
+      "conflictChunks": [],
+      "legacy": 0
+    },
+    "pushed": {
+      "rows": 15,
+      "byTable": {
+        "projects": 1,
+        "units": 2,
+        "lectures": 3,
+        "items": 3,
+        "item_lectures": 3,
+        "occurrences": 3
+      }
+    },
+    "purged": 0,
+    "writeOrder": [],
+    "boundaryLookups": 8,
+    "problems": [
+      {
+        "kind": "row",
+        "what": "变更包 other-100.json",
+        "head": "这个变更包读不出来（不是合法的 JSON），没有收。"
+      }
+    ]
+  }
+}

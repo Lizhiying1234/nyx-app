@@ -1,0 +1,21 @@
+{
+  "appId": "com.nyx.android",
+  "appName": "Nyx",
+  "webDir": "www",
+  "server": {
+    "_注": "androidScheme http：Chromium 会把 https 页面里的 http fetch 静默升级成 https（打到纯 HTTP 端点必挂）。页面走 http origin 就没有混合内容一说；同步端点该 https 的照样 https。代价 = 没有 WebCrypto（sync-ports 已带纯 JS sha256 兜底）。",
+    "androidScheme": "http"
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "CapacitorSQLite": {
+      "androidIsEncryption": false
+    },
+    "CapacitorHttp": {
+      "_注": "同步引擎用全局 fetch 打 WebDAV/Supabase —— 浏览器 fetch 有 CORS，第三方网盘不会给 CORS 头（坚果云实测如此）。原生通道绕开它，这不是试验场权宜，是生产必需。",
+      "enabled": true
+    }
+  }
+}
