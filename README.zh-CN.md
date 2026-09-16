@@ -34,7 +34,7 @@ Nyx 接收一段英文 —— 一篇文章、一个段落、一句你自己存�
 
 ## 长什么样
 
-以下是 Windows 端。
+### 桌面端
 
 ![Today](docs/screenshots/windows-home.png)
 
@@ -65,6 +65,18 @@ Nyx 接收一段英文 —— 一篇文章、一个段落、一句你自己存�
 
 *设置 → AI。贴上任何一家的 key 都能接，协议由 key 自己判断。页面上明写着：
 key 只存在这台机器上，加密保存，不参与云同步。*
+
+### 手机端
+
+<img src="docs/screenshots/android-lookup.png" width="270"> <img src="docs/screenshots/android-lecture.png" width="270"> <img src="docs/screenshots/android-reading.png" width="270"> <img src="docs/screenshots/android-production.png" width="270">
+
+*从左到右。**Lookup** —— 用 AI 查《威尼斯商人》里的一整句：先说它什么意思，再分节讲它怎么搭起来的。
+底部四个 Tab 就是这个 App 的全部。**讲次页** —— Sonnet 18 的 6 条知识点，每条标着 `A`（理解层）
+或 `B`（写作层）和它的状态，每条都挂着它的原文出处；上面两个按钮分别进认读和产出。
+**认读练习** —— 挖掉表达的原句，下面给释义。**产出练习** —— 为这一条现场生成的句子重构题。
+可以要提示，但**要了就记一次认读失败** —— 软件不会假装你是自己做出来的。*
+
+以上截图全部使用演示数据，画面里的英文是公共领域作品（莎士比亚）。
 
 ---
 

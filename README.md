@@ -40,7 +40,9 @@ itself. See [Getting started](#getting-started).
 
 ## What it looks like
 
-Windows. The interface is in Chinese; the captions below say what each screen is doing.
+The interface is in Chinese; the captions say what each screen is doing.
+
+### On the desktop
 
 ![Today](docs/screenshots/windows-home.png)
 
@@ -75,6 +77,21 @@ progress, so rewriting it teaches you something instead of inflating a number.*
 
 *Settings → AI. Paste a key from any provider; the protocol is worked out from the key itself. The
 page states plainly that the key stays on this machine, encrypted, and never takes part in sync.*
+
+### On the phone
+
+<img src="docs/screenshots/android-lookup.png" width="270"> <img src="docs/screenshots/android-lecture.png" width="270"> <img src="docs/screenshots/android-reading.png" width="270"> <img src="docs/screenshots/android-production.png" width="270">
+
+*Left to right. **Lookup** — a whole line from *The Merchant of Venice* looked up by AI: what it
+means, then how it is built, section by section. The four tabs at the bottom are the entire app.
+**A Lecture** — six items from Sonnet 18, each marked `A` (comprehension) or `B` (production) with
+its state, each carrying the line it came from; the two buttons start either practice track.
+**A recognition drill** — the line with the expression removed and its meaning underneath.
+**A production drill** — sentence reconstruction, generated for this item on the spot. A hint is
+available, and taking it is recorded as a failed recognition; the app does not pretend you did it
+unaided.*
+
+All screenshots use demonstration data. The English in them is public domain — Shakespeare.
 
 ---
 
