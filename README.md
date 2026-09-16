@@ -7,6 +7,26 @@ A personal language-learning system, built for one user, running on two ends tha
 - **`android/`** — Phone companion (Capacitor, Svelte 5, a native accessibility service).
   Look up and capture words from inside any other app, analyse a single item, run exercises.
 
+## Download — v0.1.0
+
+### ⬇ [Windows — portable .zip, 146 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-windows-v0.1.0-portable.zip)
+### ⬇ [Android — .apk, 72 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-android-v0.1.0-debug.apk)
+
+[All releases](https://github.com/Lizhiying1234/nyx-app/releases)　·　[Full release notes](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
+
+Both builds need two things you have to supply yourself: **MDX/MDD dictionary files** and an
+**OpenAI-compatible API key**. Without them the app starts and the interface works, but lookup and
+analysis do not.
+
+Two things to know before you install:
+
+- **Windows** is portable — unzip and run `Nyx.exe`, nothing is installed. Do **not** unzip into
+  `C:\Program Files` (not writable by default; the app will fail to start). Windows will show a
+  SmartScreen warning because this build is not code-signed.
+- **Android** is debug-signed and sideloaded. Upgrading to a later build means **uninstalling first**,
+  and **uninstalling an Android app deletes its local data** — for Nyx that is your learning database.
+  Back it up before you uninstall anything.
+
 ## This is a snapshot
 
 This repository is **the current code as a single commit**. It carries no development history,
@@ -74,6 +94,24 @@ please do not reuse it without permission.
   理解材料、析出知识点、出题、练习、记录。
 - **`android/`** —— 手机端（Capacitor + Svelte 5 + 原生无障碍服务）。
   在任何别的 App 里取词查词、单条解析、执行练习。
+
+## 下载 — v0.1.0
+
+### ⬇ [Windows —— 绿色便携 .zip，146 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-windows-v0.1.0-portable.zip)
+### ⬇ [Android —— .apk，72 MB](https://github.com/Lizhiying1234/nyx-app/releases/download/v0.1.0/Nyx-android-v0.1.0-debug.apk)
+
+[全部版本](https://github.com/Lizhiying1234/nyx-app/releases)　·　[完整发布说明](https://github.com/Lizhiying1234/nyx-app/releases/tag/v0.1.0)
+
+两个包都需要你自己准备两样东西：**MDX/MDD 词典文件** 和 **OpenAI 兼容的 API key**。
+这两样没有，软件能启动、界面能用，但查词和解析不能用。
+
+装之前要知道两件事：
+
+- **Windows** 是绿色便携的 —— 解压出来双击 `Nyx.exe` 就用，不安装。**别**解压到
+  `C:\Program Files`（默认不可写，软件会打不开）。因为这个构建没有代码签名，Windows 会弹 SmartScreen 警告。
+- **Android** 是调试签名、侧载安装的。将来升级到新版本**必须先卸载**，而
+  **Android 卸载 App 会连同它的本地数据一起删掉** —— 对 Nyx 来说就是你手机上那份学习数据库。
+  卸载任何东西之前先备份。
 
 ## 这是一份快照
 
