@@ -68,7 +68,13 @@ key 只存在这台机器上，加密保存，不参与云同步。*
 
 ### 手机端
 
-<img src="docs/screenshots/android-lookup.png" width="270"> <img src="docs/screenshots/android-lecture.png" width="270"> <img src="docs/screenshots/android-reading.png" width="270"> <img src="docs/screenshots/android-production.png" width="270">
+<img src="docs/screenshots/android-assist.png" width="330">
+
+***Assist** —— 手机端存在的理由。画面里这个是**别人的 App**：一个开在 Reddit 里的帖子。
+在里面任意选中一个词，Nyx 就地给出答案 —— 先给释义，第二个页签是词典条目，**Save** 收进词库。
+`不在 Atlas` 是说这个词还没进你的库。全程不用离开你正在读的那个 App。*
+
+<img src="docs/screenshots/android-lookup.png" width="250"> <img src="docs/screenshots/android-lecture.png" width="250"> <img src="docs/screenshots/android-reading.png" width="250"> <img src="docs/screenshots/android-production.png" width="250">
 
 *从左到右。**Lookup** —— 用 AI 查《威尼斯商人》里的一整句：先说它什么意思，再分节讲它怎么搭起来的。
 底部四个 Tab 就是这个 App 的全部。**讲次页** —— Sonnet 18 的 6 条知识点，每条标着 `A`（理解层）
@@ -76,7 +82,8 @@ key 只存在这台机器上，加密保存，不参与云同步。*
 **认读练习** —— 挖掉表达的原句，下面给释义。**产出练习** —— 为这一条现场生成的句子重构题。
 可以要提示，但**要了就记一次认读失败** —— 软件不会假装你是自己做出来的。*
 
-以上截图全部使用演示数据，画面里的英文是公共领域作品（莎士比亚）。
+以上截图全部使用演示数据。Nyx 内部画面里的英文是公共领域作品（莎士比亚）；
+Assist 那张里的是 Reddit 上一个由管理机器人发的公开帖子。
 
 ---
 

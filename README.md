@@ -80,7 +80,14 @@ page states plainly that the key stays on this machine, encrypted, and never tak
 
 ### On the phone
 
-<img src="docs/screenshots/android-lookup.png" width="270"> <img src="docs/screenshots/android-lecture.png" width="270"> <img src="docs/screenshots/android-reading.png" width="270"> <img src="docs/screenshots/android-production.png" width="270">
+<img src="docs/screenshots/android-assist.png" width="330">
+
+***Assist** — the reason the phone app exists. This is someone else's application: a Reddit thread,
+open in Reddit. Select a word anywhere in it and Nyx answers in place — meaning first, a dictionary
+entry behind the second tab, and **Save** to put it into your library. `不在 Atlas` means this word
+is not in your library yet. You never leave the app you were reading.*
+
+<img src="docs/screenshots/android-lookup.png" width="250"> <img src="docs/screenshots/android-lecture.png" width="250"> <img src="docs/screenshots/android-reading.png" width="250"> <img src="docs/screenshots/android-production.png" width="250">
 
 *Left to right. **Lookup** — a whole line from *The Merchant of Venice* looked up by AI: what it
 means, then how it is built, section by section. The four tabs at the bottom are the entire app.
@@ -91,7 +98,8 @@ its state, each carrying the line it came from; the two buttons start either pra
 available, and taking it is recorded as a failed recognition; the app does not pretend you did it
 unaided.*
 
-All screenshots use demonstration data. The English in them is public domain — Shakespeare.
+All screenshots use demonstration data. The English inside Nyx is public domain — Shakespeare. The
+Assist screenshot shows a public Reddit thread posted by a moderation bot.
 
 ---
 
